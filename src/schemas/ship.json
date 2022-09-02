@@ -1,0 +1,629 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "$id": "https://www.abstractplay.com/schemas/fullthrust/ship/1-0-0.json#",
+    "title": "Full Thrust Ship",
+    "description": "Representation of a valid Full Thrust ship",
+    "definitions": {
+        "arcs": {
+            "type": "array",
+            "items": {
+                "enum": ["F", "FS", "FP", "A", "AS", "AP", "all", "broad"]
+            },
+            "minItems": 1
+        }
+    },
+    "type": "object",
+    "properties": {
+        "points": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "mass": {
+            "type": "integer",
+            "minimum": 5
+        },
+        "hull": {
+            "type": "object",
+            "properties": {
+                "points": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "rows": {
+                    "enum": [3, 4, 5, 6],
+                    "default": 4
+                }
+            },
+            "required": ["points", "rows"],
+            "additionalProperties": false
+        },
+        "armour": {
+            "description": "Rows of armour. First element being the innermost layer. No layer can be larger than the first row of hull boxes.",
+            "type": "array",
+            "items": {
+                "type": "integer",
+                "minimum": 0
+            }
+        },
+        "systems": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "anyOf": [
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["drive"]
+                            },
+                            "advanced": {
+                                "type": "boolean",
+                                "default": false
+                            },
+                            "thrust": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        },
+                        "required": ["name", "thrust"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["ftl"]
+                            },
+                            "advanced": {
+                                "type": "boolean",
+                                "default": false
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["fireControl"]
+                            },
+                            "advanced": {
+                                "type": "boolean",
+                                "default": false
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["adfc"]
+                            },
+                            "advanced": {
+                                "type": "boolean",
+                                "default": false
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["hangar"]
+                            },
+                            "icon": {
+                                "description": "This decides what SSD icon to use. If not provided, the standard hangar icon is selected.",
+                                "enum": ["I", "circle", "triangle", "bold", "DD", "MR", "chevron", "hex", "missle", "ship", "L", "A", "T", "H", "F", "P", "rack"]
+                            },
+                            "id": {
+                                "description": "A unique identifier used to target this hangar in orders and in the `fighters` property."
+                            }
+                        },
+                        "required": ["name", "id"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["launchTube"]
+                            },
+                            "catapult": {
+                                "type": "boolean",
+                                "default": false
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["screen"]
+                            },
+                            "advanced": {
+                                "type": "boolean",
+                                "default": false
+                            },
+                            "area": {
+                                "type": "boolean",
+                                "default": false
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["suicide"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["mineSweeper"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["mineLayer"]
+                            },
+                            "capacity": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "default": 2
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["magazine"]
+                            },
+                            "id": {
+                                "description": "A unique identifier used to tie this magazine to one or more launchers."
+                            },
+                            "modifier": {
+                                "enum": ["er", "twostage"]
+                            },
+                            "capacity": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        },
+                        "required": ["name"]
+                    }
+                ]
+            }
+        },
+        "ordnance": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "oneOf": [
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["antiMatterMissile"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["missile"]
+                            },
+                            "modifier": {
+                                "enum": ["er", "twostage"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["salvo"]
+                            },
+                            "modifier": {
+                                "enum": ["er", "twostage"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["salvoLauncher"]
+                            },
+                            "modifier": {
+                                "enum": ["er", "twostage"]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            },
+                            "magazine": {
+                                "description": "The unique ID of a missile magazine",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["name", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["rocketPod"]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name"]
+                    }
+                ]
+            }
+        },
+        "weapons": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "oneOf": [
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["pds"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["ads"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["scatterGun"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["grapeshot"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["beam"]
+                            },
+                            "class": {
+                                "enum": [1, 2, 3, 4]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "class", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["emp"]
+                            },
+                            "class": {
+                                "enum": [1, 2, 3, 4]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "class", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["plasmaCannon"]
+                            },
+                            "class": {
+                                "enum": [1, 2, 3, 4]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "class", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["graser"]
+                            },
+                            "heavy": {
+                                "type": "boolean",
+                                "default": false
+                            },
+                            "class": {
+                                "enum": [1, 2, 3, 4]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "class", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["phaser"]
+                            },
+                            "class": {
+                                "enum": [1, 2, 3, 4]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "class", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["transporter"]
+                            },
+                            "class": {
+                                "enum": [1, 2, 3, 4]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "class", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["gatling"]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["particle"]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["meson"]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["needle"]
+                            },
+                            "class": {
+                                "enum": [1, 2, 3, 4]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "class", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["torpedoPulse"]
+                            },
+                            "range": {
+                                "enum": ["standard", "short", "long"],
+                                "default": "standard"
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["submunition"]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["kgun"]
+                            },
+                            "class": {
+                                "enum": [1, 2, 3, 4, 5, 6]
+                            },
+                            "range": {
+                                "enum": ["standard", "short", "long"],
+                                "default": "standard"
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "class", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["fusion"]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["gravitic"]
+                            },
+                            "class": {
+                                "enum": [1, 2, 3]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "class", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["plasmaBolt"]
+                            },
+                            "class": {
+                                "enum": [1, 2, 3, 4, 5, 6]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "class", "arcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["spinalBeam"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["spinalPlasma"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["spinalSingularity"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["kineticPenetrator"]
+                            },
+                            "arcs": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "arcs"]
+                    }
+                ]
+            }
+        },
+        "extras": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "oneOf": [
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["bay"]
+                            },
+                            "type": {
+                                "enum": ["cargo", "passenger", "troop"]
+                            },
+                            "id": {
+                                "description": "A unique identifier used to target this specific bay in orders.",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["name", "type", "id"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["damageControl"]
+                            },
+                            "quantity": {
+                                "type": "integer",
+                                "minimum": 1
+                            }
+                        },
+                        "required": ["name", "quantity"]
+                    }
+                ]
+            }
+        },
+        "fighters": {
+            "description": "There cannot be more fighters than hangars. The type of fighter doesn't have to match the type of hangar, but it should to avoid confusion. The hangar type simply determines the icon on the SSD. The fighter type here determines what fighters you actually have available in game.",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "description": "The fighters' base type",
+                        "enum": ["standard", "interceptor", "attack", "torpedo", "graser", "plasma", "MKP", "missile", "light"],
+                        "default": "standard"
+                    },
+                    "mods": {
+                        "type": "array",
+                        "items": {
+                            "enum": ["heavy", "fast", "longRange", "ftl", "robot"]
+                        }
+                    },
+                    "hangar": {
+                        "description": "Must match a hangar id. Omitted if the fighters are deployed.",
+                        "type": "string"
+                    }
+                },
+                "required": ["type"]
+            }
+        },
+        "class": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "notes": {
+            "description": "Markdown-encoded flavour text attached to this particular ship.",
+            "type": "string"
+        }
+    }
+}
