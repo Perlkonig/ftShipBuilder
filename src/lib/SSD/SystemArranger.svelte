@@ -32,6 +32,7 @@
     let cellsize = 0;
     const systems: ISystem[] = [];
     const sysDistinct: ISystemSVG[] = [];
+    const lines: IPoint[][] = [];
     $: if (layout !== undefined) {
         block = layout.blockSystems();
         blocksWide = Math.floor(block.width / layout.cellsize);
@@ -48,43 +49,95 @@
         }
         // Get full list of all system instances, adding coordinates and IDs as necessary.
         // Also add distinct glyphs to the `sysDistinct` array.
-        for (const sys of $ship.systems) {
-            if ( (sys.name === "drive") || (sys.name === "ftl") ) {
-                continue;
+        for (const set of ["systems", "ordnance"]) {
+            const ignore = ["drive", "ftl"];
+            const sysSet = $ship[set] as ISystem[];
+            for (const sys of sysSet) {
+                if (ignore.includes(sys.name)) {
+                    continue;
+                }
+                if ( (! sys.hasOwnProperty("id")) || (sys.id === undefined) ) {
+                    sys.id = nanoid(5);
+                }
+                if ( (! sys.hasOwnProperty("x")) || (sys.x === undefined) ) {
+                    sys.x = 1;
+                } else if (sys.x >= blocksWide) {
+                    sys.x = blocksWide - 1;
+                }
+                if ( (! sys.hasOwnProperty("y")) || (sys.y === undefined) ) {
+                    sys.y = 1;
+                } else if (sys.y >= blocksHigh) {
+                    sys.y = blocksHigh - 1;
+                }
+                const svg = getSVG(sys);
+                if (svg !== undefined) {
+                    sys.glyph = svg;
+                    const idx = sysDistinct.findIndex(x => x.id === svg.id);
+                    if (idx === -1) {
+                        sysDistinct.push(svg);
+                    }
+                }
+                systems.push(sys as ISystem);
             }
-            if ( (! sys.hasOwnProperty("id")) || (sys.id === undefined) ) {
-                sys.id = nanoid(5);
-            }
-            if ( (! sys.hasOwnProperty("x")) || (sys.x === undefined) ) {
-                sys.x = 1;
-            } else if (sys.x >= blocksWide) {
-                sys.x = blocksWide - 1;
-            }
-            if ( (! sys.hasOwnProperty("y")) || (sys.y === undefined) ) {
-                sys.y = 1;
-            } else if (sys.y >= blocksHigh) {
-                sys.y = blocksHigh - 1;
-            }
-            const svg = getSVG(sys);
-            if (svg !== undefined) {
-                sys.glyph = svg;
-                const idx = sysDistinct.findIndex(x => x.id === svg.id);
-                if (idx === -1) {
-                    sysDistinct.push(svg);
+        }
+
+        // Find launcher/magazine combos and draw lines between them
+        for (const sys of systems){
+            if (sys.name === "salvoLauncher") {
+                if ( (sys.hasOwnProperty("magazine")) && (sys.magazine !== undefined) ) {
+                    const mag = systems.find(x => x.id === sys.magazine);
+                    if (mag !== undefined) {
+                        const xLaunch = sys.x * layout.cellsize;
+                        const yLaunch = sys.y * layout.cellsize;
+                        const wLaunch = sys.glyph.width * layout.cellsize;
+                        const hLaunch = sys.glyph.height * layout.cellsize;
+                        const x1 = xLaunch + (wLaunch / 2);
+                        const y1 = yLaunch + (hLaunch / 2);
+
+                        const xMag = mag.x * layout.cellsize;
+                        const yMag = mag.y * layout.cellsize;
+                        const wMag = mag.glyph.width * layout.cellsize;
+                        const hMag = mag.glyph.height * layout.cellsize;
+                        const x2 = xMag + (wMag / 2);
+                        const y2 = yMag + (hMag / 2);
+
+                        lines.push([{x: x1, y: y1}, {x: x2, y: y2}]);
+                    }
                 }
             }
-            systems.push(sys as ISystem);
         }
+
         exportLayout();
     }
 
     let svgDisplay: SVGSVGElement;
-    let dragSelected: SVGUseElement;
+    let dragSelected: SVGUseElement; // | SVGGElement;
     let offset: IPoint;
+    // let transform: SVGTransform;
     let maxx: number;
     let maxy: number;
 
-    const startDrag = (e: MouseEvent) => {
+    // See view-source:https://raw.githubusercontent.com/petercollingridge/code-for-blog/master/svg-interaction/draggable/draggable_groups.svg
+    // const initDrag = (e: MouseEvent | TouchEvent) => {
+    //     offset = getMousePosition(e);
+
+    //     // Make sure the first transform on the element is a translate transform
+    //     const transforms = dragSelected.transform.baseVal;
+
+    //     if ( (transforms.length === 0) || (transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) ) {
+    //         // Create an transform that translates by (0, 0)
+    //         const translate = svgDisplay.createSVGTransform();
+    //         translate.setTranslate(0, 0);
+    //         dragSelected.transform.baseVal.insertItemBefore(translate, 0);
+    //     }
+
+    //     // Get initial translation
+    //     transform = transforms.getItem(0);
+    //     offset.x -= transform.matrix.e;
+    //     offset.y -= transform.matrix.f;
+    // }
+
+    const startDrag = (e: MouseEvent | TouchEvent) => {
         if ((e.target as SVGUseElement).classList.contains("draggable")) {
             dragSelected = e.target as SVGUseElement;
             offset = getMousePosition(e);
@@ -98,7 +151,7 @@
         }
     }
 
-    const drag = (e: MouseEvent) => {
+    const drag = (e: MouseEvent | TouchEvent) => {
         if (dragSelected !== undefined) {
             e.preventDefault();
             const coord = getMousePosition(e);
@@ -115,7 +168,7 @@
         }
     }
 
-    const endDrag = (e: MouseEvent) => {
+    const endDrag = (e: MouseEvent | TouchEvent) => {
         if (dragSelected !== undefined) {
             const draggedId = dragSelected.getAttribute("id");
             let sys: ISystem;
@@ -128,8 +181,8 @@
             if (sys !== undefined) {
                 const width = Math.floor(block.width / layout.cellsize);
                 const height = Math.floor(block.height / layout.cellsize);
-                let newx = Math.floor(parseFloat(dragSelected.getAttribute("x")) / layout.cellsize);
-                let newy = Math.floor(parseFloat(dragSelected.getAttribute("y")) / layout.cellsize);
+                let newx = Math.round(parseFloat(dragSelected.getAttribute("x")) / layout.cellsize);
+                let newy = Math.round(parseFloat(dragSelected.getAttribute("y")) / layout.cellsize);
                 if (newx < 0) { newx = 0; }
                 if (newx >= width) { newx = width - 1; }
                 if (newy < 0) { newy = 0;}
@@ -144,11 +197,17 @@
         }
     }
 
-    const getMousePosition = (e: MouseEvent): IPoint => {
+    const getMousePosition = (e: MouseEvent | TouchEvent): IPoint => {
         var CTM = svgDisplay.getScreenCTM();
+        let realE: MouseEvent | Touch;
+        if (e.hasOwnProperty("touches")) {
+            realE = (e as TouchEvent).touches[0];
+        } else {
+            realE = e as MouseEvent;
+        }
         return {
-            x: (e.clientX - CTM.e) / CTM.a,
-            y: (e.clientY - CTM.f) / CTM.d
+            x: (realE.clientX - CTM.e) / CTM.a,
+            y: (realE.clientY - CTM.f) / CTM.d
         };
     }
 
@@ -159,8 +218,14 @@
             s += distinct.svg;
         }
         s += `</defs>`;
+        for (const line of lines) {
+            s += `<line x1="${line[0].x}" y1="${line[0].y}" x2="${line[1].x}" y2="${line[1].y}" stroke="black" stroke-width="5" />`;
+        }
         for (const sys of systems) {
             s += `<use id="${sys.id}" href="#svg_${sys.glyph.id}" x="${sys.x * layout.cellsize}" y="${sys.y * layout.cellsize}" width="${sys.glyph.width * layout.cellsize}" height="${sys.glyph.height * layout.cellsize}" />`;
+            if (sys.name === "bay") {
+                s += `<text x="${(sys.x * layout.cellsize) + ((sys.glyph.width * layout.cellsize) / 2)}" y="${(sys.y * layout.cellsize) + ((sys.glyph.height * layout.cellsize) * 0.75)}" dominant-baseline="middle" text-anchor="middle" font-size="${(sys.glyph.height * layout.cellsize) * 0.25}">${sys.capacity}</text>`;
+            }
         }
         s += `</symbol>`;
         $ssdComponents.systems = s;
@@ -169,7 +234,7 @@
 
 {#if layout !== undefined}
 <div class="ssd">
-    <svg viewBox="-1 -1 {block.width + 2} {block.height + 2}" width="100%" height="100%" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:mouseleave="{endDrag}" bind:this="{svgDisplay}">
+    <svg viewBox="-1 -1 {block.width + 2} {block.height + 2}" width="100%" height="100%" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:mouseleave="{endDrag}" on:touchstart="{startDrag}" on:touchmove="{drag}" on:touchend="{endDrag}" on:touchleave="{endDrag}" on:touchcancel="{endDrag}" bind:this="{svgDisplay}">
         <defs>
         {#each sysDistinct as g}
             {@html g.svg}
@@ -184,8 +249,16 @@
         <line x1="0" y1="{y}" x2="{block.width}" y2="{y}" stroke="#c0c0c0"/>
     {/each}
         </g>
+
+    {#each lines as line}
+        <line x1="{line[0].x}" y1="{line[0].y}" x2="{line[1].x}" y2="{line[1].y}" stroke="black" stroke-width="5" />
+    {/each}
+
     {#each systems as sys}
         <use id="{sys.id}" href="#svg_{sys.glyph.id}" x="{sys.x * layout.cellsize}" y="{sys.y * layout.cellsize}" width="{sys.glyph.width * layout.cellsize}" height="{sys.glyph.height * layout.cellsize}" class="draggable confined" />
+        {#if sys.name === "bay"}
+            <text x="{(sys.x * layout.cellsize) + ((sys.glyph.width * layout.cellsize) / 2)}" y="{(sys.y * layout.cellsize) + ((sys.glyph.height * layout.cellsize) * 0.75)}" dominant-baseline="middle" text-anchor="middle" font-size="{(sys.glyph.height * layout.cellsize) * 0.25}">{sys.capacity}</text>
+        {/if}
     {/each}
     </svg>
 </div>

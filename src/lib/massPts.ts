@@ -5,6 +5,13 @@ export interface IMassPts {
     points: number;
 };
 
+interface IHull {
+    points: number;
+    rows: 3|4|5|6;
+    stealth: "0"|"1"|"2";
+    streamlining: "none"|"partial"|"full";
+};
+
 export const calcAllMassPts = (ship: FullThrustShip) => {
     let mass = 0;
     let points = 0;
@@ -18,6 +25,14 @@ export const calcAllMassPts = (ship: FullThrustShip) => {
     results = calcHullMassPts(ship.hull);
     mass += results.mass;
     points += results.points;
+
+    results = calcStealthHull(ship.hull, ship.armour);
+    mass += results.mass;
+    points += results.points
+
+    results = calcStreamlining(ship.hull, ship.mass);
+    mass += results.mass;
+    points += results.points
 
     // Armour
     results = calcArmourMassPts(ship.armour);
@@ -37,16 +52,22 @@ export const calcAllMassPts = (ship: FullThrustShip) => {
 
     // Weapons
     // Ordnance
+    for (const sys of ship.ordnance) {
+        results = calcSysMassPts(sys, ship.mass);
+        if (results !== undefined) {
+            mass += results.mass;
+            points += results.points;
+        } else {
+            throw new Error(`Unrecognized system encountered: ${JSON.stringify(sys)}`);
+        }
+    }
+
     // Extras
     // Fighters
 
     return {mass, points};
 };
 
-interface IHull {
-    points: number;
-    rows: 3|4|5|6;
-};
 export const calcHullMassPts = (hull: IHull): IMassPts => {
     const results = {mass: 0, points: 0};
     results.mass = hull.points;
@@ -61,6 +82,27 @@ export const calcHullMassPts = (hull: IHull): IMassPts => {
     }
     return results;
 };
+
+export const calcStealthHull = (hull: IHull, armour: number[]): IMassPts => {
+    const armourBoxes = armour.reduce((acc, curr) => {return acc + curr}, 0);
+    const allBoxes = armourBoxes + hull.points;
+    if (hull.stealth === "1") {
+        return {mass: 0, points: allBoxes * 2}
+    } else if (hull.stealth === "2") {
+        return {mass: 0, points: allBoxes * 4}
+    }
+    return {mass: 0, points: 0};
+}
+
+export const calcStreamlining = (hull: IHull, mass: number): IMassPts => {
+    if (hull.streamlining === "full") {
+        return {mass: Math.round(mass * 0.1), points: 0};
+    } else if (hull.streamlining === "partial") {
+        return {mass: Math.round(mass * 0.05), points: 0};
+    } else {
+        return {mass: 0, points: 0};
+    }
+}
 
 export const calcArmourMassPts = (armour: number[]): IMassPts => {
     const results = {mass: 0, points: 0};
@@ -138,6 +180,66 @@ export const calcSysMassPts = (sys: ISystem, shipMass: number): IMassPts | undef
         let points = mass * 2;
         if ( (sys.hasOwnProperty("advanced")) && (sys.advanced) ) {
             points = mass * 3;
+        }
+        return {mass, points};
+    } else if (sys.name === "bay") {
+        let mass: number;
+        if (sys.hasOwnProperty("capacity")) {
+            mass = sys.capacity as number;
+        }
+        return {mass, points: 0};
+    } else if ( (sys.name === "marines") || (sys.name === "damageControl") ) {
+        return {mass: 0, points: 5};
+    } else if (sys.name === "amt") {
+        return {mass: 2, points: 10};
+    } else if (sys.name === "missile") {
+        if (sys.hasOwnProperty("modifier")) {
+            if (sys.modifier === "er") {
+                return {mass: 3, points: 9};
+            } else if (sys.modifier === "twostage") {
+                return {mass: 4, points: 12};
+            }
+        } else {
+            return {mass: 2, points: 6};
+        }
+    } else if (sys.name === "salvo") {
+        if (sys.hasOwnProperty("modifier")) {
+            if (sys.modifier === "er") {
+                return {mass: 5, points: 15};
+            } else if (sys.modifier === "twostage") {
+                return {mass: 6, points: 18};
+            }
+        } else {
+            return {mass: 4, points: 12};
+        }
+    } else if (sys.name === "salvoLauncher") {
+        return {mass: 3, points: 9};
+    } else if (sys.name === "rocketPod") {
+        return {mass: 1, points: 3};
+    } else if (sys.name === "magazine") {
+        if ( (sys.hasOwnProperty("modifier")) && (sys.hasOwnProperty("capacity")) ) {
+            if (sys.modifier === "er") {
+                return {mass: 3 * (sys.capacity as number), points: 9 * (sys.capacity as number)};
+            } else if (sys.modifier === "twostage") {
+                return {mass: 4 * (sys.capacity as number), points: 12 * (sys.capacity as number)};
+            }
+        } else {
+            return {mass: 2 * (sys.capacity as number), points: 6 * (sys.capacity as number)};
+        }
+    } else if (sys.name === "mkp") {
+        return {mass: 1, points: 4}
+    } else if (sys.name === "stealthField") {
+        const mass = Math.round(shipMass * 0.05);
+        return {mass, points: mass * 6};
+    } else if (sys.name === "holofield") {
+        const mass = Math.round(shipMass * 0.1);
+        return {mass, points: mass * 5};
+    } else if (sys.name === "ecm") {
+        let mass = 1;
+        let points = 3;
+        if ( (sys.hasOwnProperty("area")) && (sys.area) ) {
+            mass *= 2;
+            points *= 2;
         }
         return {mass, points};
     }

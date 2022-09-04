@@ -7,6 +7,13 @@
     import Aa from './SysDisplay/AA.svelte';
     import Capacity from './SysDisplay/Capacity.svelte';
     import MassPts from './SysDisplay/MassPts.svelte';
+    import Type from "./SysDisplay/Type.svelte";
+    import Id from "./SysDisplay/Id.svelte";
+    import Modifier from "./SysDisplay/Modifier.svelte";
+    import ArcSingle from "./SysDisplay/ArcSingle.svelte";
+    import Arcs from "./SysDisplay/Arcs.svelte";
+    import Magazine from "./SysDisplay/Magazine.svelte";
+    import Area from "./SysDisplay/Area.svelte";
 
     interface ISystem {
         name: string;
@@ -47,6 +54,11 @@
             prop={prop}
             idx={idx}
         />
+    {:else if sys.name === "ecm"}
+        <Area
+            prop={prop}
+            idx={idx}
+        />
     {:else if sys.name === "screen"}
         <Aa
             prop={prop}
@@ -57,7 +69,67 @@
             prop={prop}
             idx={idx}
             min={2}
-            max={9}
+        />
+    {:else if sys.name === "bay"}
+        <Type
+            prop={prop}
+            idx={idx}
+            choices={[["passenger","Passenger Berth"],["troop","Troop Berth"],["cargo","Cargo Hold"]]}
+        />
+        <Capacity
+            prop={prop}
+            idx={idx}
+            min={1}
+        />
+        <Id
+            prop={prop}
+            idx={idx}
+        />
+    {:else if sys.name === "magazine"}
+        <Modifier
+            prop={prop}
+            idx={idx}
+            choices={[["er", "Long Range"], ["twostage", "Multistage"]]}
+        />
+        <Capacity
+            prop={prop}
+            idx={idx}
+            min={2}
+        />
+        <Id
+            prop={prop}
+            idx={idx}
+        />
+    {:else if ( (sys.name === "missile") || (sys.name === "salvo") ) }
+        <Modifier
+            prop={prop}
+            idx={idx}
+            choices={[["er", "Long Range"], ["twostage", "Multistage"]]}
+        />
+    {:else if sys.name === "mkp"}
+        <ArcSingle
+            prop={prop}
+            idx={idx}
+        />
+    {:else if sys.name === "rocketPod"}
+        <Arcs
+            prop={prop}
+            idx={idx}
+            minArcs={3}
+            maxArcs={3}
+            arcBlacklist={["FS", "AS", "A"]}
+        />
+    {:else if sys.name === "salvoLauncher"}
+        <Arcs
+            prop={prop}
+            idx={idx}
+            minArcs={3}
+            maxArcs={3}
+            arcBlacklist={["FS", "AS", "A"]}
+        />
+        <Magazine
+            prop={prop}
+            idx={idx}
         />
     {/if}
     <MassPts

@@ -16,7 +16,6 @@
     const bFtl = layout.blockFtl();
     const bCore = layout.blockCore();
     const svgCore = svgLib.find(x => x.id === "coreSys")!;
-    const svgDrive = svgLib.find(x => x.id === "drive")!;
     const hasFtl: boolean = $ship.systems.find(x => x.name === "ftl") !== undefined;
     let hasFtlAdv = false;
     let svgFtl = svgLib.find(x => x.id === "ftl")!;
@@ -26,6 +25,13 @@
             hasFtlAdv = true;
             svgFtl = svgLib.find(x => x.id === "ftlAdv")!;
         }
+    }
+    let svgDrive = svgLib.find(x => x.id === "drive")!;
+    let hasAdvDrive = false;
+    const sysDrive = $ship.systems.find(x => x.name === "drive")!;
+    if ( (sysDrive.hasOwnProperty("advanced")) && (sysDrive.advanced) ) {
+        hasAdvDrive = true;
+        svgDrive = svgLib.find(x => x.id === "driveAdv")!;
     }
     let nameElement: SVGTextElement;
     let thrustElement: SVGTextElement;
@@ -50,7 +56,6 @@
 
     const genHull = () => {
         const cf = Math.ceil($ship.mass / 20);
-        // Add purchased DCPs when implemented
         const interval = Math.ceil($ship.hull.points / cf);
         const boxes: number[] = [];
         for (let i = 0; i < $ship.hull.points; i++) {
@@ -77,8 +82,12 @@
         const svgHull = svgLib.find(x => x.id === "hull")!;
         const svgHullCrew = svgLib.find(x => x.id === "hullCrew")!;
         const svgArmour = svgLib.find(x => x.id === "armour")!;
+        const svgStealth = svgLib.find(x => x.id === "stealthHull");
         let s = `<symbol id="_ssdHull" viewBox="-1 -1 ${bHull.width + 2} ${bHull.height + 2}">`;
         s += `<defs>`;
+        if ($ship.hull.stealth !== "0") {
+            s += svgStealth.svg;
+        }
         s += svgHull.svg;
         s += svgHullCrew.svg;
         if ( ($ship.hasOwnProperty("armour")) && ($ship.armour.length > 0) ) {
@@ -102,6 +111,15 @@
                     height = svgHullCrew.height * layout.cellsize
                 }
                 s += `<use href="#svg_${id}" x="${x}" y="${y}" width="${width}" height="${height}" />`;
+
+            }
+            if (
+                    ( ($ship.hull.stealth === "2") &&
+                        ( (hullRows.length - (row + 1) === 2) ||
+                        (hullRows.length - (row + 1) === 0) ) ) ||
+                    ( ($ship.hull.stealth === "1") &&
+                        ( (hullRows.length - (row + 1) === 1)) ) ) {
+                    s += `<use href="#svg_stealthHull" x="${boxes.length * layout.cellsize}" y="${y}" width="${svgStealth.width * layout.cellsize}" height="${svgStealth.height * layout.cellsize}" />`;
             }
         }
 
@@ -173,8 +191,13 @@
 {:else if hasFtl}
     <use href="#svg_ftl" x="{bFtl.minx}" y="{bFtl.miny}" width="{bFtl.width}" height="{bFtl.height}" />
 {/if}
+{#if hasAdvDrive}
+    <use href="#svg_driveAdv" x="{bDrive.minx}" y="{bDrive.miny}" width="{bDrive.width}" height="{bDrive.height}" />
+    <text x="{bDrive.minx + (bDrive.width / 2)}" y="{bDrive.miny + (bDrive.height / 2) + (bDrive.height * 0.05)}" bind:this="{thrustElement}" dominant-baseline="middle" text-anchor="middle">{totalThrust}</text>
+{:else}
     <use href="#svg_drive" x="{bDrive.minx}" y="{bDrive.miny}" width="{bDrive.width}" height="{bDrive.height}" />
     <text x="{bDrive.minx + (bDrive.width / 2)}" y="{bDrive.miny + (bDrive.height / 2) + (bDrive.height * 0.1)}" bind:this="{thrustElement}" dominant-baseline="middle" text-anchor="middle">{totalThrust}</text>
+{/if}
 </svg>
 </div>
 

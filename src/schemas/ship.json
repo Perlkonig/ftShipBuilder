@@ -5,11 +5,13 @@
     "description": "Representation of a valid Full Thrust ship",
     "definitions": {
         "arcs": {
-            "type": "array",
-            "items": {
-                "enum": ["F", "FS", "FP", "A", "AS", "AP", "all", "broad"]
-            },
-            "minItems": 1
+            "enum": ["F", "FS", "FP", "A", "AS", "AP"]
+        },
+        "numarcs": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 6,
+            "default": 1
         }
     },
     "type": "object",
@@ -32,9 +34,17 @@
                 "rows": {
                     "enum": [3, 4, 5, 6],
                     "default": 4
+                },
+                "stealth": {
+                    "enum": ["0", "1", "2"],
+                    "default": "0"
+                },
+                "streamlining": {
+                    "enum": ["none", "partial", "full"],
+                    "default": "none"
                 }
             },
-            "required": ["points", "rows"],
+            "required": ["points", "rows", "stealth", "streamlining"],
             "additionalProperties": false
         },
         "armour": {
@@ -46,6 +56,7 @@
             }
         },
         "systems": {
+            "description": "This property contains all systems that get checked on threshold rolls but that are not used during the 'fire' or 'ordnance' phases of play.",
             "type": "array",
             "items": {
                 "type": "object",
@@ -177,6 +188,25 @@
                     {
                         "properties": {
                             "name": {
+                                "enum": ["bay"]
+                            },
+                            "type": {
+                                "enum": ["cargo", "passenger", "troop"]
+                            },
+                            "capacity": {
+                                "type": "number",
+                                "minimum": 1
+                            },
+                            "id": {
+                                "description": "A unique identifier used to target this specific bay in orders.",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["name", "type", "capacity", "id"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
                                 "enum": ["magazine"]
                             },
                             "id": {
@@ -187,7 +217,43 @@
                             },
                             "capacity": {
                                 "type": "integer",
-                                "minimum": 0
+                                "minimum": 2
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["damageControl"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["marines"]
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["ecm"]
+                            },
+                            "area": {
+                                "type": "boolean",
+                                "default": false
+                            }
+                        },
+                        "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["stealthField"]
                             }
                         },
                         "required": ["name"]
@@ -196,6 +262,7 @@
             }
         },
         "ordnance": {
+            "description": "This property contains all systems that get deployed during the 'ordnance' phase of play. These systems are also checked on threshold rolls.",
             "type": "array",
             "items": {
                 "type": "object",
@@ -235,34 +302,49 @@
                             "name": {
                                 "enum": ["salvoLauncher"]
                             },
-                            "modifier": {
-                                "enum": ["er", "twostage"]
-                            },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "enum": [3]
                             },
                             "magazine": {
                                 "description": "The unique ID of a missile magazine",
                                 "type": "string"
                             }
                         },
-                        "required": ["name", "arcs"]
+                        "required": ["name", "leftArc", "numArcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["mkp"]
+                            },
+                            "arc": {
+                                "$ref": "#/definitions/arcs"
+                            }
+                        },
+                        "required": ["name", "arc"]
                     },
                     {
                         "properties": {
                             "name": {
                                 "enum": ["rocketPod"]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "enum": [3]
                             }
                         },
-                        "required": ["name"]
+                        "required": ["name", "leftArc", "numArcs"]
                     }
                 ]
             }
         },
         "weapons": {
+            "description": "This property contains all systems that players can trigger during the 'fire' phase of play. These systems are also checked on threshold rolls.",
             "type": "array",
             "items": {
                 "type": "object",
@@ -307,11 +389,14 @@
                             "class": {
                                 "enum": [1, 2, 3, 4]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "class", "arcs"]
+                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -321,11 +406,14 @@
                             "class": {
                                 "enum": [1, 2, 3, 4]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "class", "arcs"]
+                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -335,11 +423,14 @@
                             "class": {
                                 "enum": [1, 2, 3, 4]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "class", "arcs"]
+                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -353,11 +444,14 @@
                             "class": {
                                 "enum": [1, 2, 3, 4]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "class", "arcs"]
+                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -367,11 +461,14 @@
                             "class": {
                                 "enum": [1, 2, 3, 4]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "class", "arcs"]
+                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -381,44 +478,56 @@
                             "class": {
                                 "enum": [1, 2, 3, 4]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "class", "arcs"]
+                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
                             "name": {
                                 "enum": ["gatling"]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "arcs"]
+                        "required": ["name", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
                             "name": {
                                 "enum": ["particle"]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "arcs"]
+                        "required": ["name", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
                             "name": {
                                 "enum": ["meson"]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "arcs"]
+                        "required": ["name", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -428,11 +537,14 @@
                             "class": {
                                 "enum": [1, 2, 3, 4]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "class", "arcs"]
+                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -443,22 +555,28 @@
                                 "enum": ["standard", "short", "long"],
                                 "default": "standard"
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "arcs"]
+                        "required": ["name", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
                             "name": {
                                 "enum": ["submunition"]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "arcs"]
+                        "required": ["name", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -472,22 +590,28 @@
                                 "enum": ["standard", "short", "long"],
                                 "default": "standard"
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "class", "arcs"]
+                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
                             "name": {
                                 "enum": ["fusion"]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "arcs"]
+                        "required": ["name", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -497,11 +621,14 @@
                             "class": {
                                 "enum": [1, 2, 3]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "class", "arcs"]
+                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -511,11 +638,14 @@
                             "class": {
                                 "enum": [1, 2, 3, 4, 5, 6]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "class", "arcs"]
+                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -546,47 +676,25 @@
                             "name": {
                                 "enum": ["kineticPenetrator"]
                             },
-                            "arcs": {
+                            "leftArc": {
                                 "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "arcs"]
+                        "required": ["name", "leftArc", "numArcs"]
                     }
                 ]
             }
         },
         "extras": {
+            "description": "This property contains all systems that do NOT get checked on threshold rolls.",
             "type": "array",
             "items": {
                 "type": "object",
                 "oneOf": [
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["bay"]
-                            },
-                            "type": {
-                                "enum": ["cargo", "passenger", "troop"]
-                            },
-                            "id": {
-                                "description": "A unique identifier used to target this specific bay in orders.",
-                                "type": "string"
-                            }
-                        },
-                        "required": ["name", "type", "id"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["damageControl"]
-                            },
-                            "quantity": {
-                                "type": "integer",
-                                "minimum": 1
-                            }
-                        },
-                        "required": ["name", "quantity"]
-                    }
+                    {}
                 ]
             }
         },

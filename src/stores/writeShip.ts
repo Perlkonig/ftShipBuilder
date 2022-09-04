@@ -2,7 +2,7 @@ import { writable } from "svelte/store";
 import type { Arcs, FullThrustShip } from "../schemas/ship";
 
 const starterShip: FullThrustShip = {
-    hull: {points: 1, rows: 4},
+    hull: {points: 1, rows: 4, stealth: "0"},
     armour: [] as number[],
     systems: [
         {

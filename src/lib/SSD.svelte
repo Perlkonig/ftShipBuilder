@@ -2,7 +2,7 @@
     import { ship } from "../stores/writeShip";
     import { layoutList } from "./layouts";
     import type { ILayoutDesc } from "./layouts";
-    import Skeleton from "./SSD/Skeleton.svelte";
+    import Assembled from "./SSD/Assembled.svelte";
     import SystemArranger from "./SSD/SystemArranger.svelte";
 
     let selectedID: string;
@@ -39,11 +39,10 @@
         {/key}
     {/if}
 
-
     <h2 class="subtitle">Assembled SSD</h2>
     {#if (selected !== undefined) }
         {#key selectedID}
-        <Skeleton
+        <Assembled
             layoutID={selectedID}
         />
         {/key}

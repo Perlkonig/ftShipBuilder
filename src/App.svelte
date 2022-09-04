@@ -23,6 +23,17 @@
   </div>
 </main>
 
+<footer class="footer">
+  <div class="content has-text-centered">
+    <p>
+      <a href="https://github.com/Perlkonig/ftShipBuilder">Fork me on GitHub!</a>
+    </p>
+    <p>
+      Buy me a coffee at <a href="https://paypal.me/abstractplay">paypal.me/abstractplay</a>. Thank you!
+    </p>
+  </div>
+</footer>
+
 <style>
   .sticky {
     position: sticky;

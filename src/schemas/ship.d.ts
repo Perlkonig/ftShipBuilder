@@ -5,13 +5,8 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-/**
- * @minItems 1
- */
-export type Arcs = [
-  "F" | "FS" | "FP" | "A" | "AS" | "AP" | "all" | "broad",
-  ...("F" | "FS" | "FP" | "A" | "AS" | "AP" | "all" | "broad")[]
-];
+export type Arcs = "F" | "FS" | "FP" | "A" | "AS" | "AP";
+export type Numarcs = number;
 
 /**
  * Representation of a valid Full Thrust ship
@@ -22,11 +17,16 @@ export interface FullThrustShip {
   hull?: {
     points: number;
     rows: 3 | 4 | 5 | 6;
+    stealth: "0" | "1" | "2";
+    streamlining: "none" | "partial" | "full";
   };
   /**
    * Rows of armour. First element being the innermost layer. No layer can be larger than the first row of hull boxes.
    */
   armour?: number[];
+  /**
+   * This property contains all systems that get checked on threshold rolls but that are not used during the 'fire' or 'ordnance' phases of play.
+   */
   systems?: (
     | {
         name: "drive";
@@ -105,6 +105,16 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
+        name: "bay";
+        type: "cargo" | "passenger" | "troop";
+        capacity: number;
+        /**
+         * A unique identifier used to target this specific bay in orders.
+         */
+        id: string;
+        [k: string]: unknown;
+      }
+    | {
         name: "magazine";
         /**
          * A unique identifier used to tie this magazine to one or more launchers.
@@ -116,7 +126,27 @@ export interface FullThrustShip {
         capacity?: number;
         [k: string]: unknown;
       }
+    | {
+        name: "damageControl";
+        [k: string]: unknown;
+      }
+    | {
+        name: "marines";
+        [k: string]: unknown;
+      }
+    | {
+        name: "ecm";
+        area?: boolean;
+        [k: string]: unknown;
+      }
+    | {
+        name: "stealthField";
+        [k: string]: unknown;
+      }
   )[];
+  /**
+   * This property contains all systems that get deployed during the 'ordnance' phase of play. These systems are also checked on threshold rolls.
+   */
   ordnance?: (
     | {
         name: "antiMatterMissile";
@@ -134,8 +164,8 @@ export interface FullThrustShip {
       }
     | {
         name: "salvoLauncher";
-        modifier?: "er" | "twostage";
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: 3;
         /**
          * The unique ID of a missile magazine
          */
@@ -143,11 +173,20 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
+        name: "mkp";
+        arc: Arcs;
+        [k: string]: unknown;
+      }
+    | {
         name: "rocketPod";
-        arcs?: Arcs;
+        leftArc: Arcs;
+        numArcs: 3;
         [k: string]: unknown;
       }
   )[];
+  /**
+   * This property contains all systems that players can trigger during the 'fire' phase of play. These systems are also checked on threshold rolls.
+   */
   weapons?: (
     | {
         name: "pds";
@@ -168,94 +207,110 @@ export interface FullThrustShip {
     | {
         name: "beam";
         class: 1 | 2 | 3 | 4;
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "emp";
         class: 1 | 2 | 3 | 4;
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "plasmaCannon";
         class: 1 | 2 | 3 | 4;
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "graser";
         heavy?: boolean;
         class: 1 | 2 | 3 | 4;
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "phaser";
         class: 1 | 2 | 3 | 4;
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "transporter";
         class: 1 | 2 | 3 | 4;
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "gatling";
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "particle";
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "meson";
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "needle";
         class: 1 | 2 | 3 | 4;
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "torpedoPulse";
         range?: "standard" | "short" | "long";
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "submunition";
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "kgun";
         class: 1 | 2 | 3 | 4 | 5 | 6;
         range?: "standard" | "short" | "long";
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "fusion";
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "gravitic";
         class: 1 | 2 | 3;
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "plasmaBolt";
         class: 1 | 2 | 3 | 4 | 5 | 6;
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
@@ -272,26 +327,15 @@ export interface FullThrustShip {
       }
     | {
         name: "kineticPenetrator";
-        arcs: Arcs;
+        leftArc: Arcs;
+        numArcs: Numarcs;
         [k: string]: unknown;
       }
   )[];
-  extras?: (
-    | {
-        name: "bay";
-        type: "cargo" | "passenger" | "troop";
-        /**
-         * A unique identifier used to target this specific bay in orders.
-         */
-        id: string;
-        [k: string]: unknown;
-      }
-    | {
-        name: "damageControl";
-        quantity: number;
-        [k: string]: unknown;
-      }
-  )[];
+  /**
+   * This property contains all systems that do NOT get checked on threshold rolls.
+   */
+  extras?: unknown[];
   /**
    * There cannot be more fighters than hangars. The type of fighter doesn't have to match the type of hangar, but it should to avoid confusion. The hangar type simply determines the icon on the SSD. The fighter type here determines what fighters you actually have available in game.
    */

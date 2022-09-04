@@ -1,14 +1,82 @@
 <script lang="ts">
+    import { afterUpdate } from "svelte";
     import { ship } from "../stores/writeShip";
     import { calcAllMassPts } from "./massPts";
     import type { IMassPts } from "./massPts";
     import MassPts from "./MassPts.svelte";
+
+    interface ISystem {
+        name: string;
+        [k: string]: unknown;
+    };
 
     let results: IMassPts;
     $: results = calcAllMassPts($ship);
     let delta: number;
     $: if ( ($ship.hasOwnProperty("mass")) && ($ship.mass !== undefined) ) {
         delta = $ship.mass - results.mass;
+    }
+
+    let errors: string[];
+    afterUpdate(() => {
+        errors = findErrors();
+    });
+
+    const findErrors = (): string[] | undefined => {
+        const errors: string[] = [];
+
+        // Mass out of range
+        if ( ($ship.mass === undefined) || ($ship.mass < 5) || ($ship.mass > 300) ) {
+            errors.push("The ship's mass must be between 5 and 300.");
+        }
+        // Hull strength out of range
+        if ( ($ship.hull.points === undefined) || ($ship.hull.points < ($ship.mass * 0.1)) ) {
+            errors.push("The ship's hull must be at least 10% of total mass.")
+        }
+        // Any armour rows out of range
+        const maxArmour = Math.ceil($ship.hull.points / $ship.hull.rows);
+        if ( ($ship.hasOwnProperty("armour")) && ($ship.armour.length > 0) ) {
+            for (let i = 0; i < $ship.armour.length; i++) {
+                if ($ship.armour[i] > maxArmour) {
+                    errors.push(`Armour row ${i + 1} is too long. Based on your hull configuration, no armour row can contain more than ${maxArmour} points.`);
+                }
+            }
+        }
+        // Sufficient room for DCPs and marines?
+        const cf = Math.ceil($ship.mass / 20);
+        let baysPassengers = 0;
+        let baysTroops = 0;
+        let addMarines = 0;
+        let addDamage = 0;
+        for (let i = 0; i < $ship.systems.length; i++) {
+            if ($ship.systems[i].name === "damageControl") {
+                addDamage++;
+            } else if ($ship.systems[i].name === "marines") {
+                addMarines++;
+            } else if ($ship.systems[i].name === "bay") {
+                if ($ship.systems[i].type === "passenger") {
+                    baysPassengers++;
+                } else if ($ship.systems[i].type === "troop") {
+                    baysTroops++;
+                }
+            }
+        }
+        const maxBerthedPassengers = baysPassengers * 4;
+        const maxBerthedTroops = baysTroops * 3;
+        const maxAdds = cf + maxBerthedPassengers + maxBerthedTroops;
+        if ((addMarines + addDamage) > maxAdds) {
+            errors.push(`You have overallocated your crew! You have ${cf} crew you can freely allocate between damage control and marines. Based on equipped berths, you can also allocate no more than ${maxBerthedPassengers} additional damage control and ${maxBerthedTroops} additional marines.`);
+        } else if (addDamage > (cf + maxBerthedPassengers)) {
+            errors.push(`You have allocated too many damage control parties. You can have at most ${cf} plus ${maxBerthedPassengers} from purchased berths.`);
+        } else if (addMarines > (cf + maxBerthedTroops)) {
+            errors.push(`You have allocated too many marines. You can have at most ${cf} plus ${maxBerthedTroops} from purchased berths.`);
+        }
+
+        if (errors.length > 0) {
+            return errors;
+        } else {
+            return undefined;
+        }
     }
 </script>
 
@@ -28,6 +96,13 @@
         {:else}
             <span class="tag is-danger">Overallocated by {delta} mass!</span>
         {/if}
+        </div>
+        <div class="content">
+    {#if errors !== undefined}
+        {#each errors as e}
+            <p>{e}</p>
+        {/each}
+    {/if}
         </div>
     {/if}
 </section>

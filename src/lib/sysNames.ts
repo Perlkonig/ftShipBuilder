@@ -5,10 +5,23 @@ interface ISystem {
 
 const dict: Map<string, string> = new Map<string, string>([
     ["adfc", "Area Defense Fire Control"],
+    ["amt", "Antimatter Missile"],
+    ["bay", "Hold or Berth"],
+    ["damageControl", "Extra Damage Control"],
+    ["ecm", "ECM Device"],
     ["fireControl", "Fire Control"],
+    ["holofield", "Holofield"],
+    ["magazine", "Salvo Missile Magazine"],
+    ["marines", "Extra Marines"],
     ["mineLayer", "Mine Layer"],
     ["mineSweeper", "Mine Sweeper"],
+    ["missile", "Heavy Missile"],
+    ["mkp", "Multiple Kinetic Penetrator"],
+    ["rocketPod", "Rocket Pod"],
+    ["salvo", "Salvo Missile Rack (single-use)"],
+    ["salvoLauncher", "Salvo Missile Launcher"],
     ["screen", "Screen"],
+    ["stealthField", "Stealth Field Generator"],
     ["suicide", "Antimatter Suicide Charge"],
 ]);
 
@@ -36,6 +49,28 @@ export const obj2name = (sys: ISystem): string => {
             area = sys.area as boolean;
         }
         return (advanced ? "Advanced " : "") + (area ? "Area " : "") + str2name(sys.name);
+    } else if (sys.name === "bay") {
+        if (sys.hasOwnProperty("type")) {
+            if (sys.type === "passenger") {
+                return "Passenger Berth";
+            } else if (sys.type === "troop") {
+                return "Troop Berth";
+            } else if (sys.type === "cargo") {
+                return "Cargo Hold";
+            }
+        }
+    } else if ( (sys.name === "salvo") || (sys.name === "magazine") || (sys.name === "missile") ) {
+        if (sys.hasOwnProperty("modifier")) {
+            if (sys.modifier === "er") {
+                return str2name(sys.name) + ' - Long Range';
+            } else if (sys.modifier === "twostage") {
+                return str2name(sys.name) + ' - Multistage';
+            }
+        }
+    } else if (sys.name === "ecm") {
+        if ( (sys.hasOwnProperty("area")) && (sys.area) ) {
+            return "Area " + str2name(sys.name);
+        }
     }
     // The rest just get looked up
     return str2name(sys.name);
