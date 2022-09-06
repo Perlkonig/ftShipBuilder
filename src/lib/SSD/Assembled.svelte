@@ -4,6 +4,7 @@
     import { ship } from "../../stores/writeShip";
     import { ssdComponents } from "../../stores/writeSsd";
     import { layoutFactory } from "../layouts";
+    import { getSystem } from "../systems";
     import { svgLib } from "../svgLib";
 
     export let layoutID: string;
@@ -16,23 +17,20 @@
     const bFtl = layout.blockFtl();
     const bCore = layout.blockCore();
     const svgCore = svgLib.find(x => x.id === "coreSys")!;
-    const hasFtl: boolean = $ship.systems.find(x => x.name === "ftl") !== undefined;
+    const sysFtl = $ship.systems.find(x => x.name === "ftl")!;
+    const hasFtl: boolean =  sysFtl !== undefined;
     let hasFtlAdv = false;
-    let svgFtl = svgLib.find(x => x.id === "ftl")!;
-    if (hasFtl) {
-        const sys = $ship.systems.find(x => x.name === "ftl")!;
-        if ( (sys.hasOwnProperty("advanced")) && (sys.advanced) ) {
+    if ( (sysFtl.hasOwnProperty("advanced")) && (sysFtl.advanced) ) {
             hasFtlAdv = true;
-            svgFtl = svgLib.find(x => x.id === "ftlAdv")!;
-        }
     }
-    let svgDrive = svgLib.find(x => x.id === "drive")!;
-    let hasAdvDrive = false;
+    const svgFtl = getSystem(sysFtl, $ship).glyph();
     const sysDrive = $ship.systems.find(x => x.name === "drive")!;
+    let hasAdvDrive = false;
     if ( (sysDrive.hasOwnProperty("advanced")) && (sysDrive.advanced) ) {
         hasAdvDrive = true;
-        svgDrive = svgLib.find(x => x.id === "driveAdv")!;
     }
+    const svgDrive = getSystem(sysDrive, $ship).glyph();
+
     let nameElement: SVGTextElement;
     let thrustElement: SVGTextElement;
     let fullSsdSvg: SVGElement;

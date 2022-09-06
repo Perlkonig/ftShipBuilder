@@ -4,8 +4,8 @@
     import { layoutFactory } from "../layouts";
     import type { IBox } from "../layouts";
     import type { ISystemSVG } from "../svgLib";
-    import { getSVG } from "../svgLib";
     import { nanoid } from "nanoid";
+    import { getSystem } from "../systems";
 
     export let layoutID: string;
 
@@ -49,7 +49,7 @@
         }
         // Get full list of all system instances, adding coordinates and IDs as necessary.
         // Also add distinct glyphs to the `sysDistinct` array.
-        for (const set of ["systems", "ordnance"]) {
+        for (const set of ["systems", "ordnance", "weapons"]) {
             const ignore = ["drive", "ftl"];
             const sysSet = $ship[set] as ISystem[];
             for (const sys of sysSet) {
@@ -69,7 +69,7 @@
                 } else if (sys.y >= blocksHigh) {
                     sys.y = blocksHigh - 1;
                 }
-                const svg = getSVG(sys);
+                const svg = getSystem(sys, $ship).glyph();
                 if (svg !== undefined) {
                     sys.glyph = svg;
                     const idx = sysDistinct.findIndex(x => x.id === svg.id);

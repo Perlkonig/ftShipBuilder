@@ -3,10 +3,9 @@
     import pako from "pako";
     import { Buffer } from "buffer";
     import { ship } from "../stores/writeShip";
-    import { str2name } from "./sysNames";
     import SysDisplay from "./SysDisplay.svelte";
     import MassPts from "./MassPts.svelte";
-    import { calcArmourMassPts, calcHullMassPts, calcSysMassPts, calcStealthHull, calcStreamlining } from "./massPts";
+    import { systemList, ordnanceList, weaponList, getSpecial, getSystem, sortNames } from "./systems";
 
     const addArmour = () => {
         $ship.armour.push(1);
@@ -68,9 +67,7 @@
     let shipOrdnance: string;
     const addOrdnance = () => {
         if (shipOrdnance !== undefined) {
-            if (shipOrdnance === "mkp") {
-                $ship.ordnance.push({name: shipOrdnance, arc: "F"});
-            } else if ( (shipOrdnance === "salvoLauncher") || (shipOrdnance === "rocketPod") ) {
+            if ( (shipOrdnance === "salvoLauncher") || (shipOrdnance === "rocketPod") ) {
                 $ship.ordnance.push({name: shipOrdnance, leftArc: "FP", numArcs: 3});
             } else {
                 // @ts-ignore
@@ -82,9 +79,18 @@
     let shipWeapon: string;
     const addWeapon = () => {
         if (shipWeapon !== undefined) {
-            $ship.weapons.push({name: shipWeapon});
-            $ship = $ship;
+            if (shipWeapon === "ads") {
+                $ship.weapons.push({name: shipWeapon, leftArc: "FP", numArcs: 3});
+            } else if (shipWeapon === "beam") {
+                $ship.weapons.push({name: "beam", class: 1, leftArc: "F", numArcs: 1});
+            } else if (shipWeapon === "mkp") {
+                $ship.weapons.push({name: "mkp", arc: "F"});
+            } else {
+                $ship.weapons.push({name: shipWeapon});
+                $ship = $ship;
+            }
         }
+        $ship = $ship;
     };
 
     const setClass = () => {
@@ -126,272 +132,273 @@
         encodedShip = Buffer.from(compressed).toString("base64");
     }
 
-    const systemList = ["suicide", "adfc", "damageControl", "ecm", "holofield", "marines", "fireControl", "bay", "mineLayer", "mineSweeper", "magazine", "screen", "stealthField"];
-    const ordnanceList = ["amt", "missile", "mkp", "rocketPod", "salvo", "salvoLauncher"];
-    const weaponList = [];
+    // const systemList = ["suicide", "adfc", "damageControl", "ecm", "holofield", "marines", "fireControl", "bay", "mineLayer", "mineSweeper", "magazine", "screen", "stealthField"];
+    // const ordnanceList = ["amt", "missile", "mkp", "rocketPod", "salvo", "salvoLauncher"];
+    // const weaponList = ["ads", "pds", "scatterGun"];
 </script>
 
-<section class="section">
-    <h2 class="subtitle" title="All things hull">Structure</h2>
+<div class="columns">
+    <div class="column">
+        <section class="section">
+            <h2 class="subtitle" title="All things hull">Structure</h2>
 
-    <div class="field">
-        <label class="label" for="mass">Mass</label>
-        <div class="control">
-            <input id="mass" class="input" type="number" placeholder="Mass" min="4" max="300" step="2" bind:value={$ship.mass} on:change="{setClass}">
-        </div>
-    {#if ($ship.mass < 4)}
-        <p class="help is-danger">The minimum mass is 4.</p>
-    {:else if ($ship.mass > 300)}
-        <p class="help is-danger">The maximum mass is 300.</p>
-    {:else if ( ($ship.mass > 10) && ($ship.mass % 2 !== 0) )}
-        <p class="help is-danger">The mass of ships larger than 9 must be an even number.</p>
-    {/if}
-    </div>
-
-    {#if ( ($ship.hasOwnProperty("mass")) && ($ship.mass >= 4) )}
-    <div class="field">
-        <label class="label" for="class">Ship class</label>
-        <div class="control">
-            <input id="class" class="input" type="text" placeholder="Ship class" bind:value="{$ship.class}">
-        </div>
-        <p class="help">Is overwritten by the system if the mass changes.</p>
-    </div>
-
-    <div class="field">
-        <label class="label" for="shipName">Ship name</label>
-        <div class="control">
-            <input id="shipName" class="input" type="text" placeholder="Ship name" bind:value="{$ship.name}">
-        </div>
-        <p class="help">Appears on the SSD in quotes.</p>
-    </div>
-
-    <div class="field">
-        <label class="label" for="hull">Hull strength</label>
-        <div class="control">
-        <input id="hull" class="input" type="number" placeholder="Hull strength" bind:value={$ship.hull.points} max="{$ship.mass}">
-        </div>
-        {#if $ship.hull.points < ($ship.mass * 0.1)}
-            <p class="help is-danger">Hull strength must be at least 10% of total mass.</p>
-        {:else if $ship.hull.points > $ship.mass}
-            <p class="help is-danger">Hull strength may not exceed the total mass.</p>
-        {:else if $ship.hull.points < ($ship.mass * 0.2)}
-            <p class="help is-danger">Hull rating: FRAGILE</p>
-        {:else if $ship.hull.points < ($ship.mass * 0.3)}
-            <p class="help is-warning">Hull rating: WEAK</p>
-        {:else if $ship.hull.points < ($ship.mass * 0.4)}
-            <p class="help is-success">Hull rating: AVERAGE</p>
-        {:else if $ship.hull.points < ($ship.mass * 0.5)}
-            <p class="help is-success">Hull rating: STRONG</p>
-        {:else if $ship.hull.points >= ($ship.mass * 0.5)}
-            <p class="help is-warning">Hull rating: SUPER</p>
-        {/if}
-    </div>
-
-    <div class="field">
-        <label class="label" for="rows">Hull rows</label>
-        <div class="control">
-        <input id="rows" class="input" type="number" placeholder="Hull rows" min="3" max="6" bind:value={$ship.hull.rows}>
-        </div>
-        <p class="help">4 is the default. 3 means advanced tech. 5 and 6 increases your odds of critical damage, but reduces the point cost.</p>
-    </div>
-    <MassPts
-        results={calcHullMassPts($ship.hull)}
-    />
-
-    <div class="field is-grouped">
-        <div class="control">
-        {#if $ship.armour.length < 5}
-            <button class="button is-primary" on:click="{addArmour}">
-                Add armour row
-            </button>
-        {:else}
-            <button class="button is-primary" disabled>
-                Add armour row
-            </button>
-        {/if}
-        </div>
-        <div class="control">
-            <button class="button is-danger" on:click="{delArmour}">
-                Remove armour row
-            </button>
-        </div>
-    </div>
-
-    {#each $ship.armour as row, i }
-    <div class="field">
-        <label class="label" for="armour{i}">Armour: Row {i + 1}</label>
-        <div class="control">
-        <input id="armour{i}" class="input" type="number" placeholder="Armour points" min="1" max="{Math.ceil($ship.hull.points / $ship.hull.rows)}" bind:value={$ship.armour[i]}>
-        </div>
-    {#if $ship.armour[i] > Math.ceil($ship.hull.points / $ship.hull.rows)}
-        <p class="help is-danger">You can only have as much armour per row as hull boxes on your first row ({Math.ceil($ship.hull.points / $ship.hull.rows)}).</p>
-    {/if}
-    </div>
-{/each}
-    <MassPts
-        results={calcArmourMassPts($ship.armour)}
-    />
-
-    <div class="field">
-        <label class="label" for="stealth">Stealth level</label>
-        <div class="control">
-            <div class="select">
-                <select id="stealth" bind:value={$ship.hull.stealth} on:change="{() => $ship = $ship}">
-                    <option value="0">No stealth</option>
-                    <option value="1">Stealth level 1</option>
-                    <option value="2">Stealth level 2</option>
-                </select>
+            <div class="field">
+                <label class="label" for="mass">Mass</label>
+                <div class="control">
+                    <input id="mass" class="input" type="number" placeholder="Mass" min="4" max="300" step="2" bind:value={$ship.mass} on:change="{setClass}">
+                </div>
+            {#if ($ship.mass < 4)}
+                <p class="help is-danger">The minimum mass is 4.</p>
+            {:else if ($ship.mass > 300)}
+                <p class="help is-danger">The maximum mass is 300.</p>
+            {:else if ( ($ship.mass > 10) && ($ship.mass % 2 !== 0) )}
+                <p class="help is-danger">The mass of ships larger than 9 must be an even number.</p>
+            {/if}
             </div>
-        </div>
-    </div>
-    <MassPts
-        results={calcStealthHull($ship.hull, $ship.armour)}
-    />
 
-    <div class="field">
-        <label class="label" for="streamlining">Atmospheric streamlining</label>
-        <div class="control">
-            <div class="select">
-                <select id="streamlining" bind:value={$ship.hull.streamlining} on:change="{() => $ship = $ship}">
-                    <option value="none">None</option>
-                    <option value="partial">Partial</option>
-                    <option value="full">Full</option>
-                </select>
+            <div class="field">
+                <label class="label" for="class">Ship class</label>
+                <div class="control">
+                    <input id="class" class="input" type="text" placeholder="Ship class" bind:value="{$ship.class}">
+                </div>
+                <p class="help">Is overwritten by the system if the mass changes.</p>
             </div>
-            <p class="help">Not indicated on the SSD.</p>
-        </div>
-    </div>
-    <MassPts
-        results={calcStreamlining($ship.hull, $ship.mass)}
-    />
-{/if}
-</section>
 
-{#if ( ($ship.hasOwnProperty("mass")) && ($ship.mass >= 4) )}
-<section class="section">
-    <h2 class="subtitle" title="How you make it go">Drive Systems</h2>
+            <div class="field">
+                <label class="label" for="shipName">Ship name</label>
+                <div class="control">
+                    <input id="shipName" class="input" type="text" placeholder="Ship name" bind:value="{$ship.name}">
+                </div>
+                <p class="help">Appears on the SSD in quotes.</p>
+            </div>
 
-    <div class="field">
-        <label class="label" for="thrust">Thrust</label>
-        <div class="control">
-            <input id="thrust" class="input" type="number" placeholder="Thrust" min="0" bind:value={thrust}>
-        </div>
-        <div class="control">
-            <label class="checkbox">
-                <input type="checkbox" bind:checked="{driveAdvanced}">
-                Advanced drive
-            </label>
-        </div>
-        <MassPts
-            results={calcSysMassPts($ship.systems.find(x => x.name === "drive"), $ship.mass)}
-        />
-        <div class="control">
-            <label class="checkbox">
-                <input type="checkbox" bind:checked="{ftl}">
-                FTL enabled
-            </label>
-        {#if ftl}
-            <label class="checkbox">
-                <input type="checkbox" bind:checked="{ftlAdvanced}">
-                Advanced FTL
-            </label>
+            <div class="field">
+                <label class="label" for="hull">Hull strength</label>
+                <div class="control">
+                <input id="hull" class="input" type="number" placeholder="Hull strength" bind:value={$ship.hull.points} max="{$ship.mass}">
+                </div>
+                {#if $ship.hull.points < ($ship.mass * 0.1)}
+                    <p class="help is-danger">Hull strength must be at least 10% of total mass.</p>
+                {:else if $ship.hull.points > $ship.mass}
+                    <p class="help is-danger">Hull strength may not exceed the total mass.</p>
+                {:else if $ship.hull.points < ($ship.mass * 0.2)}
+                    <p class="help is-danger">Hull rating: FRAGILE</p>
+                {:else if $ship.hull.points < ($ship.mass * 0.3)}
+                    <p class="help is-warning">Hull rating: WEAK</p>
+                {:else if $ship.hull.points < ($ship.mass * 0.4)}
+                    <p class="help is-success">Hull rating: AVERAGE</p>
+                {:else if $ship.hull.points < ($ship.mass * 0.5)}
+                    <p class="help is-success">Hull rating: STRONG</p>
+                {:else if $ship.hull.points >= ($ship.mass * 0.5)}
+                    <p class="help is-warning">Hull rating: SUPER</p>
+                {/if}
+            </div>
+
+            <div class="field">
+                <label class="label" for="rows">Hull rows</label>
+                <div class="control">
+                <input id="rows" class="input" type="number" placeholder="Hull rows" min="3" max="6" bind:value={$ship.hull.rows}>
+                </div>
+                <p class="help">4 is the default. 3 means advanced tech. 5 and 6 increases your odds of critical damage, but reduces the point cost.</p>
+            </div>
             <MassPts
-                results={calcSysMassPts($ship.systems.find(x => x.name === "ftl"), $ship.mass)}
+                obj={getSpecial("hull", $ship)}
             />
-        {/if}
-        </div>
-    </div>
-</section>
 
-<section class="section">
-    <h2 class="subtitle" title="Systems that appear on your SSD but that aren't triggered in the ordnance or firing phases">General Systems</h2>
-    <div class="field">
-        <label class="label" for="shipSystems">Select a system to add</label>
-        <div class="control">
-          <div class="select">
-            <select id="shipSystems" bind:value={shipSystem}>
-            {#each systemList as sysname}
-                <option value="{sysname}">{str2name(sysname)}</option>
-            {/each}
-            </select>
-          </div>
-        </div>
-        <p class="help">Some systems have additional options available once equipped.</p>
-        <div class="control">
-            <button class="button is-primary" on:click="{addSystem}">Add System</button>
-        </div>
-    </div>
-    <section class="container">
-    {#each $ship.systems as sys, i}
-        {#if systemList.includes(sys.name) }
-        <SysDisplay
-            prop="systems"
-            idx={i}
-        />
-        {/if}
-    {/each}
-    </section>
-</section>
+            <div class="field is-grouped">
+                <div class="control">
+                {#if $ship.armour.length < 5}
+                    <button class="button is-primary" on:click="{addArmour}">
+                        Add armour row
+                    </button>
+                {:else}
+                    <button class="button is-primary" disabled>
+                        Add armour row
+                    </button>
+                {/if}
+                </div>
+                <div class="control">
+                    <button class="button is-danger" on:click="{delArmour}">
+                        Remove armour row
+                    </button>
+                </div>
+            </div>
 
-<section class="section">
-    <h2 class="subtitle" title="Systems that are triggered during the ordnance phase">Ordnance</h2>
-    <div class="field">
-        <label class="label" for="ordnanceSystems">Select a system to add</label>
-        <div class="control">
-          <div class="select">
-            <select id="ordnanceSystems" bind:value={shipOrdnance}>
-            {#each ordnanceList as ordname}
-                <option value="{ordname}">{str2name(ordname)}</option>
+            {#each $ship.armour as row, i }
+            <div class="field">
+                <label class="label" for="armour{i}">Armour: Row {i + 1}</label>
+                <div class="control">
+                <input id="armour{i}" class="input" type="number" placeholder="Armour points" min="1" max="{Math.ceil($ship.hull.points / $ship.hull.rows)}" bind:value={$ship.armour[i]}>
+                </div>
+            {#if $ship.armour[i] > Math.ceil($ship.hull.points / $ship.hull.rows)}
+                <p class="help is-danger">You can only have as much armour per row as hull boxes on your first row ({Math.ceil($ship.hull.points / $ship.hull.rows)}).</p>
+            {/if}
+            </div>
             {/each}
-            </select>
-          </div>
-        </div>
-        <p class="help">Some systems have additional options available once equipped.</p>
-        <div class="control">
-            <button class="button is-primary" on:click="{addOrdnance}">Load Ordnance</button>
-        </div>
-    </div>
-    <section class="container">
-    {#each $ship.ordnance as sys, i}
-        {#if ordnanceList.includes(sys.name) }
-        <SysDisplay
-            prop="ordnance"
-            idx={i}
-        />
-        {/if}
-    {/each}
-    </section>
-</section>
+            <MassPts
+                obj={getSpecial("armour", $ship)}
+            />
 
-<section class="section">
-    <h2 class="subtitle" title="Systems that are triggered during the firing phase">Weapons (Offensive and Defensive)</h2>
-    <div class="field">
-        <label class="label" for="weaponSystems">Select a system to add</label>
-        <div class="control">
-          <div class="select">
-            <select id="weaponSystems" bind:value={shipWeapon}>
-            {#each weaponList as weaponName}
-                <option value="{weaponName}">{str2name(weaponName)}</option>
+            <div class="field">
+                <label class="label" for="stealth">Stealth level</label>
+                <div class="control">
+                    <div class="select">
+                        <select id="stealth" bind:value={$ship.hull.stealth} on:change="{() => $ship = $ship}">
+                            <option value="0">No stealth</option>
+                            <option value="1">Stealth level 1</option>
+                            <option value="2">Stealth level 2</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <MassPts
+                obj={getSpecial("stealth", $ship)}
+            />
+
+            <div class="field">
+                <label class="label" for="streamlining">Atmospheric streamlining</label>
+                <div class="control">
+                    <div class="select">
+                        <select id="streamlining" bind:value={$ship.hull.streamlining} on:change="{() => $ship = $ship}">
+                            <option value="none">None</option>
+                            <option value="partial">Partial</option>
+                            <option value="full">Full</option>
+                        </select>
+                    </div>
+                    <p class="help">Not indicated on the SSD.</p>
+                </div>
+            </div>
+            <MassPts
+                obj={getSpecial("streamlining", $ship)}
+            />
+        </section>
+
+        <section class="section">
+            <h2 class="subtitle" title="How you make it go">Drive Systems</h2>
+
+            <div class="field">
+                <label class="label" for="thrust">Thrust</label>
+                <div class="control">
+                    <input id="thrust" class="input" type="number" placeholder="Thrust" min="0" bind:value={thrust}>
+                </div>
+                <div class="control">
+                    <label class="checkbox">
+                        <input type="checkbox" bind:checked="{driveAdvanced}">
+                        Advanced drive
+                    </label>
+                </div>
+                <MassPts
+                    obj={getSystem($ship.systems.find(x => x.name === "drive"), $ship)}
+                />
+                <div class="control">
+                    <label class="checkbox">
+                        <input type="checkbox" bind:checked="{ftl}">
+                        FTL enabled
+                    </label>
+                {#if ftl}
+                    <label class="checkbox">
+                        <input type="checkbox" bind:checked="{ftlAdvanced}">
+                        Advanced FTL
+                    </label>
+                    <MassPts
+                        obj={getSystem($ship.systems.find(x => x.name === "ftl"), $ship)}
+                    />
+                {/if}
+                </div>
+            </div>
+        </section>
+    </div> <!-- Column -->
+
+    <div class="column">
+        <section class="section">
+            <h2 class="subtitle" title="Systems that appear on your SSD but that aren't triggered in the ordnance or firing phases">General Systems</h2>
+            <div class="field">
+                <label class="label" for="shipSystems">Select a system to add</label>
+                <div class="control">
+                <div class="select">
+                    <select id="shipSystems" bind:value={shipSystem}>
+                    {#each systemList as sysname}
+                        <option value="{sysname}">{sortNames.get(sysname)}</option>
+                    {/each}
+                    </select>
+                </div>
+                </div>
+                <p class="help">Some systems have additional options available once equipped.</p>
+                <div class="control">
+                    <button class="button is-primary" on:click="{addSystem}">Add System</button>
+                </div>
+            </div>
+            <section class="container">
+            {#each $ship.systems as sys, i}
+                {#if systemList.includes(sys.name) }
+                <SysDisplay
+                    prop="systems"
+                    idx={i}
+                />
+                {/if}
             {/each}
-            </select>
-          </div>
-        </div>
-        <p class="help">Some systems have additional options available once equipped.</p>
-        <div class="control">
-            <button class="button is-primary" on:click="{addWeapon}">Load weapon</button>
-        </div>
-    </div>
-    <section class="container">
-    {#each $ship.weapons as sys, i}
-        {#if weaponList.includes(sys.name) }
-        <SysDisplay
-            prop="weapon"
-            idx={i}
-        />
-        {/if}
-    {/each}
-    </section>
-</section>
+            </section>
+        </section>
+
+        <section class="section">
+            <h2 class="subtitle" title="Systems that are triggered during the ordnance phase">Ordnance</h2>
+            <div class="field">
+                <label class="label" for="ordnanceSystems">Select a system to add</label>
+                <div class="control">
+                <div class="select">
+                    <select id="ordnanceSystems" bind:value={shipOrdnance}>
+                    {#each ordnanceList as ordname}
+                        <option value="{ordname}">{sortNames.get(ordname)}</option>
+                    {/each}
+                    </select>
+                </div>
+                </div>
+                <p class="help">Some systems have additional options available once equipped.</p>
+                <div class="control">
+                    <button class="button is-primary" on:click="{addOrdnance}">Load Ordnance</button>
+                </div>
+            </div>
+            <section class="container">
+            {#each $ship.ordnance as sys, i}
+                {#if ordnanceList.includes(sys.name) }
+                <SysDisplay
+                    prop="ordnance"
+                    idx={i}
+                />
+                {/if}
+            {/each}
+            </section>
+        </section>
+
+        <section class="section">
+            <h2 class="subtitle" title="Systems that are triggered during the firing phase">Weapons (Offensive and Defensive)</h2>
+            <div class="field">
+                <label class="label" for="weaponSystems">Select a system to add</label>
+                <div class="control">
+                <div class="select">
+                    <select id="weaponSystems" bind:value={shipWeapon}>
+                    {#each weaponList as weaponName}
+                        <option value="{weaponName}">{sortNames.get(weaponName)}</option>
+                    {/each}
+                    </select>
+                </div>
+                </div>
+                <p class="help">Some systems have additional options available once equipped.</p>
+                <div class="control">
+                    <button class="button is-primary" on:click="{addWeapon}">Add weapon</button>
+                </div>
+            </div>
+            <section class="container">
+            {#each $ship.weapons as sys, i}
+                {#if weaponList.includes(sys.name) }
+                <SysDisplay
+                    prop="weapons"
+                    idx={i}
+                />
+                {/if}
+            {/each}
+            </section>
+        </section>
 
 <!--
 <div class="level">
@@ -402,4 +409,5 @@
     </div>
 </div>
 -->
-{/if}
+    </div> <!-- Column -->
+</div> <!-- Columns -->

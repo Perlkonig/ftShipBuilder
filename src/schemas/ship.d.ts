@@ -40,12 +40,7 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "fireControl";
-        advanced?: boolean;
-        [k: string]: unknown;
-      }
-    | {
-        name: "adfc";
+        name: "fireControl" | "adfc";
         advanced?: boolean;
         [k: string]: unknown;
       }
@@ -92,11 +87,7 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "suicide";
-        [k: string]: unknown;
-      }
-    | {
-        name: "mineSweeper";
+        name: "suicide" | "mineSweeper" | "damageControl" | "marines" | "stealthField" | "holofield";
         [k: string]: unknown;
       }
     | {
@@ -127,20 +118,8 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "damageControl";
-        [k: string]: unknown;
-      }
-    | {
-        name: "marines";
-        [k: string]: unknown;
-      }
-    | {
         name: "ecm";
         area?: boolean;
-        [k: string]: unknown;
-      }
-    | {
-        name: "stealthField";
         [k: string]: unknown;
       }
   )[];
@@ -153,12 +132,7 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "missile";
-        modifier?: "er" | "twostage";
-        [k: string]: unknown;
-      }
-    | {
-        name: "salvo";
+        name: "missile" | "salvo";
         modifier?: "er" | "twostage";
         [k: string]: unknown;
       }
@@ -173,11 +147,6 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "mkp";
-        arc: Arcs;
-        [k: string]: unknown;
-      }
-    | {
         name: "rocketPod";
         leftArc: Arcs;
         numArcs: 3;
@@ -189,37 +158,22 @@ export interface FullThrustShip {
    */
   weapons?: (
     | {
-        name: "pds";
+        name: "pds" | "scatterGun" | "grapeshot";
+        [k: string]: unknown;
+      }
+    | {
+        name: "spinalBeam" | "spinalPlasma" | "spinalSingularity";
+        range: "short" | "medium" | "long";
         [k: string]: unknown;
       }
     | {
         name: "ads";
-        [k: string]: unknown;
-      }
-    | {
-        name: "scatterGun";
-        [k: string]: unknown;
-      }
-    | {
-        name: "grapeshot";
-        [k: string]: unknown;
-      }
-    | {
-        name: "beam";
-        class: 1 | 2 | 3 | 4;
         leftArc: Arcs;
-        numArcs: Numarcs;
+        numArcs: 3 | 6;
         [k: string]: unknown;
       }
     | {
-        name: "emp";
-        class: 1 | 2 | 3 | 4;
-        leftArc: Arcs;
-        numArcs: Numarcs;
-        [k: string]: unknown;
-      }
-    | {
-        name: "plasmaCannon";
+        name: "beam" | "emp" | "plasmaCannon" | "phaser" | "transporter" | "needle";
         class: 1 | 2 | 3 | 4;
         leftArc: Arcs;
         numArcs: Numarcs;
@@ -234,40 +188,7 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "phaser";
-        class: 1 | 2 | 3 | 4;
-        leftArc: Arcs;
-        numArcs: Numarcs;
-        [k: string]: unknown;
-      }
-    | {
-        name: "transporter";
-        class: 1 | 2 | 3 | 4;
-        leftArc: Arcs;
-        numArcs: Numarcs;
-        [k: string]: unknown;
-      }
-    | {
-        name: "gatling";
-        leftArc: Arcs;
-        numArcs: Numarcs;
-        [k: string]: unknown;
-      }
-    | {
-        name: "particle";
-        leftArc: Arcs;
-        numArcs: Numarcs;
-        [k: string]: unknown;
-      }
-    | {
-        name: "meson";
-        leftArc: Arcs;
-        numArcs: Numarcs;
-        [k: string]: unknown;
-      }
-    | {
-        name: "needle";
-        class: 1 | 2 | 3 | 4;
+        name: "gatling" | "particle" | "meson" | "submunition" | "fusion";
         leftArc: Arcs;
         numArcs: Numarcs;
         [k: string]: unknown;
@@ -280,21 +201,9 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "submunition";
-        leftArc: Arcs;
-        numArcs: Numarcs;
-        [k: string]: unknown;
-      }
-    | {
         name: "kgun";
         class: 1 | 2 | 3 | 4 | 5 | 6;
         range?: "standard" | "short" | "long";
-        leftArc: Arcs;
-        numArcs: Numarcs;
-        [k: string]: unknown;
-      }
-    | {
-        name: "fusion";
         leftArc: Arcs;
         numArcs: Numarcs;
         [k: string]: unknown;
@@ -314,21 +223,8 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "spinalBeam";
-        [k: string]: unknown;
-      }
-    | {
-        name: "spinalPlasma";
-        [k: string]: unknown;
-      }
-    | {
-        name: "spinalSingularity";
-        [k: string]: unknown;
-      }
-    | {
-        name: "kineticPenetrator";
-        leftArc: Arcs;
-        numArcs: Numarcs;
+        name: "mkp";
+        arc: Arcs;
         [k: string]: unknown;
       }
   )[];

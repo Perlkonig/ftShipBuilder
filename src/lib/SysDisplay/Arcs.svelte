@@ -1,6 +1,8 @@
 <script lang="ts">
-    import { ship } from "@/stores/writeShip";
-    import type {Arcs} from "@/schemas/ship";
+    import { ship } from "../../stores/writeShip";
+    import type {Arcs} from "../../schemas/ship";
+    import { getSystem } from "../systems";
+    import type { System } from "../systems";
 
     interface ISystem {
         name: string;
@@ -18,6 +20,7 @@
     let sys: ISystem;
     $: sys = $ship[prop][idx];
 
+    const arcList: [Arcs, string][] = [["F", "Fore"], ["FP", "Fore Port"], ["FS", "Fore Starboard"], ["A", "Aft"], ["AP", "Aft Port"], ["AS", "Aft Starboard"]];
 </script>
 
 <div class="field">
@@ -25,7 +28,7 @@
     <div class="control">
         <div class="select" id="type">
             <select bind:value={sys.leftArc} on:change="{() => $ship = $ship}">
-            {#each [["F", "Fore"], ["FP", "Fore Port"], ["FS", "Fore Starboard"], ["A", "Aft"], ["AP", "Aft Port"], ["AS", "Aft Starboard"]] as pair}
+            {#each arcList as pair}
                 {#if (! arcBlacklist.includes(pair[0]))}
                     <option value="{pair[0]}">{pair[1]}</option>
                 {/if}

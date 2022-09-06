@@ -8,16 +8,13 @@
   <h1 class="title">Full Thrust Ship Builder</h1>
   <!-- svelte-ignore missing-declaration -->
   <p class="version subtitle">Version: {__APP_VERSION__}</p>
-  <div class="columns">
-    <div class="column is-three-quarters">
-      <Builder/>
-    </div>
-    <div class="column">
-      <div class="sticky">
-        <Status/>
-      </div>
-    </div>
+  <div class="sticky">
+    <Status/>
   </div>
+  <div class="container">
+    <Builder/>
+  </div>
+  <hr>
   <div class="container">
     <SSD/>
   </div>
@@ -38,5 +35,8 @@
   .sticky {
     position: sticky;
     top: 0;
+    z-index: 100;
+    width: 100%;
+    background: white;
   }
 </style>

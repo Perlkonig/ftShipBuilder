@@ -24,6 +24,7 @@
                 <option value="F">Forward</option>
                 <option value="FP">Forward Port</option>
                 <option value="FS">Forward Starboard</option>
+                <option value="A">Aft</option>
                 <option value="AP">Aft Port</option>
                 <option value="AS">Aft Starboard</option>
             </select>

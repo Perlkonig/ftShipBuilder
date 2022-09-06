@@ -1,13 +1,19 @@
 <script lang="ts">
-    import { afterUpdate } from "svelte";
     import { ship } from "../stores/writeShip";
-    import { calcAllMassPts } from "./massPts";
-    import type { IMassPts } from "./massPts";
+    import { afterUpdate } from "svelte";
+    import type { FullThrustShip } from "../schemas/ship";
     import MassPts from "./MassPts.svelte";
+    import type { SpecialSystem } from "./systems";
+    import { specialsList, allRegSystems, getSystem, getSpecial } from "./systems";
 
     interface ISystem {
         name: string;
         [k: string]: unknown;
+    };
+
+    interface IMassPts {
+        mass: number;
+        points: number;
     };
 
     let results: IMassPts;
@@ -15,6 +21,33 @@
     let delta: number;
     $: if ( ($ship.hasOwnProperty("mass")) && ($ship.mass !== undefined) ) {
         delta = $ship.mass - results.mass;
+    }
+
+    const calcAllMassPts = (ship: FullThrustShip): IMassPts => {
+        let mass = 0;
+        let points = 0;
+
+        if (! ship.hasOwnProperty("mass")) {
+            return undefined;
+        }
+
+        for (const id of specialsList) {
+            const obj = getSpecial(id, ship);
+            mass += obj.mass();
+            points += obj.points();
+        }
+
+        for (const group of ["systems", "ordnance", "weapons"]) {
+            if (ship.hasOwnProperty(group)) {
+                for (const sys of ship[group] as ISystem[]) {
+                    const obj = getSystem(sys, ship);
+                    mass += obj.mass();
+                    points += obj.points()
+                }
+            }
+        }
+
+        return {mass, points};
     }
 
     let errors: string[];
@@ -72,6 +105,19 @@
             errors.push(`You have allocated too many marines. You can have at most ${cf} plus ${maxBerthedTroops} from purchased berths.`);
         }
 
+        // Sufficient room for spinal mounts
+        const maxSpinalMass = 16 * Math.ceil($ship.mass / 50);
+        let spinalMass = 0;
+        for (const sys of $ship.weapons) {
+            if (sys.name.startsWith("spinal")) {
+                const obj = getSystem(sys, $ship);
+                spinalMass += obj.mass();
+            }
+        }
+        if (spinalMass > maxSpinalMass) {
+            errors.push(`Your spinal-mounted weapons are too heavy. You can only equip 16 mass of spinal weapons for every 50 total ship mass (rounded up).`);
+        }
+
         if (errors.length > 0) {
             return errors;
         } else {
@@ -85,9 +131,11 @@
     <h2 class="subtitle">Status</h2>
 
     {#if results !== undefined}
-        <MassPts
-            results={results}
-        />
+        <div class="container">
+            <span class="tag is-success is-light">{results.mass} mass</span>
+            <span class="tag is-info is-light">{results.points} points</span>
+        </div>
+
         <div class="container">
         {#if delta > 0}
             <span class="tag is-warning">{delta} mass remaining</span>

@@ -92,19 +92,7 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["fireControl"]
-                            },
-                            "advanced": {
-                                "type": "boolean",
-                                "default": false
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["adfc"]
+                                "enum": ["fireControl", "adfc"]
                             },
                             "advanced": {
                                 "type": "boolean",
@@ -159,15 +147,7 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["suicide"]
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["mineSweeper"]
+                                "enum": ["suicide", "mineSweeper", "damageControl", "marines", "stealthField", "holofield"]
                             }
                         },
                         "required": ["name"]
@@ -225,35 +205,11 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["damageControl"]
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["marines"]
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
                                 "enum": ["ecm"]
                             },
                             "area": {
                                 "type": "boolean",
                                 "default": false
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["stealthField"]
                             }
                         },
                         "required": ["name"]
@@ -278,18 +234,7 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["missile"]
-                            },
-                            "modifier": {
-                                "enum": ["er", "twostage"]
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["salvo"]
+                                "enum": ["missile", "salvo"]
                             },
                             "modifier": {
                                 "enum": ["er", "twostage"]
@@ -318,17 +263,6 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["mkp"]
-                            },
-                            "arc": {
-                                "$ref": "#/definitions/arcs"
-                            }
-                        },
-                        "required": ["name", "arc"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
                                 "enum": ["rocketPod"]
                             },
                             "leftArc": {
@@ -352,39 +286,42 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["pds"]
+                                "enum": ["pds", "scatterGun", "grapeshot"]
                             }
                         },
                         "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["spinalBeam", "spinalPlasma", "spinalSingularity"]
+                            },
+                            "range": {
+                                "enum": ["short", "medium", "long"],
+                                "default": "short"
+                            }
+                        },
+                        "required": ["name", "range"]
                     },
                     {
                         "properties": {
                             "name": {
                                 "enum": ["ads"]
+                            },
+                            "leftArc": {
+                                "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "enum": [3, 6],
+                                "default": 3
                             }
                         },
-                        "required": ["name"]
+                        "required": ["name", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
                             "name": {
-                                "enum": ["scatterGun"]
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["grapeshot"]
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["beam"]
+                                "enum": ["beam", "emp", "plasmaCannon", "phaser", "transporter", "needle"]
                             },
                             "class": {
                                 "enum": [1, 2, 3, 4]
@@ -398,40 +335,7 @@
                         },
                         "required": ["name", "class", "leftArc", "numArcs"]
                     },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["emp"]
-                            },
-                            "class": {
-                                "enum": [1, 2, 3, 4]
-                            },
-                            "leftArc": {
-                                "$ref": "#/definitions/arcs"
-                            },
-                            "numArcs": {
-                                "$ref": "#/definitions/numarcs"
-                            }
-                        },
-                        "required": ["name", "class", "leftArc", "numArcs"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["plasmaCannon"]
-                            },
-                            "class": {
-                                "enum": [1, 2, 3, 4]
-                            },
-                            "leftArc": {
-                                "$ref": "#/definitions/arcs"
-                            },
-                            "numArcs": {
-                                "$ref": "#/definitions/numarcs"
-                            }
-                        },
-                        "required": ["name", "class", "leftArc", "numArcs"]
-                    },
+
                     {
                         "properties": {
                             "name": {
@@ -456,41 +360,7 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["phaser"]
-                            },
-                            "class": {
-                                "enum": [1, 2, 3, 4]
-                            },
-                            "leftArc": {
-                                "$ref": "#/definitions/arcs"
-                            },
-                            "numArcs": {
-                                "$ref": "#/definitions/numarcs"
-                            }
-                        },
-                        "required": ["name", "class", "leftArc", "numArcs"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["transporter"]
-                            },
-                            "class": {
-                                "enum": [1, 2, 3, 4]
-                            },
-                            "leftArc": {
-                                "$ref": "#/definitions/arcs"
-                            },
-                            "numArcs": {
-                                "$ref": "#/definitions/numarcs"
-                            }
-                        },
-                        "required": ["name", "class", "leftArc", "numArcs"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["gatling"]
+                                "enum": ["gatling", "particle", "meson", "submunition", "fusion"]
                             },
                             "leftArc": {
                                 "$ref": "#/definitions/arcs"
@@ -500,51 +370,6 @@
                             }
                         },
                         "required": ["name", "leftArc", "numArcs"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["particle"]
-                            },
-                            "leftArc": {
-                                "$ref": "#/definitions/arcs"
-                            },
-                            "numArcs": {
-                                "$ref": "#/definitions/numarcs"
-                            }
-                        },
-                        "required": ["name", "leftArc", "numArcs"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["meson"]
-                            },
-                            "leftArc": {
-                                "$ref": "#/definitions/arcs"
-                            },
-                            "numArcs": {
-                                "$ref": "#/definitions/numarcs"
-                            }
-                        },
-                        "required": ["name", "leftArc", "numArcs"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["needle"]
-                            },
-                            "class": {
-                                "enum": [1, 2, 3, 4]
-                            },
-                            "leftArc": {
-                                "$ref": "#/definitions/arcs"
-                            },
-                            "numArcs": {
-                                "$ref": "#/definitions/numarcs"
-                            }
-                        },
-                        "required": ["name", "class", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -554,20 +379,6 @@
                             "range": {
                                 "enum": ["standard", "short", "long"],
                                 "default": "standard"
-                            },
-                            "leftArc": {
-                                "$ref": "#/definitions/arcs"
-                            },
-                            "numArcs": {
-                                "$ref": "#/definitions/numarcs"
-                            }
-                        },
-                        "required": ["name", "leftArc", "numArcs"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["submunition"]
                             },
                             "leftArc": {
                                 "$ref": "#/definitions/arcs"
@@ -598,20 +409,6 @@
                             }
                         },
                         "required": ["name", "class", "leftArc", "numArcs"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["fusion"]
-                            },
-                            "leftArc": {
-                                "$ref": "#/definitions/arcs"
-                            },
-                            "numArcs": {
-                                "$ref": "#/definitions/numarcs"
-                            }
-                        },
-                        "required": ["name", "leftArc", "numArcs"]
                     },
                     {
                         "properties": {
@@ -650,40 +447,13 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["spinalBeam"]
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["spinalPlasma"]
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["spinalSingularity"]
-                            }
-                        },
-                        "required": ["name"]
-                    },
-                    {
-                        "properties": {
-                            "name": {
-                                "enum": ["kineticPenetrator"]
+                                "enum": ["mkp"]
                             },
-                            "leftArc": {
+                            "arc": {
                                 "$ref": "#/definitions/arcs"
-                            },
-                            "numArcs": {
-                                "$ref": "#/definitions/numarcs"
                             }
                         },
-                        "required": ["name", "leftArc", "numArcs"]
+                        "required": ["name", "arc"]
                     }
                 ]
             }

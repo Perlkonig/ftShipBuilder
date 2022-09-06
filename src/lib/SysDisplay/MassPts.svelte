@@ -1,7 +1,7 @@
 <script lang="ts">
     import { ship } from "../../stores/writeShip";
-    import { calcSysMassPts } from "../massPts";
-    import type { IMassPts } from "../massPts";
+    import { getSystem } from "../systems";
+    import type { System } from "../systems";
 
     interface ISystem {
         name: string;
@@ -12,11 +12,11 @@
     export let idx: number;
     let sys: ISystem;
     $: sys = $ship[prop][idx];
-    let massPts: IMassPts;
-    $: massPts = calcSysMassPts(sys, $ship.mass);
+    let obj: System;
+    $: obj = getSystem(sys, $ship);
 </script>
 
 <div class="container">
-    <span class="tag is-success is-light">{massPts.mass} mass</span>
-    <span class="tag is-info is-light">{massPts.points} points</span>
+    <span class="tag is-success is-light">{obj.mass()} mass</span>
+    <span class="tag is-info is-light">{obj.points()} points</span>
 </div>

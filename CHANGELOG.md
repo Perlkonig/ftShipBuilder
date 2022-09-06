@@ -5,7 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v0.2.1] - 2022-09-09
+
+### Changed
+
+* Moved to a more efficient site layout.
+
+### Broken
+
+* I'm afraid the click and drag is not working consistently on mobile. Something I hope to fix eventually. Works just fine across all desktop browsers, though.
+
+### Developers
+
+* Completely refactored the system handling code (`src/lib/systems`). Each system has its own class file that encapsulates its naming, mass, points, and symbols all together. This should make it much more straightforward to add or edit systems.
 
 ## [v0.2.0] - 2022-09-04
 
