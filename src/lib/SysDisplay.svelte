@@ -142,7 +142,7 @@ import Class from "./SysDisplay/Class.svelte";
             idx={idx}
             choices={[["short", "Short range (24 mu)"], ["medium", "Medium range (32 mu)"], ["long", "Long range (48 mu)"]]}
         />
-    {:else if ["beam"].includes(sys.name)}
+    {:else if ["beam", "emp", "plasmaCannon", "phaser", "transporter", "needle"].includes(sys.name)}
         <Class
             prop={prop}
             idx={idx}

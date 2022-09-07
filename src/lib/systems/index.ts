@@ -36,6 +36,11 @@ import { SpinalBeam } from "./spinalBeam";
 import { SpinalPlasma } from "./spinalPlasma";
 import { SpinalSingularity } from "./spinalSingularity";
 import { Beam } from "./beam";
+import { Emp } from "./emp";
+import { PlasmaCannon } from "./plasmaCannon";
+import { Phaser } from "./phaser";
+import { Transporter } from "./transporter";
+import { Needle } from "./needle";
 
 export { SpecialSystem, System };
 export const specialsList: string[] = ["hull", "stealth", "streamlining", "armour"];
@@ -69,6 +74,11 @@ export const sortNames = new Map<string, string>([
     ["spinalPlasma", "Spinal Mount - Plasma"],
     ["spinalSingularity", "Spinal Mount - Point Singularity Projector"],
     ["beam", "Beam"],
+    ["emp", "EMP Projector"],
+    ["plasmaCannon", "Plasma Cannon"],
+    ["phaser", "Phaser"],
+    ["transporter", "Transporter Beam"],
+    ["needle", "Needle Beam"],
 ]);
 
 // Put the short code in the appropriate list in whatever order. They get sorted for display.
@@ -90,7 +100,7 @@ export const ordnanceList: string[] = ["rocketPod", "salvoLauncher", "missile", 
         return 0;
     }
 });
-export const weaponList: string[] = ["beam", "spinalSingularity", "spinalPlasma", "spinalBeam", "grapeshot", "scatterGun", "pds", "mkp", "ads"].sort((a, b) => {
+export const weaponList: string[] = ["needle", "transporter", "phaser", "plasmaCannon", "emp", "beam", "spinalSingularity", "spinalPlasma", "spinalBeam", "grapeshot", "scatterGun", "pds", "mkp", "ads"].sort((a, b) => {
     if (sortNames.get(a) > sortNames.get(b)) {
         return 1;
     } else if (sortNames.get(a) < sortNames.get(b)) {
@@ -178,6 +188,16 @@ export const getSystem = (data: ISystem, ship: FullThrustShip): System => {
             return new SpinalSingularity(data, ship);
         case "beam":
             return new Beam(data, ship);
+        case "emp":
+            return new Emp(data, ship);
+        case "plasmaCannon":
+            return new PlasmaCannon(data, ship);
+        case "phaser":
+            return new Phaser(data, ship);
+        case "transporter":
+            return new Transporter(data, ship);
+        case "needle":
+            return new Needle(data, ship);
         default:
             console.error(`Could not find a system with the name ${data.name}`);
             break;
