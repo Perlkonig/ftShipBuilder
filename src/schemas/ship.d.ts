@@ -182,6 +182,7 @@ export interface FullThrustShip {
     | {
         name: "graser";
         heavy?: boolean;
+        highIntensity?: boolean;
         class: 1 | 2 | 3 | 4;
         leftArc: Arcs;
         numArcs: Numarcs;

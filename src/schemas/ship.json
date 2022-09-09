@@ -335,13 +335,16 @@
                         },
                         "required": ["name", "class", "leftArc", "numArcs"]
                     },
-
                     {
                         "properties": {
                             "name": {
                                 "enum": ["graser"]
                             },
                             "heavy": {
+                                "type": "boolean",
+                                "default": false
+                            },
+                            "highIntensity": {
                                 "type": "boolean",
                                 "default": false
                             },

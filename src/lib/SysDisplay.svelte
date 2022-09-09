@@ -13,8 +13,9 @@
     import Area from "./SysDisplay/Area.svelte";
     import { getSystem } from "./systems";
     import type { System } from "./systems";
-import Range from "./SysDisplay/Range.svelte";
-import Class from "./SysDisplay/Class.svelte";
+    import Range from "./SysDisplay/Range.svelte";
+    import Class from "./SysDisplay/Class.svelte";
+    import Graser from "./SysDisplay/Graser.svelte";
 
     interface ISystem {
         name: string;
@@ -148,6 +149,21 @@ import Class from "./SysDisplay/Class.svelte";
             idx={idx}
             min={1}
             max={4}
+        />
+        <Arcs
+            prop={prop}
+            idx={idx}
+        />
+    {:else if sys.name === "graser"}
+        <Class
+            prop={prop}
+            idx={idx}
+            min={1}
+            max={4}
+        />
+        <Graser
+            prop={prop}
+            idx={idx}
         />
         <Arcs
             prop={prop}

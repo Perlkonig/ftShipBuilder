@@ -83,6 +83,8 @@
                 $ship.weapons.push({name: shipWeapon, leftArc: "FP", numArcs: 3});
             } else if (["phaser", "transporter", "needle", "beam", "emp", "plasmaCannon"].includes(shipWeapon)) {
                 $ship.weapons.push({name: shipWeapon, class: 1, leftArc: "F", numArcs: 1});
+            } else if (shipWeapon === "graser") {
+                $ship.weapons.push({name: "graser", class: 1, leftArc: "F", numArcs: 3, heavy: false, highIntensity: false});
             } else if (shipWeapon === "mkp") {
                 $ship.weapons.push({name: "mkp", arc: "F"});
             } else {
