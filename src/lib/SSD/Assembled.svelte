@@ -2,21 +2,17 @@
     import { Canvg } from "canvg";
     import { afterUpdate, beforeUpdate } from 'svelte';
     import { ship } from "../../stores/writeShip";
+    import { savedLayouts } from "../../stores/writeStoredLayouts";
     import { ssdComponents } from "../../stores/writeSsd";
-    import { layoutFactory } from "../layouts";
+    import { layouts } from "../layouts";
+    import type { ILayout } from "../layouts";
     import { getSystem } from "../systems";
     import { svgLib } from "../svgLib";
 
     export let layoutID: string;
 
-    const layout = layoutFactory(layoutID, 1000);
-    const bSystems = layout.blockSystems();
-    const bName = layout.blockName();
-    const bStats = layout.blockStats();
-    const bHull = layout.blockHull();
-    const bDrive = layout.blockDrive();
-    const bFtl = layout.blockFtl();
-    const bCore = layout.blockCore();
+    const allLayouts: ILayout[] = [...layouts, ...$savedLayouts];
+    const layout = allLayouts.find(x => x.id === layoutID);
     const svgCore = svgLib.find(x => x.id === "coreSys")!;
     const sysFtl = $ship.systems.find(x => x.name === "ftl")!;
     const hasFtl: boolean =  sysFtl !== undefined;
@@ -78,12 +74,12 @@
             hullRows.push(node);
         }
 
-        const blocksHigh = Math.floor(bHull.height / layout.cellsize);
+        const blocksHigh = Math.floor(layout.blockHull.height / layout.cellsize);
         const svgHull = svgLib.find(x => x.id === "hull")!;
         const svgHullCrew = svgLib.find(x => x.id === "hullCrew")!;
         const svgArmour = svgLib.find(x => x.id === "armour")!;
         const svgStealth = svgLib.find(x => x.id === "stealthHull");
-        let s = `<symbol id="_ssdHull" viewBox="-1 -1 ${bHull.width + 2} ${bHull.height + 2}">`;
+        let s = `<symbol id="_ssdHull" viewBox="-1 -1 ${layout.blockHull.width + 2} ${layout.blockHull.height + 2}">`;
         s += `<defs>`;
         if ($ship.hull.stealth !== "0") {
             s += svgStealth.svg;
@@ -146,8 +142,8 @@
     afterUpdate(() => {
         if (nameElement !== undefined) {
             var bb = nameElement.getBBox();
-            var widthTransform = bName.width * 0.9 / bb.width;
-            var heightTransform = bName.height * 0.9 / bb.height;
+            var widthTransform = layout.blockName.width * 0.9 / bb.width;
+            var heightTransform = layout.blockName.height * 0.9 / bb.height;
             var value = widthTransform < heightTransform ? widthTransform : heightTransform;
             nameElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
             const currx = parseFloat(nameElement.getAttribute("x"));
@@ -157,8 +153,8 @@
         }
         if (statsElement !== undefined) {
             var bb = statsElement.getBBox();
-            var widthTransform = bStats.width * 0.9 / bb.width;
-            var heightTransform = bStats.height * 0.9 / bb.height;
+            var widthTransform = layout.blockStats.width * 0.9 / bb.width;
+            var heightTransform = layout.blockStats.height * 0.9 / bb.height;
             var value = widthTransform < heightTransform ? widthTransform : heightTransform;
             statsElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
             const currx = parseFloat(statsElement.getAttribute("x"));
@@ -168,8 +164,8 @@
         }
         if (thrustElement !== undefined) {
             var bb = thrustElement.getBBox();
-            var widthTransform = bDrive.width * 0.75 / bb.width;
-            var heightTransform = bDrive.height * 0.75 / bb.height;
+            var widthTransform = layout.blockDrive.width * 0.75 / bb.width;
+            var heightTransform = layout.blockDrive.height * 0.75 / bb.height;
             var value = widthTransform < heightTransform ? widthTransform : heightTransform;
             thrustElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
             const currx = parseFloat(thrustElement.getAttribute("x"));
@@ -193,22 +189,22 @@
         {/if}
         </defs>
     <rect x="0" y="0" width="{layout.width}" height="{layout.height}" stroke="black" fill="white" />
-    <text x="{bName.minx + (bName.width / 2)}" y="{bName.miny + (bName.height / 2)}" bind:this="{nameElement}" dominant-baseline="middle" text-anchor="middle">{$ship.class} "{$ship.name}"</text>
-    <text x="{bStats.minx + (bStats.width / 2)}" y="{bStats.miny + (bStats.height / 2)}" bind:this="{statsElement}" dominant-baseline="middle" text-anchor="middle">Mass: {$ship.mass}, NPV: {$ship.points}</text>
-    <use href="#_ssdSystems" x="{bSystems.minx}" y="{bSystems.miny}" width="{bSystems.width}" height="{bSystems.height}" />
-    <use href="#_ssdHull" x="{bHull.minx}" y="{bHull.miny}" width="{bHull.width}" height="{bHull.height}" />
-    <use href="#svg_coreSys" x="{bCore.minx}" y="{bCore.miny}" width="{bCore.width}" height="{bCore.height}" />
+    <text x="{layout.blockName.minx + (layout.blockName.width / 2)}" y="{layout.blockName.miny + (layout.blockName.height / 2)}" bind:this="{nameElement}" dominant-baseline="middle" text-anchor="middle">{$ship.class} "{$ship.name}"</text>
+    <text x="{layout.blockStats.minx + (layout.blockStats.width / 2)}" y="{layout.blockStats.miny + (layout.blockStats.height / 2)}" bind:this="{statsElement}" dominant-baseline="middle" text-anchor="middle">Mass: {$ship.mass}, NPV: {$ship.points}</text>
+    <use href="#_ssdSystems" x="{layout.blockSystems.minx}" y="{layout.blockSystems.miny}" width="{layout.blockSystems.width}" height="{layout.blockSystems.height}" />
+    <use href="#_ssdHull" x="{layout.blockHull.minx}" y="{layout.blockHull.miny}" width="{layout.blockHull.width}" height="{layout.blockHull.height}" />
+    <use href="#svg_coreSys" x="{layout.blockCore.minx}" y="{layout.blockCore.miny}" width="{layout.blockCore.width}" height="{layout.blockCore.height}" />
 {#if hasFtlAdv}
-    <use href="#svg_ftlAdv" x="{bFtl.minx}" y="{bFtl.miny}" width="{bFtl.width}" height="{bFtl.height}" />
+    <use href="#svg_ftlAdv" x="{layout.blockFtl.minx}" y="{layout.blockFtl.miny}" width="{layout.blockFtl.width}" height="{layout.blockFtl.height}" />
 {:else if hasFtl}
-    <use href="#svg_ftl" x="{bFtl.minx}" y="{bFtl.miny}" width="{bFtl.width}" height="{bFtl.height}" />
+    <use href="#svg_ftl" x="{layout.blockFtl.minx}" y="{layout.blockFtl.miny}" width="{layout.blockFtl.width}" height="{layout.blockFtl.height}" />
 {/if}
 {#if hasAdvDrive}
-    <use href="#svg_driveAdv" x="{bDrive.minx}" y="{bDrive.miny}" width="{bDrive.width}" height="{bDrive.height}" />
-    <text x="{bDrive.minx + (bDrive.width / 2)}" y="{bDrive.miny + (bDrive.height / 2) + (bDrive.height * 0.05)}" bind:this="{thrustElement}" dominant-baseline="middle" text-anchor="middle">{totalThrust}</text>
+    <use href="#svg_driveAdv" x="{layout.blockDrive.minx}" y="{layout.blockDrive.miny}" width="{layout.blockDrive.width}" height="{layout.blockDrive.height}" />
+    <text x="{layout.blockDrive.minx + (layout.blockDrive.width / 2)}" y="{layout.blockDrive.miny + (layout.blockDrive.height / 2) + (layout.blockDrive.height * 0.05)}" bind:this="{thrustElement}" dominant-baseline="middle" text-anchor="middle">{totalThrust}</text>
 {:else}
-    <use href="#svg_drive" x="{bDrive.minx}" y="{bDrive.miny}" width="{bDrive.width}" height="{bDrive.height}" />
-    <text x="{bDrive.minx + (bDrive.width / 2)}" y="{bDrive.miny + (bDrive.height / 2) + (bDrive.height * 0.1)}" bind:this="{thrustElement}" dominant-baseline="middle" text-anchor="middle">{totalThrust}</text>
+    <use href="#svg_drive" x="{layout.blockDrive.minx}" y="{layout.blockDrive.miny}" width="{layout.blockDrive.width}" height="{layout.blockDrive.height}" />
+    <text x="{layout.blockDrive.minx + (layout.blockDrive.width / 2)}" y="{layout.blockDrive.miny + (layout.blockDrive.height / 2) + (layout.blockDrive.height * 0.1)}" bind:this="{thrustElement}" dominant-baseline="middle" text-anchor="middle">{totalThrust}</text>
 {/if}
 </svg>
 </div>

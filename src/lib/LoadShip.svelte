@@ -8,7 +8,6 @@
     const loadJSON = () => {
         $ship = JSON.parse(shipJSON);
         modalLoadJSON = undefined;
-        alert("Ship loaded");
     }
 
     let shipID: string;
@@ -18,7 +17,6 @@
         const entry = $savedShips.find(x => x.name === shipID);
         if (entry !== undefined) {
             $ship = JSON.parse(entry.json);
-            alert("Ship loaded");
         }
     }
 
@@ -26,7 +24,6 @@
         const idx = $savedShips.findIndex(x => x.name === delShip);
         if (idx !== -1) {
             $savedShips.splice(idx, 1);
-            alert("Ship deleted");
             $savedShips = $savedShips;
         }
     }

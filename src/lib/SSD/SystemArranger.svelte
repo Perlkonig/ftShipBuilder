@@ -1,7 +1,9 @@
 <script lang="ts">
     import { ship } from "../../stores/writeShip";
+    import { savedLayouts } from "../../stores/writeStoredLayouts";
     import { ssdComponents } from "../../stores/writeSsd";
-    import { layoutFactory } from "../layouts";
+    import { layouts } from "../layouts";
+    import type { ILayout } from "../layouts";
     import type { IBox } from "../layouts";
     import type { ISystemSVG } from "../svgLib";
     import { nanoid } from "nanoid";
@@ -23,7 +25,8 @@
         y: number;
     }
 
-    const layout = layoutFactory(layoutID, 1000);
+    const allLayouts: ILayout[] = [...layouts, ...$savedLayouts];
+    const layout = allLayouts.find(x => x.id === layoutID);
     let block: IBox;
     let blocksWide: number;
     let blocksHigh: number;
@@ -34,7 +37,7 @@
     const sysDistinct: ISystemSVG[] = [];
     const lines: IPoint[][] = [];
     $: if (layout !== undefined) {
-        block = layout.blockSystems();
+        block = layout.blockSystems;
         blocksWide = Math.floor(block.width / layout.cellsize);
         blocksHigh = Math.floor(block.height / layout.cellsize);
         let currx = cellsize;
