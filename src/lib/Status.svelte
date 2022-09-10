@@ -2,8 +2,6 @@
     import { ship } from "../stores/writeShip";
     import { afterUpdate } from "svelte";
     import type { FullThrustShip } from "../schemas/ship";
-    import MassPts from "./MassPts.svelte";
-    import type { SpecialSystem } from "./systems";
     import { specialsList, allRegSystems, getSystem, getSpecial } from "./systems";
 
     interface ISystem {
@@ -23,30 +21,31 @@
         delta = $ship.mass - results.mass;
     }
 
-    const calcAllMassPts = (ship: FullThrustShip): IMassPts => {
+    const calcAllMassPts = (shipObj: FullThrustShip): IMassPts => {
         let mass = 0;
         let points = 0;
 
-        if (! ship.hasOwnProperty("mass")) {
+        if (! shipObj.hasOwnProperty("mass")) {
             return undefined;
         }
 
         for (const id of specialsList) {
-            const obj = getSpecial(id, ship);
+            const obj = getSpecial(id, shipObj);
             mass += obj.mass();
             points += obj.points();
         }
 
         for (const group of ["systems", "ordnance", "weapons"]) {
-            if (ship.hasOwnProperty(group)) {
-                for (const sys of ship[group] as ISystem[]) {
-                    const obj = getSystem(sys, ship);
+            if (shipObj.hasOwnProperty(group)) {
+                for (const sys of shipObj[group] as ISystem[]) {
+                    const obj = getSystem(sys, shipObj);
                     mass += obj.mass();
                     points += obj.points()
                 }
             }
         }
 
+        shipObj.points = points;
         return {mass, points};
     }
 

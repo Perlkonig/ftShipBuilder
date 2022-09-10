@@ -5,10 +5,9 @@
     import Assembled from "./SSD/Assembled.svelte";
     import SystemArranger from "./SSD/SystemArranger.svelte";
 
-    let selectedID: string;
     let selected: ILayoutDesc;
-    $: if (selectedID !== undefined) {
-        selected = layoutList.find(x => x.id === selectedID);
+    $: if ($ship.layout !== undefined) {
+        selected = layoutList.find(x => x.id === $ship.layout);
     }
 </script>
 
@@ -19,7 +18,7 @@
         <label class="label" for="layouts">Select a layout</label>
         <div class="control">
             <div class="select">
-                <select id="layouts" bind:value={selectedID}>
+                <select id="layouts" bind:value={$ship.layout}>
                     <option hidden disabled selected value> -- select a layout -- </option>
                 {#each layoutList as l}
                     <option id="{l.id}" value="{l.id}">{l.name}</option>
@@ -32,18 +31,18 @@
 {#key $ship}
     <h2 class="subtitle">Arrange Systems</h2>
     {#if (selected !== undefined) }
-        {#key selectedID}
+        {#key $ship.layout}
             <SystemArranger
-                layoutID={selectedID}
+                layoutID={$ship.layout}
             />
         {/key}
     {/if}
 
     <h2 class="subtitle">Assembled SSD</h2>
     {#if (selected !== undefined) }
-        {#key selectedID}
+        {#key $ship.layout}
         <Assembled
-            layoutID={selectedID}
+            layoutID={$ship.layout}
         />
         {/key}
     {/if}

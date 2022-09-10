@@ -2,6 +2,7 @@
   import Builder from "./lib/Builder.svelte";
   import Status from "./lib/Status.svelte";
   import SSD from "./lib/SSD.svelte";
+  import LoadShip from "./lib/LoadShip.svelte";
 </script>
 
 <main class="container p-6">
@@ -11,6 +12,7 @@
   <div class="sticky">
     <Status/>
   </div>
+  <LoadShip/>
   <div class="container">
     <Builder/>
   </div>

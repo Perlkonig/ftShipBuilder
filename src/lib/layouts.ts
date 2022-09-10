@@ -15,6 +15,7 @@ abstract class Layout {
     }
 
     abstract blockName(): IBox;
+    abstract blockStats(): IBox;
     abstract blockHull(): IBox;
     abstract blockDrive(): IBox;
     abstract blockFtl(): IBox;
@@ -45,6 +46,14 @@ class LayoutCompact extends Layout {
         const miny = 0;
         const width = this.width - minx;
         const height = this.height * 0.1;
+        return {minx, miny, width, height};
+    };
+
+    blockStats = (): IBox => {
+        const minx = 0;
+        const miny = 0;
+        const width = this.width / 3;
+        const height = this.height * 0.05;
         return {minx, miny, width, height};
     };
 
@@ -102,7 +111,16 @@ class LayoutNarrow extends Layout {
         const minx = 0;
         const miny = 0;
         const width = this.width;
-        const height = this.height * 0.1;
+        const height = this.height * 0.075;
+        return {minx, miny, width, height};
+    };
+
+    blockStats = (): IBox => {
+        const bn = this.blockName();
+        const minx = 0;
+        const miny = bn.miny + bn.height;
+        const width = this.width;
+        const height = this.height * 0.025;
         return {minx, miny, width, height};
     };
 
@@ -159,7 +177,16 @@ class LayoutStandard extends Layout {
         const minx = 0;
         const miny = 0;
         const width = this.width;
-        const height = this.height * 0.1;
+        const height = this.height * 0.075;
+        return {minx, miny, width, height};
+    };
+
+    blockStats = (): IBox => {
+        const bn = this.blockName();
+        const minx = 0;
+        const miny = bn.miny + bn.height;
+        const width = this.width;
+        const height = this.height * 0.025;
         return {minx, miny, width, height};
     };
 
@@ -216,7 +243,16 @@ class LayoutSquare extends Layout {
         const minx = 0;
         const miny = 0;
         const width = this.width;
-        const height = this.height * 0.1;
+        const height = this.height * 0.075;
+        return {minx, miny, width, height};
+    };
+
+    blockStats = (): IBox => {
+        const bn = this.blockName();
+        const minx = 0;
+        const miny = bn.miny + bn.height;
+        const width = this.width;
+        const height = this.height * 0.025;
         return {minx, miny, width, height};
     };
 
@@ -273,7 +309,16 @@ class LayoutHuge extends Layout {
         const minx = 0;
         const miny = 0;
         const width = this.width;
-        const height = this.height * 0.1;
+        const height = this.height * 0.075;
+        return {minx, miny, width, height};
+    };
+
+    blockStats = (): IBox => {
+        const bn = this.blockName();
+        const minx = 0;
+        const miny = bn.miny + bn.height;
+        const width = this.width;
+        const height = this.height * 0.025;
         return {minx, miny, width, height};
     };
 

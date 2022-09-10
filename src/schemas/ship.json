@@ -502,6 +502,10 @@
         "name": {
             "type": "string"
         },
+        "layout": {
+            "description": "An optional string identifying the preset layout used for the SSD. This is helpful when loading a saved ship into the builder.",
+            "type": "string"
+        },
         "notes": {
             "description": "Markdown-encoded flavour text attached to this particular ship.",
             "type": "string"

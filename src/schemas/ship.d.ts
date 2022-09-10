@@ -251,6 +251,10 @@ export interface FullThrustShip {
   class?: string;
   name?: string;
   /**
+   * An optional string identifying the preset layout used for the SSD. This is helpful when loading a saved ship into the builder.
+   */
+  layout?: string;
+  /**
    * Markdown-encoded flavour text attached to this particular ship.
    */
   notes?: string;

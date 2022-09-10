@@ -12,6 +12,7 @@
     const layout = layoutFactory(layoutID, 1000);
     const bSystems = layout.blockSystems();
     const bName = layout.blockName();
+    const bStats = layout.blockStats();
     const bHull = layout.blockHull();
     const bDrive = layout.blockDrive();
     const bFtl = layout.blockFtl();
@@ -32,6 +33,7 @@
     const svgDrive = getSystem(sysDrive, $ship).glyph();
 
     let nameElement: SVGTextElement;
+    let statsElement: SVGTextElement;
     let thrustElement: SVGTextElement;
     let fullSsdSvg: SVGElement;
     let svgDataStr: string;
@@ -153,6 +155,17 @@
             nameElement.setAttribute("x", (currx / value).toString());
             nameElement.setAttribute("y", (curry / value).toString());
         }
+        if (statsElement !== undefined) {
+            var bb = statsElement.getBBox();
+            var widthTransform = bStats.width * 0.9 / bb.width;
+            var heightTransform = bStats.height * 0.9 / bb.height;
+            var value = widthTransform < heightTransform ? widthTransform : heightTransform;
+            statsElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
+            const currx = parseFloat(statsElement.getAttribute("x"));
+            const curry = parseFloat(statsElement.getAttribute("y"));
+            statsElement.setAttribute("x", (currx / value).toString());
+            statsElement.setAttribute("y", (curry / value).toString());
+        }
         if (thrustElement !== undefined) {
             var bb = thrustElement.getBBox();
             var widthTransform = bDrive.width * 0.75 / bb.width;
@@ -181,6 +194,7 @@
         </defs>
     <rect x="0" y="0" width="{layout.width}" height="{layout.height}" stroke="black" fill="white" />
     <text x="{bName.minx + (bName.width / 2)}" y="{bName.miny + (bName.height / 2)}" bind:this="{nameElement}" dominant-baseline="middle" text-anchor="middle">{$ship.class} "{$ship.name}"</text>
+    <text x="{bStats.minx + (bStats.width / 2)}" y="{bStats.miny + (bStats.height / 2)}" bind:this="{statsElement}" dominant-baseline="middle" text-anchor="middle">Mass: {$ship.mass}, NPV: {$ship.points}</text>
     <use href="#_ssdSystems" x="{bSystems.minx}" y="{bSystems.miny}" width="{bSystems.width}" height="{bSystems.height}" />
     <use href="#_ssdHull" x="{bHull.minx}" y="{bHull.miny}" width="{bHull.width}" height="{bHull.height}" />
     <use href="#svg_coreSys" x="{bCore.minx}" y="{bCore.miny}" width="{bCore.width}" height="{bCore.height}" />
