@@ -1,8 +1,8 @@
 <script lang="ts">
     import { ship } from "../stores/writeShip";
     import { savedLayouts } from "../stores/writeStoredLayouts";
-    import { layouts } from "./layouts";
-    import type { ILayout } from "./layouts";
+    import { layouts } from "../lib/layouts";
+    import type { ILayout } from "../lib/layouts";
     import Assembled from "./SSD/Assembled.svelte";
     import SystemArranger from "./SSD/SystemArranger.svelte";
     import CustomLayout from "./SSD/CustomLayout.svelte";

@@ -18,5 +18,5 @@
     <div class="control">
         <input id="identifier" class="input" type="text" placeholder="Unique identifier" bind:value={sys.id} on:change="{() => $ship = $ship}">
     </div>
-    <p class="help">This ID is used primarly to link launchers to magazines and will be used in later tools. For now, feel free to accept the default or enter your own. It must be unique across your entire ship.</p>
+    <p class="help">This ID is used primarly to link launchers to magazines and fighters to hangars and will be used in later tools. For now, feel free to accept the default or enter your own. It must be unique across your entire ship.</p>
 </div>

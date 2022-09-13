@@ -106,12 +106,14 @@
                             "name": {
                                 "enum": ["hangar"]
                             },
-                            "icon": {
-                                "description": "This decides what SSD icon to use. If not provided, the standard hangar icon is selected.",
-                                "enum": ["I", "circle", "triangle", "bold", "DD", "MR", "chevron", "hex", "missle", "ship", "L", "A", "T", "H", "F", "P", "rack"]
+                            "isRack": {
+                                "type": "boolean",
+                                "default": false
+
                             },
                             "id": {
-                                "description": "A unique identifier used to target this hangar in orders and in the `fighters` property."
+                                "description": "A unique identifier used to target this hangar in orders and in the `fighters` property.",
+                                "type": "string"
                             }
                         },
                         "required": ["name", "id"]
@@ -321,6 +323,20 @@
                     {
                         "properties": {
                             "name": {
+                                "enum": ["submuntion"]
+                            },
+                            "leftArc": {
+                                "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "enum": [3]
+                            }
+                        },
+                        "required": ["name", "leftArc", "numArcs"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
                                 "enum": ["beam", "emp", "plasmaCannon", "phaser", "transporter", "needle"]
                             },
                             "class": {
@@ -363,7 +379,7 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["gatling", "particle", "meson", "submunition", "fusion"]
+                                "enum": ["gatling", "particle", "meson", "fusion"]
                             },
                             "leftArc": {
                                 "$ref": "#/definitions/arcs"
@@ -379,9 +395,8 @@
                             "name": {
                                 "enum": ["torpedoPulse"]
                             },
-                            "range": {
-                                "enum": ["standard", "short", "long"],
-                                "default": "standard"
+                            "modifier": {
+                                "enum": ["short", "long"]
                             },
                             "leftArc": {
                                 "$ref": "#/definitions/arcs"
@@ -400,9 +415,8 @@
                             "class": {
                                 "enum": [1, 2, 3, 4, 5, 6]
                             },
-                            "range": {
-                                "enum": ["standard", "short", "long"],
-                                "default": "standard"
+                            "modifier": {
+                                "enum": ["short", "long"]
                             },
                             "leftArc": {
                                 "$ref": "#/definitions/arcs"
@@ -433,7 +447,7 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["plasmaBolt"]
+                                "enum": ["pbl"]
                             },
                             "class": {
                                 "enum": [1, 2, 3, 4, 5, 6]
@@ -472,14 +486,14 @@
             }
         },
         "fighters": {
-            "description": "There cannot be more fighters than hangars. The type of fighter doesn't have to match the type of hangar, but it should to avoid confusion. The hangar type simply determines the icon on the SSD. The fighter type here determines what fighters you actually have available in game.",
+            "description": "There cannot be more fighters than hangars.",
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
                     "type": {
                         "description": "The fighters' base type",
-                        "enum": ["standard", "interceptor", "attack", "torpedo", "graser", "plasma", "MKP", "missile", "light"],
+                        "enum": ["standard", "interceptor", "attack", "torpedo", "graser", "plasma", "MKP", "missile", "multiRole", "light", "lightInterceptor", "lightAttack"],
                         "default": "standard"
                     },
                     "mods": {

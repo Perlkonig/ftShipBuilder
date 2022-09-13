@@ -4,10 +4,10 @@
     import { ship } from "../../stores/writeShip";
     import { savedLayouts } from "../../stores/writeStoredLayouts";
     import { ssdComponents } from "../../stores/writeSsd";
-    import { layouts } from "../layouts";
-    import type { ILayout } from "../layouts";
-    import { getSystem } from "../systems";
-    import { svgLib } from "../svgLib";
+    import { layouts } from "../../lib/layouts";
+    import type { ILayout } from "../../lib/layouts";
+    import { getSystem } from "../../lib/systems";
+    import { svgLib } from "../../lib/svgLib";
 
     export let layoutID: string;
 

@@ -6,7 +6,7 @@
     import { savedShips } from "../stores/writeStoredShips";
     import SysDisplay from "./SysDisplay.svelte";
     import MassPts from "./MassPts.svelte";
-    import { systemList, ordnanceList, weaponList, getSpecial, getSystem, sortNames } from "./systems";
+    import { systemList, ordnanceList, weaponList, getSpecial, getSystem, sortNames } from "../lib/systems";
 
     const addArmour = () => {
         $ship.armour.push(1);
@@ -56,8 +56,12 @@
                 $ship.systems.push({name: "mineLayer", capacity: 2});
             } else if (shipSystem === "bay") {
                 $ship.systems.push({name: "bay", id: nanoid(5), capacity: 1, type: "cargo"});
+            } else if (shipSystem === "hangar") {
+                $ship.systems.push({name: "hangar", id: nanoid(5), isRack: false, critRules: false});
             } else if (shipSystem === "magazine") {
                 $ship.systems.push({name: "magazine", capacity: 2, id: nanoid(5)});
+            } else if (shipSystem === "launchTube") {
+                $ship.systems.push({name: "launchTube", catapult: false});
             } else {
                 // @ts-ignore
                 $ship.systems.push({name: shipSystem});
@@ -82,8 +86,12 @@
         if (shipWeapon !== undefined) {
             if (shipWeapon === "ads") {
                 $ship.weapons.push({name: shipWeapon, leftArc: "FP", numArcs: 3});
-            } else if (["phaser", "transporter", "needle", "beam", "emp", "plasmaCannon"].includes(shipWeapon)) {
+            } else if (["phaser", "transporter", "needle", "beam", "emp", "plasmaCannon", "kgun", "gravitic", "pbl"].includes(shipWeapon)) {
                 $ship.weapons.push({name: shipWeapon, class: 1, leftArc: "F", numArcs: 1});
+            } else if (["gatling", "particle", "meson", "fusion", "torpedoPulse"].includes(shipWeapon)) {
+                $ship.weapons.push({name: shipWeapon, leftArc: "F", numArcs: 1});
+            } else if (shipWeapon === "submunition") {
+                $ship.weapons.push({name: shipWeapon, leftArc: "FP", numArcs: 3});
             } else if (shipWeapon === "graser") {
                 $ship.weapons.push({name: "graser", class: 1, leftArc: "F", numArcs: 3, heavy: false, highIntensity: false});
             } else if (shipWeapon === "mkp") {
@@ -95,6 +103,23 @@
         }
         $ship = $ship;
     };
+
+    const addFighter = () => {
+        $ship.fighters.push({name: "fighters", type: "standard"});
+        $ship = $ship;
+    };
+
+    let emptyHangars: number;
+    let duplicateHangars = false;
+    $: {
+        const numHangars = $ship.systems.reduce((a, v) => {return v.name === "hangar" ? a + 1 : a}, 0);
+        const numFighters = $ship.fighters.length;
+        emptyHangars = numHangars - numFighters;
+        const unique: Set<string> = new Set([...$ship.fighters.map(x => x.hangar)]);
+        if (unique.size !== $ship.fighters.length) {
+            duplicateHangars = true;
+        }
+    }
 
     const setClass = () => {
         const m = $ship.mass;
@@ -135,6 +160,8 @@
         replacedString = JSON.stringify($ship, (k, v) => {
             if (k === "glyph") {
                 return undefined;
+            // } else if (k === "critRules") {
+            //     return undefined;
             } else {
                 return v;
             }
@@ -149,6 +176,9 @@
     // const weaponList = ["ads", "pds", "scatterGun"];
 
     let saveName: string;
+    $: if ( (saveName === undefined) || (saveName.length === 0) ) {
+        saveName = $ship.name;
+    }
     let duplicated: boolean = true;
     $: if ( (saveName !== undefined) && (saveName !== "") ) {
         const idx = $savedShips.findIndex(x => x.name === saveName);
@@ -434,6 +464,39 @@
             </section>
         </section>
 
+    {#if ( (emptyHangars > 0) || ($ship.fighters.length > 0) )}
+        <section class="section">
+            <h2 class="subtitle">Fighters</h2>
+            <div class="content">
+                <p>
+                    You have {emptyHangars} empty hangar{emptyHangars != 1 ? "s" : ""} awaiting fighters.
+                </p>
+            {#if duplicateHangars}
+                <p class="alert">
+                    You have multiple fighters assigned to the same hangar.
+                </p>
+            {/if}
+            </div>
+            <div class="field">
+                <div class="control">
+                {#if emptyHangars > 0}
+                    <button class="button is-primary" on:click="{addFighter}">Add fighter wing</button>
+                {:else}
+                    <button class="button is-primary" disabled>Add fighter wing</button>
+                {/if}
+                </div>
+            </div>
+            <section class="container">
+            {#each $ship.fighters as sys, i}
+                <SysDisplay
+                    prop="fighters"
+                    idx={i}
+                />
+            {/each}
+            </section>
+        </section>
+    {/if}
+
     </div> <!-- Column -->
 </div> <!-- Columns -->
 <div class="level">
@@ -466,3 +529,10 @@
     </div>
     -->
 </div>
+
+<style>
+    .alert {
+        color: red;
+        font-style: italic;
+    }
+</style>

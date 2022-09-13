@@ -1,11 +1,13 @@
 <script lang="ts">
-  import Builder from "./lib/Builder.svelte";
-  import Status from "./lib/Status.svelte";
-  import SSD from "./lib/SSD.svelte";
-  import LoadShip from "./lib/LoadShip.svelte";
+  import Builder from "./components/Builder.svelte";
+  import Status from "./components/Status.svelte";
+  import SSD from "./components/SSD.svelte";
+  import LoadShip from "./components/LoadShip.svelte";
+  import Nav from "./components/Nav.svelte";
 </script>
 
 <main class="container p-6">
+  <Nav />
   <h1 class="title">Full Thrust Ship Builder</h1>
   <!-- svelte-ignore missing-declaration -->
   <p class="version subtitle">Version: {__APP_VERSION__}</p>

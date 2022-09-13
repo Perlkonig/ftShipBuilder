@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { System, SpecialSystem } from "./systems";
+    import type { System, SpecialSystem } from "../lib/systems";
 
     export let obj: System | SpecialSystem;
 </script>

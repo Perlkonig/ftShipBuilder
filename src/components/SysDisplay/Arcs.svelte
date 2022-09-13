@@ -1,8 +1,8 @@
 <script lang="ts">
     import { ship } from "../../stores/writeShip";
     import type {Arcs} from "../../schemas/ship";
-    import { getSystem } from "../systems";
-    import type { System } from "../systems";
+    import { getSystem } from "../../lib/systems";
+    import type { System } from "../../lib/systems";
 
     interface ISystem {
         name: string;

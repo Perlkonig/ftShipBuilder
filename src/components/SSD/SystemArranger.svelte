@@ -2,12 +2,12 @@
     import { ship } from "../../stores/writeShip";
     import { savedLayouts } from "../../stores/writeStoredLayouts";
     import { ssdComponents } from "../../stores/writeSsd";
-    import { layouts } from "../layouts";
-    import type { ILayout } from "../layouts";
-    import type { IBox } from "../layouts";
-    import type { ISystemSVG } from "../svgLib";
+    import { layouts } from "../../lib/layouts";
+    import type { ILayout } from "../../lib/layouts";
+    import type { IBox } from "../../lib/layouts";
+    import type { ISystemSVG } from "../../lib/svgLib";
     import { nanoid } from "nanoid";
-    import { getSystem } from "../systems";
+    import { getSystem } from "../../lib/systems";
 
     export let layoutID: string;
 
@@ -259,9 +259,6 @@
 
     {#each systems as sys}
         <use id="{sys.id}" href="#svg_{sys.glyph.id}" x="{sys.x * layout.cellsize}" y="{sys.y * layout.cellsize}" width="{sys.glyph.width * layout.cellsize}" height="{sys.glyph.height * layout.cellsize}" class="draggable confined" />
-        {#if sys.name === "bay"}
-            <text x="{(sys.x * layout.cellsize) + ((sys.glyph.width * layout.cellsize) / 2)}" y="{(sys.y * layout.cellsize) + ((sys.glyph.height * layout.cellsize) * 0.75)}" dominant-baseline="middle" text-anchor="middle" font-size="{(sys.glyph.height * layout.cellsize) * 0.25}">{sys.capacity}</text>
-        {/if}
     {/each}
     </svg>
 </div>

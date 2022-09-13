@@ -42,6 +42,18 @@ import { Phaser } from "./phaser";
 import { Transporter } from "./transporter";
 import { Needle } from "./needle";
 import { Graser } from "./graser";
+import { Gatling } from "./gatling";
+import { Particle } from "./particle";
+import { Meson } from "./meson";
+import { Submunition } from "./submunition";
+import { Fusion } from "./fusion";
+import { TorpedoPulse } from "./torpedoPulse";
+import { Kgun } from "./kgun";
+import { Gravitic } from "./gravitic";
+import { Pbl } from "./pbl";
+import { Hangar } from "./hangar";
+import { LaunchTube } from "./launchTube";
+import { Fighters } from "./fighters";
 
 export { SpecialSystem, System };
 export const specialsList: string[] = ["hull", "stealth", "streamlining", "armour"];
@@ -81,10 +93,22 @@ export const sortNames = new Map<string, string>([
     ["transporter", "Transporter Beam"],
     ["needle", "Needle Beam"],
     ["graser", "Graser"],
+    ["gatling", "Gatling Battery"],
+    ["particle", "Twin Particle Array"],
+    ["meson", "Meson Projector"],
+    ["submunition", "Turreted Submunition Pack"],
+    ["fusion", "Fusion Array"],
+    ["torpedoPulse", "Pulse Torpedos"],
+    ["kgun", "K-Gun"],
+    ["gravitic", "Gravitic Gun"],
+    ["pbl", "Plasma Bolt Launcher"],
+    ["hangar", "Fighter Bay/Rack"],
+    ["launchTube", "Launch Tube"],
+    ["fighters", "Fighters"],
 ]);
 
 // Put the short code in the appropriate list in whatever order. They get sorted for display.
-export const systemList: string[] = ["holofield", "stealthField", "ecm", "damageControl", "marines", "magazine", "bay", "mineLayer", "mineSweeper", "screen", "suicide", "fireControl", "adfc"].sort((a, b) => {
+export const systemList: string[] = ["launchTube", "hangar", "holofield", "stealthField", "ecm", "damageControl", "marines", "magazine", "bay", "mineLayer", "mineSweeper", "screen", "suicide", "fireControl", "adfc"].sort((a, b) => {
     if (sortNames.get(a) > sortNames.get(b)) {
         return 1;
     } else if (sortNames.get(a) < sortNames.get(b)) {
@@ -102,7 +126,7 @@ export const ordnanceList: string[] = ["rocketPod", "salvoLauncher", "missile", 
         return 0;
     }
 });
-export const weaponList: string[] = ["graser", "needle", "transporter", "phaser", "plasmaCannon", "emp", "beam", "spinalSingularity", "spinalPlasma", "spinalBeam", "grapeshot", "scatterGun", "pds", "mkp", "ads"].sort((a, b) => {
+export const weaponList: string[] = ["pbl", "gravitic", "kgun", "torpedoPulse", "fusion", "submunition", "meson", "particle", "gatling", "graser", "needle", "transporter", "phaser", "plasmaCannon", "emp", "beam", "spinalSingularity", "spinalPlasma", "spinalBeam", "grapeshot", "scatterGun", "pds", "mkp", "ads"].sort((a, b) => {
     if (sortNames.get(a) > sortNames.get(b)) {
         return 1;
     } else if (sortNames.get(a) < sortNames.get(b)) {
@@ -202,6 +226,30 @@ export const getSystem = (data: ISystem, ship: FullThrustShip): System => {
             return new Needle(data, ship);
         case "graser":
             return new Graser(data, ship);
+        case "gatling":
+            return new Gatling(data, ship);
+        case "particle":
+            return new Particle(data, ship);
+        case "meson":
+            return new Meson(data, ship);
+        case "submunition":
+            return new Submunition(data, ship);
+        case "fusion":
+            return new Fusion(data, ship);
+        case "torpedoPulse":
+            return new TorpedoPulse(data, ship);
+        case "kgun":
+            return new Kgun(data, ship);
+        case "gravitic":
+            return new Gravitic(data, ship);
+        case "pbl":
+            return new Pbl(data, ship);
+        case "hangar":
+            return new Hangar(data, ship);
+        case "launchTube":
+            return new LaunchTube(data, ship);
+        case "fighters":
+            return new Fighters(data, ship);
         default:
             console.error(`Could not find a system with the name ${data.name}`);
             break;

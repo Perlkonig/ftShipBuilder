@@ -27,7 +27,7 @@ export abstract class System {
     abstract fullName(): string;
     abstract mass(): number;
     abstract points(): number;
-    abstract glyph(): IGlyph;
+    abstract glyph(): IGlyph | undefined;
 }
 
 export abstract class SpecialSystem {

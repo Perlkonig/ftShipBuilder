@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.5.0] - 2022-09-12
+
+### Added
+
+* Fighters have now been added. I haven't incorporated hangar icons yet. For now, the name of the fighter type is just printed on top.
+* All the weapons except for Pulsers have now been added.
+
+### Developers
+
+* Completely refactored the SVG code. I finally incorporated the automated generation tools I was already using directly into the code base. This drastically reduced the lines of code and resulting package size.
+* Moved some folders around.
+
 ## [v0.4.0] - 2022-09-10
 
 * You can now create, share, save, and retrieve custom SSD layouts.

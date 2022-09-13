@@ -46,33 +46,11 @@ export interface FullThrustShip {
       }
     | {
         name: "hangar";
-        /**
-         * This decides what SSD icon to use. If not provided, the standard hangar icon is selected.
-         */
-        icon?:
-          | "I"
-          | "circle"
-          | "triangle"
-          | "bold"
-          | "DD"
-          | "MR"
-          | "chevron"
-          | "hex"
-          | "missle"
-          | "ship"
-          | "L"
-          | "A"
-          | "T"
-          | "H"
-          | "F"
-          | "P"
-          | "rack";
+        isRack?: boolean;
         /**
          * A unique identifier used to target this hangar in orders and in the `fighters` property.
          */
-        id: {
-          [k: string]: unknown;
-        };
+        id: string;
         [k: string]: unknown;
       }
     | {
@@ -173,6 +151,12 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
+        name: "submuntion";
+        leftArc: Arcs;
+        numArcs: 3;
+        [k: string]: unknown;
+      }
+    | {
         name: "beam" | "emp" | "plasmaCannon" | "phaser" | "transporter" | "needle";
         class: 1 | 2 | 3 | 4;
         leftArc: Arcs;
@@ -189,14 +173,14 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "gatling" | "particle" | "meson" | "submunition" | "fusion";
+        name: "gatling" | "particle" | "meson" | "fusion";
         leftArc: Arcs;
         numArcs: Numarcs;
         [k: string]: unknown;
       }
     | {
         name: "torpedoPulse";
-        range?: "standard" | "short" | "long";
+        modifier?: "short" | "long";
         leftArc: Arcs;
         numArcs: Numarcs;
         [k: string]: unknown;
@@ -204,7 +188,7 @@ export interface FullThrustShip {
     | {
         name: "kgun";
         class: 1 | 2 | 3 | 4 | 5 | 6;
-        range?: "standard" | "short" | "long";
+        modifier?: "short" | "long";
         leftArc: Arcs;
         numArcs: Numarcs;
         [k: string]: unknown;
@@ -217,7 +201,7 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "plasmaBolt";
+        name: "pbl";
         class: 1 | 2 | 3 | 4 | 5 | 6;
         leftArc: Arcs;
         numArcs: Numarcs;
@@ -234,13 +218,25 @@ export interface FullThrustShip {
    */
   extras?: unknown[];
   /**
-   * There cannot be more fighters than hangars. The type of fighter doesn't have to match the type of hangar, but it should to avoid confusion. The hangar type simply determines the icon on the SSD. The fighter type here determines what fighters you actually have available in game.
+   * There cannot be more fighters than hangars.
    */
   fighters?: {
     /**
      * The fighters' base type
      */
-    type: "standard" | "interceptor" | "attack" | "torpedo" | "graser" | "plasma" | "MKP" | "missile" | "light";
+    type:
+      | "standard"
+      | "interceptor"
+      | "attack"
+      | "torpedo"
+      | "graser"
+      | "plasma"
+      | "MKP"
+      | "missile"
+      | "multiRole"
+      | "light"
+      | "lightInterceptor"
+      | "lightAttack";
     mods?: ("heavy" | "fast" | "longRange" | "ftl" | "robot")[];
     /**
      * Must match a hangar id. Omitted if the fighters are deployed.

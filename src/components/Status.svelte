@@ -2,7 +2,7 @@
     import { ship } from "../stores/writeShip";
     import { afterUpdate } from "svelte";
     import type { FullThrustShip } from "../schemas/ship";
-    import { specialsList, allRegSystems, getSystem, getSpecial } from "./systems";
+    import { specialsList, allRegSystems, getSystem, getSpecial } from "../lib/systems";
 
     interface ISystem {
         name: string;
