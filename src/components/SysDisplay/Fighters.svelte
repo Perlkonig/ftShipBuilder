@@ -48,6 +48,9 @@
         }
         $ship = $ship;
     });
+
+    let fighterTypes = [...type2name.entries()].sort((a, b) => {return a[1].localeCompare(b[1]);});
+    let fighterMods = [...mod2name.entries()].sort((a, b) => {return a[1].localeCompare(b[1]);});
 </script>
 
 <div class="field">
@@ -55,7 +58,7 @@
     <div class="control">
         <div class="select" id="type">
             <select bind:value={fighter.type} on:change="{() => $ship = $ship}">
-            {#each [...type2name.entries()] as pair}
+            {#each fighterTypes as pair}
                 <option value="{pair[0]}">{pair[1]}</option>
             {/each}
             </select>
@@ -65,7 +68,7 @@
 
 <div class="control">
     <p class="label">Select zero or more mods:</p>
-{#each [...mod2name.entries()] as pair}
+{#each fighterMods as pair}
     <label class="checkbox">
         <input type="checkbox" bind:group="{fighter.mods}" name="mods" value="{pair[0]}" on:change="{() => $ship = $ship}">
         {pair[1]}

@@ -172,7 +172,7 @@
             prop={prop}
             idx={idx}
         />
-    {:else if ["gatling", "particle", "meson"].includes(sys.name)}
+    {:else if ["gatling", "particle", "meson", "pulser"].includes(sys.name)}
         <Arcs
             prop={prop}
             idx={idx}

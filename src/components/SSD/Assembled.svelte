@@ -139,6 +139,9 @@
         genHull();
     });
 
+    let coreWidthOffset = 0;
+    let coreHeightOffset = 0;
+    let coreOffsetFactor = 0.15;
     afterUpdate(() => {
         if (nameElement !== undefined) {
             var bb = nameElement.getBBox();
@@ -173,6 +176,8 @@
             thrustElement.setAttribute("x", (currx / value).toString());
             thrustElement.setAttribute("y", (curry / value).toString());
         }
+        coreHeightOffset = (layout.blockCore.height * coreOffsetFactor) / 2;
+        coreWidthOffset = (layout.blockCore.width * coreOffsetFactor) / 2;
     });
 </script>
 
@@ -193,7 +198,7 @@
     <text x="{layout.blockStats.minx + (layout.blockStats.width / 2)}" y="{layout.blockStats.miny + (layout.blockStats.height / 2)}" bind:this="{statsElement}" dominant-baseline="middle" text-anchor="middle">Mass: {$ship.mass}, NPV: {$ship.points}</text>
     <use href="#_ssdSystems" x="{layout.blockSystems.minx}" y="{layout.blockSystems.miny}" width="{layout.blockSystems.width}" height="{layout.blockSystems.height}" />
     <use href="#_ssdHull" x="{layout.blockHull.minx}" y="{layout.blockHull.miny}" width="{layout.blockHull.width}" height="{layout.blockHull.height}" />
-    <use href="#svg_coreSys" x="{layout.blockCore.minx}" y="{layout.blockCore.miny}" width="{layout.blockCore.width}" height="{layout.blockCore.height}" />
+    <use href="#svg_coreSys" x="{layout.blockCore.minx + coreWidthOffset}" y="{layout.blockCore.miny + coreHeightOffset}" width="{layout.blockCore.width * (1 - coreOffsetFactor)}" height="{layout.blockCore.height * (1 - coreOffsetFactor)}" />
 {#if hasFtlAdv}
     <use href="#svg_ftlAdv" x="{layout.blockFtl.minx}" y="{layout.blockFtl.miny}" width="{layout.blockFtl.width}" height="{layout.blockFtl.height}" />
 {:else if hasFtl}

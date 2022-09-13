@@ -103,7 +103,7 @@ const genLine = (arc: Arc, side: "L"|"R" = "L"): [IPoint, IPoint] | undefined =>
     return undefined;
 }
 
-const arcList = (start: Arc, dist: number): Arc[] => {
+export const arcList = (start: Arc, dist: number): Arc[] => {
     const list = [start];
     for (let i = 1; i <= dist; i++) {
         const next = nextArc(start, i);

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ship } from "../../stores/writeShip";
+    import { snapToGrid } from "../../stores/writeSnap";
     import { savedLayouts } from "../../stores/writeStoredLayouts";
     import { ssdComponents } from "../../stores/writeSsd";
     import { layouts } from "../../lib/layouts";
@@ -184,8 +185,15 @@
             if (sys !== undefined) {
                 const width = Math.floor(block.width / layout.cellsize);
                 const height = Math.floor(block.height / layout.cellsize);
-                let newx = Math.round(parseFloat(dragSelected.getAttribute("x")) / layout.cellsize);
-                let newy = Math.round(parseFloat(dragSelected.getAttribute("y")) / layout.cellsize);
+                let newx: number;
+                let newy: number;
+                if ($snapToGrid) {
+                    newx = Math.round(parseFloat(dragSelected.getAttribute("x")) / layout.cellsize);
+                    newy = Math.round(parseFloat(dragSelected.getAttribute("y")) / layout.cellsize);
+                } else {
+                    newx = parseFloat(dragSelected.getAttribute("x")) / layout.cellsize;
+                    newy = parseFloat(dragSelected.getAttribute("y")) / layout.cellsize;
+                }
                 if (newx < 0) { newx = 0; }
                 if (newx >= width) { newx = width - 1; }
                 if (newy < 0) { newy = 0;}
@@ -236,6 +244,15 @@
 </script>
 
 {#if layout !== undefined}
+<div class="field">
+    <div class="control">
+        <label class="checkbox">
+            <input type="checkbox" bind:checked="{$snapToGrid}">
+            Snap to grid
+        </label>
+    </div>
+</div>
+
 <div class="ssd">
     <svg viewBox="-1 -1 {block.width + 2} {block.height + 2}" width="100%" height="100%" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:mouseleave="{endDrag}" on:touchstart="{startDrag}" on:touchmove="{drag}" on:touchend="{endDrag}" on:touchleave="{endDrag}" on:touchcancel="{endDrag}" bind:this="{svgDisplay}">
         <defs>

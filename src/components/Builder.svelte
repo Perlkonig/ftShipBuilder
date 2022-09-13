@@ -88,7 +88,7 @@
                 $ship.weapons.push({name: shipWeapon, leftArc: "FP", numArcs: 3});
             } else if (["phaser", "transporter", "needle", "beam", "emp", "plasmaCannon", "kgun", "gravitic", "pbl"].includes(shipWeapon)) {
                 $ship.weapons.push({name: shipWeapon, class: 1, leftArc: "F", numArcs: 1});
-            } else if (["gatling", "particle", "meson", "fusion", "torpedoPulse"].includes(shipWeapon)) {
+            } else if (["gatling", "particle", "meson", "fusion", "torpedoPulse", "pulser"].includes(shipWeapon)) {
                 $ship.weapons.push({name: shipWeapon, leftArc: "F", numArcs: 1});
             } else if (shipWeapon === "submunition") {
                 $ship.weapons.push({name: shipWeapon, leftArc: "FP", numArcs: 3});

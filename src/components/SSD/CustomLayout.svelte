@@ -41,11 +41,11 @@
             if ( (actives[prop]) && (newLayout[prop] !== undefined) && (newLayout[prop].height > 0) && (newLayout[prop].width > 0) ) {
                 rects.push(newLayout[prop]);
             }
-            if ( (newLayout[prop].height <= 0) || (newLayout[prop].width <= 0) ) {
-                actives[prop] = false;
-            } else {
-                actives[prop] = true;
-            }
+            // if ( (newLayout[prop].height <= 0) || (newLayout[prop].width <= 0) ) {
+            //     actives[prop] = false;
+            // } else {
+            //     actives[prop] = true;
+            // }
         }
     });
 
@@ -367,53 +367,6 @@
         <div class="field">
             <div class="control">
                 <label class="checkbox">
-                    <input type="checkbox" bind:checked="{actives.blockDrive}">
-                    Drive
-                </label>
-            </div>
-        </div>
-    </div>
-{#if actives.blockDrive}
-    <div class="column">
-        <div class="field">
-            <label class="label" for="minx">Top-left x coordinate</label>
-            <div class="control">
-                <input class="input" id="minx" type="number" placeholder="Top-left x coordinate" min="0" step="{newLayout.cellsize}" bind:value="{newLayout.blockDrive.minx}">
-            </div>
-        </div>
-    </div>
-    <div class="column">
-        <div class="field">
-            <label class="label" for="minx">Top-left y coordinate</label>
-            <div class="control">
-                <input class="input" id="miny" type="number" placeholder="Top-left y coordinate" min="0" step="{newLayout.cellsize}" bind:value="{newLayout.blockDrive.miny}">
-            </div>
-        </div>
-    </div>
-    <div class="column">
-        <div class="field">
-            <label class="label" for="width">Width</label>
-            <div class="control">
-                <input class="input" id="width" type="number" placeholder="Width" min="0" step="{newLayout.cellsize}" bind:value="{newLayout.blockDrive.width}">
-            </div>
-        </div>
-    </div>
-    <div class="column">
-        <div class="field">
-            <label class="label" for="height">Height</label>
-            <div class="control">
-                <input class="input" id="height" type="number" placeholder="Height" min="0" step="{newLayout.cellsize}" bind:value="{newLayout.blockDrive.height}">
-            </div>
-        </div>
-    </div>
-{/if}
-</div>
-
-<div class="columns">
-    <div class="column">
-        <div class="field">
-            <div class="control">
-                <label class="checkbox">
                     <input type="checkbox" bind:checked="{actives.blockFtl}">
                     FTL
                 </label>
@@ -450,6 +403,53 @@
             <label class="label" for="height">Height</label>
             <div class="control">
                 <input class="input" id="height" type="number" placeholder="Height" min="0" step="{newLayout.cellsize}" bind:value="{newLayout.blockFtl.height}">
+            </div>
+        </div>
+    </div>
+{/if}
+</div>
+
+<div class="columns">
+    <div class="column">
+        <div class="field">
+            <div class="control">
+                <label class="checkbox">
+                    <input type="checkbox" bind:checked="{actives.blockDrive}">
+                    Drive
+                </label>
+            </div>
+        </div>
+    </div>
+{#if actives.blockDrive}
+    <div class="column">
+        <div class="field">
+            <label class="label" for="minx">Top-left x coordinate</label>
+            <div class="control">
+                <input class="input" id="minx" type="number" placeholder="Top-left x coordinate" min="0" step="{newLayout.cellsize}" bind:value="{newLayout.blockDrive.minx}">
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="field">
+            <label class="label" for="minx">Top-left y coordinate</label>
+            <div class="control">
+                <input class="input" id="miny" type="number" placeholder="Top-left y coordinate" min="0" step="{newLayout.cellsize}" bind:value="{newLayout.blockDrive.miny}">
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="field">
+            <label class="label" for="width">Width</label>
+            <div class="control">
+                <input class="input" id="width" type="number" placeholder="Width" min="0" step="{newLayout.cellsize}" bind:value="{newLayout.blockDrive.width}">
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="field">
+            <label class="label" for="height">Height</label>
+            <div class="control">
+                <input class="input" id="height" type="number" placeholder="Height" min="0" step="{newLayout.cellsize}" bind:value="{newLayout.blockDrive.height}">
             </div>
         </div>
     </div>
