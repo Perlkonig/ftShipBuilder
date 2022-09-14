@@ -92,7 +92,7 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["fireControl", "adfc"]
+                                "enum": ["fireControl", "adfc", "sensors"]
                             },
                             "advanced": {
                                 "type": "boolean",
@@ -149,7 +149,7 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["suicide", "mineSweeper", "damageControl", "marines", "stealthField", "holofield"]
+                                "enum": ["suicide", "mineSweeper", "damageControl", "marines", "stealthField", "holofield", "cloakDevice", "cloakField", "ortillery", "reflex"]
                             }
                         },
                         "required": ["name"]
@@ -166,6 +166,16 @@
                             }
                         },
                         "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["decoy"]
+                            },
+                            "type": {
+                                "enum": ["cruiser", "capital"]
+                            }
+                        }
                     },
                     {
                         "properties": {
@@ -215,6 +225,34 @@
                             }
                         },
                         "required": ["name"]
+                    },
+                    {
+                        "properties": {
+                            "name": {
+                                "enum": ["turret"]
+                            },
+                            "leftArc": {
+                                "$ref": "#/definitions/arcs"
+                            },
+                            "numArcs": {
+                                "enum": [1, 2, 3, 4, 5, 6],
+                                "default": 1
+                            },
+                            "weapons": {
+                                "description": "A list of weapon IDs housed within this turret.",
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "size": {
+                                "description": "Purely used by SSD generators to size the turret relative to other systems. Turret glyphs are always square.",
+                                "type": "integer",
+                                "minimum": 4,
+                                "default": 4
+                            }
+                        },
+                        "required": ["name", "leftArc", "numArcs"]
                     }
                 ]
             }
@@ -288,7 +326,7 @@
                     {
                         "properties": {
                             "name": {
-                                "enum": ["pds", "scatterGun", "grapeshot"]
+                                "enum": ["pds", "scatterGun", "grapeshot", "spinalNova", "spinalWave"]
                             }
                         },
                         "required": ["name"]

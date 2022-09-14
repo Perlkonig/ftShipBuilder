@@ -33,12 +33,12 @@
         <section class="modal-card-body">
             <div class="content">
                 <p>
-                    This builder follows the  <a href="https://emeraldcoastskunkworks.wordpress.com/category/project-continum-rules/"><i>Continuum</i> ruleset</a>. But the rules are not wholly unambiguous. Some tweaks have been made. See the "Feedback" tab for information on how to report issues.
+                    This builder follows the <a href="https://emeraldcoastskunkworks.wordpress.com/category/project-continum-rules/"><i>Continuum</i> ruleset</a>. But the rules are not wholly unambiguous. Some tweaks have been made. See the "Feedback" tab for information on how to report issues.
                 </p>
-                <p>The builder knowingly lacks the following features:</p>
                 <ul>
-                    <li>Turrets</li>
-                    <li>Gunboats</li>
+                    <li>Gunboats are not supported at all, and I don't know they ever will be.</li>
+                    <li>Regenerative armour is currently unavailable, but I'm working on it.</li>
+                    <li>Turrets are implemented, but the rules are not clear, so I had to make some calls. You can have multiple arcs open on a turret, but they must be contiguous. Weapons have to be manually placed inside the turret graphic. Lines are drawn to help you.</li>
                 </ul>
                 <p>
                     This site is built on the <a href="https://svelte.dev/">Svelte framework</a>, using the <a href="https://bulma.io">Bulma CSS library</a> and good ol' <a href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">scalable vector graphics (SVG)</a> for the SSD.

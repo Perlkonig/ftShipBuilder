@@ -21,7 +21,7 @@
     <div class="control">
         <div class="select">
             <select id="type" bind:value={sys.type} on:change="{() => $ship = $ship}">
-                <option hidden disabled selected value> -- select a layout -- </option>
+                <option hidden disabled selected value> -- select a type -- </option>
             {#each choices as c}
                 <option value="{c[0]}">{c[1]}</option>
             {/each}

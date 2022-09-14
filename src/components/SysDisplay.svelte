@@ -19,6 +19,7 @@
     import Modifier from "./SysDisplay/Modifier.svelte";
     import Range from "./SysDisplay/Range.svelte";
     import Type from "./SysDisplay/Type.svelte";
+    import Turret from "./SysDisplay/Turret.svelte";
 
     interface ISystem {
         name: string;
@@ -51,7 +52,7 @@
         <div class="content">
             {sys.fullName()}
         </div>
-    {#if ( (sys.name === "adfc") || (sys.name === "fireControl") )}
+    {#if ( (sys.name === "adfc") || (sys.name === "fireControl") || (sys.name === "sensors") )}
         <Advanced
             prop={prop}
             idx={idx}
@@ -140,7 +141,7 @@
             prop={prop}
             idx={idx}
         />
-    {:else if sys.name.startsWith("spinal")}
+    {:else if ( (sys.name.startsWith("spinal")) && (sys.name !== "spinalNova") && (sys.name !== "spinalWave") ) }
         <Range
             prop={prop}
             idx={idx}
@@ -264,6 +265,17 @@
         <Fighters
             prop={prop}
             idx={idx}
+        />
+    {:else if sys.name === "turret"}
+        <Turret
+            prop={prop}
+            idx={idx}
+        />
+    {:else if sys.name === "decoy"}
+        <Type
+            prop={prop}
+            idx={idx}
+            choices={[["cruiser","Cruiser Decoy"],["capital","Capital Decoy"]]}
         />
     {/if}
     <MassPts

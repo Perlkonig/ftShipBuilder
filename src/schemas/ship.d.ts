@@ -40,7 +40,7 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "fireControl" | "adfc";
+        name: "fireControl" | "adfc" | "sensors";
         advanced?: boolean;
         [k: string]: unknown;
       }
@@ -65,12 +65,27 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name: "suicide" | "mineSweeper" | "damageControl" | "marines" | "stealthField" | "holofield";
+        name:
+          | "suicide"
+          | "mineSweeper"
+          | "damageControl"
+          | "marines"
+          | "stealthField"
+          | "holofield"
+          | "cloakDevice"
+          | "cloakField"
+          | "ortillery"
+          | "reflex";
         [k: string]: unknown;
       }
     | {
         name: "mineLayer";
         capacity?: number;
+        [k: string]: unknown;
+      }
+    | {
+        name?: "decoy";
+        type?: "cruiser" | "capital";
         [k: string]: unknown;
       }
     | {
@@ -98,6 +113,20 @@ export interface FullThrustShip {
     | {
         name: "ecm";
         area?: boolean;
+        [k: string]: unknown;
+      }
+    | {
+        name: "turret";
+        leftArc: Arcs;
+        numArcs: 1 | 2 | 3 | 4 | 5 | 6;
+        /**
+         * A list of weapon IDs housed within this turret.
+         */
+        weapons?: string[];
+        /**
+         * Purely used by SSD generators to size the turret relative to other systems. Turret glyphs are always square.
+         */
+        size?: number;
         [k: string]: unknown;
       }
   )[];
@@ -136,7 +165,7 @@ export interface FullThrustShip {
    */
   weapons?: (
     | {
-        name: "pds" | "scatterGun" | "grapeshot";
+        name: "pds" | "scatterGun" | "grapeshot" | "spinalNova" | "spinalWave";
         [k: string]: unknown;
       }
     | {

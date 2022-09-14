@@ -1,5 +1,6 @@
 import type { FullThrustShip } from "src/schemas/ship";
-import type { SpecialSystem, System, ISystem } from "./_base";
+import type { Arc, SpecialSystem, System, ISystem } from "./_base";
+export type {Arc};
 
 import { Hull } from "./specials/hull";
 import { Stealth } from "./specials/stealth";
@@ -55,6 +56,15 @@ import { Hangar } from "./hangar";
 import { LaunchTube } from "./launchTube";
 import { Fighters } from "./fighters";
 import { Pulser } from "./pulser";
+import { Turret } from "./turret";
+import { CloakDevice } from "./cloakDevice";
+import { CloakField } from "./cloakField";
+import { Sensors } from "./sensors";
+import { Decoy } from "./decoy";
+import { Ortillery } from "./ortillery";
+import { SpinalNova } from "./spinalNova";
+import { SpinalWave } from "./spinalWave";
+import { Reflex } from "./reflex";
 
 export { SpecialSystem, System };
 export const specialsList: string[] = ["hull", "stealth", "streamlining", "armour"];
@@ -107,10 +117,19 @@ export const sortNames = new Map<string, string>([
     ["launchTube", "Launch Tube"],
     ["fighters", "Fighters"],
     ["pulser", "Pulser"],
+    ["turret", "Turret"],
+    ["cloakDevice", "Cloaking Device"],
+    ["cloakField", "Cloaking Field"],
+    ["sensors", "Advanced Sensors"],
+    ["decoy", "Weasel Decoy"],
+    ["ortillery", "Ortillery System"],
+    ["spinalNova", "Spinal Mount - Nova Cannon (deprecated)"],
+    ["spinalWave", "Spinal Mount - Wave Gun (deprecated)"],
+    ["reflex", "Reflex Field"],
 ]);
 
 // Put the short code in the appropriate list in whatever order. They get sorted for display.
-export const systemList: string[] = ["launchTube", "hangar", "holofield", "stealthField", "ecm", "damageControl", "marines", "magazine", "bay", "mineLayer", "mineSweeper", "screen", "suicide", "fireControl", "adfc"].sort((a, b) => {
+export const systemList: string[] = ["reflex", "ortillery", "decoy", "sensors", "cloakDevice", "cloakField", "turret", "launchTube", "hangar", "holofield", "stealthField", "ecm", "damageControl", "marines", "magazine", "bay", "mineLayer", "mineSweeper", "screen", "suicide", "fireControl", "adfc"].sort((a, b) => {
     if (sortNames.get(a) > sortNames.get(b)) {
         return 1;
     } else if (sortNames.get(a) < sortNames.get(b)) {
@@ -128,7 +147,7 @@ export const ordnanceList: string[] = ["rocketPod", "salvoLauncher", "missile", 
         return 0;
     }
 });
-export const weaponList: string[] = ["pulser", "pbl", "gravitic", "kgun", "torpedoPulse", "fusion", "submunition", "meson", "particle", "gatling", "graser", "needle", "transporter", "phaser", "plasmaCannon", "emp", "beam", "spinalSingularity", "spinalPlasma", "spinalBeam", "grapeshot", "scatterGun", "pds", "mkp", "ads"].sort((a, b) => {
+export const weaponList: string[] = ["spinalWave", "spinalNova", "pulser", "pbl", "gravitic", "kgun", "torpedoPulse", "fusion", "submunition", "meson", "particle", "gatling", "graser", "needle", "transporter", "phaser", "plasmaCannon", "emp", "beam", "spinalSingularity", "spinalPlasma", "spinalBeam", "grapeshot", "scatterGun", "pds", "mkp", "ads"].sort((a, b) => {
     if (sortNames.get(a) > sortNames.get(b)) {
         return 1;
     } else if (sortNames.get(a) < sortNames.get(b)) {
@@ -254,6 +273,24 @@ export const getSystem = (data: ISystem, ship: FullThrustShip): System => {
             return new Fighters(data, ship);
         case "pulser":
             return new Pulser(data, ship);
+        case "turret":
+            return new Turret(data, ship);
+        case "cloakDevice":
+            return new CloakDevice(data, ship);
+        case "cloakField":
+            return new CloakField(data, ship);
+        case "sensors":
+            return new Sensors(data, ship);
+        case "decoy":
+            return new Decoy(data, ship);
+        case "ortillery":
+            return new Ortillery(data, ship);
+        case "spinalNova":
+            return new SpinalNova(data, ship);
+        case "spinalWave":
+            return new SpinalWave(data, ship);
+        case "reflex":
+            return new Reflex(data, ship);
         default:
             console.error(`Could not find a system with the name ${data.name}`);
             break;

@@ -117,6 +117,18 @@
             errors.push(`Your spinal-mounted weapons are too heavy. You can only equip 16 mass of spinal weapons for every 50 total ship mass (rounded up).`);
         }
 
+        // Sufficient room for turrets
+        const maxTurrets = Math.ceil($ship.mass / 50);
+        let turrets = 0;
+        for (const sys of $ship.systems) {
+            if (sys.name === "turret") {
+                turrets++;
+            }
+        }
+        if (turrets > maxTurrets) {
+            errors.push(`You have too many turrets. You can only have one turret for every 50 total ship mass (rounded up).`);
+        }
+
         if (errors.length > 0) {
             return errors;
         } else {

@@ -62,6 +62,10 @@
                 $ship.systems.push({name: "magazine", capacity: 2, id: nanoid(5)});
             } else if (shipSystem === "launchTube") {
                 $ship.systems.push({name: "launchTube", catapult: false});
+            } else if (shipSystem === "turret") {
+                $ship.systems.push({name: "turret", leftArc: "F", numArcs: 1});
+            } else if (shipSystem === "decoy") {
+                $ship.systems.push({name: "decoy", type: "cruiser"});
             } else {
                 // @ts-ignore
                 $ship.systems.push({name: shipSystem});

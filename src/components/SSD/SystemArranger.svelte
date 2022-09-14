@@ -111,6 +111,44 @@
             }
         }
 
+        // Find turret/weapon combos and draw lines between them if they are not layered.
+        for (const s of $ship.systems) {
+            if (s.name === "turret") {
+                for (const id of s.weapons) {
+                    let obj: any;
+                    let idx = $ship.ordnance.findIndex(x => x.id === id);
+                    if (idx !== -1) {
+                        obj = $ship.ordnance[idx];
+                    } else {
+                        idx = $ship.weapons.findIndex(x => x.id === id);
+                        if (idx !== -1) {
+                            obj = $ship.weapons[idx];
+                        }
+                    }
+                    if (obj !== undefined) {
+                        const xTurret = (s.x as number) * layout.cellsize;
+                        const yTurret = (s.y as number) * layout.cellsize;
+                        const wTurret = s.glyph.width * layout.cellsize;
+                        const hTurret = s.glyph.height * layout.cellsize;
+                        const x1 = xTurret + (wTurret / 2);
+                        const y1 = yTurret + (hTurret / 2);
+
+                        const xWeapon = obj.x * layout.cellsize;
+                        const yWeapon = obj.y * layout.cellsize;
+                        const wWeapon = obj.glyph.width * layout.cellsize;
+                        const hWeapon = obj.glyph.height * layout.cellsize;
+                        const x2 = xWeapon + (wWeapon / 2);
+                        const y2 = yWeapon + (hWeapon / 2);
+
+                        // Test for overlap
+                        if ( (xWeapon < xTurret) || (xWeapon > xTurret + wTurret) || (yWeapon < yTurret) || (yWeapon > yTurret + hTurret) ) {
+                            lines.push([{x: x1, y: y1}, {x: x2, y: y2}]);
+                        }
+                    }
+                }
+            }
+        }
+
         exportLayout();
     }
 
