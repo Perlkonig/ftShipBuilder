@@ -84,7 +84,7 @@ export interface FullThrustShip {
         [k: string]: unknown;
       }
     | {
-        name?: "decoy";
+        name: "decoy";
         type?: "cruiser" | "capital";
         [k: string]: unknown;
       }

@@ -8,21 +8,23 @@
     import type { ILayout } from "../../lib/layouts";
     import { getSystem } from "../../lib/systems";
     import { svgLib } from "../../lib/svgLib";
-    import type { IGlyph } from "src/lib/systems/_base";
+    import type { IGlyph, ISystem } from "src/lib/systems/_base";
 
     export let layoutID: string;
 
     const allLayouts: ILayout[] = [...layouts, ...$savedLayouts];
     const layout = allLayouts.find(x => x.id === layoutID);
     const svgCore = svgLib.find(x => x.id === "coreSys")!;
-    const sysFtl = $ship.systems.find(x => x.name === "ftl")!;
-    const hasFtl: boolean = sysFtl !== undefined;
+    const sysFtl: ISystem = $ship.systems.find(x => x.name === "ftl");
     let hasFtlAdv = false;
     let svgFtl: IGlyph;
-    if ( (hasFtl) && (sysFtl.hasOwnProperty("advanced")) && (sysFtl.advanced) ) {
+    if ( (sysFtl !== undefined) && (sysFtl.hasOwnProperty("advanced")) && (sysFtl.advanced) ) {
         hasFtlAdv = true;
+    }
+    if (sysFtl !== undefined) {
         svgFtl = getSystem(sysFtl, $ship).glyph();
     }
+
     const sysDrive = $ship.systems.find(x => x.name === "drive")!;
     let hasAdvDrive = false;
     if ( (sysDrive.hasOwnProperty("advanced")) && (sysDrive.advanced) ) {
@@ -191,7 +193,7 @@
             {@html $ssdComponents.hull}
             {@html svgCore.svg}
             {@html svgDrive.svg}
-        {#if ( (hasFtl) && (svgFtl !== undefined) )}
+        {#if (svgFtl !== undefined) }
             {@html svgFtl.svg}
         {/if}
         </defs>
@@ -203,7 +205,7 @@
     <use href="#svg_coreSys" x="{layout.blockCore.minx + coreWidthOffset}" y="{layout.blockCore.miny + coreHeightOffset}" width="{layout.blockCore.width * (1 - coreOffsetFactor)}" height="{layout.blockCore.height * (1 - coreOffsetFactor)}" />
 {#if hasFtlAdv}
     <use href="#svg_ftlAdv" x="{layout.blockFtl.minx}" y="{layout.blockFtl.miny}" width="{layout.blockFtl.width}" height="{layout.blockFtl.height}" />
-{:else if hasFtl}
+{:else if sysFtl !== undefined}
     <use href="#svg_ftl" x="{layout.blockFtl.minx}" y="{layout.blockFtl.miny}" width="{layout.blockFtl.width}" height="{layout.blockFtl.height}" />
 {/if}
 {#if hasAdvDrive}

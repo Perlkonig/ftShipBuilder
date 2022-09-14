@@ -125,7 +125,7 @@ export const sortNames = new Map<string, string>([
     ["ortillery", "Ortillery System"],
     ["spinalNova", "Spinal Mount - Nova Cannon (deprecated)"],
     ["spinalWave", "Spinal Mount - Wave Gun (deprecated)"],
-    ["reflex", "Reflex Field"],
+    ["reflex", "Reflex Field (deprecated)"],
 ]);
 
 // Put the short code in the appropriate list in whatever order. They get sorted for display.
