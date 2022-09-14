@@ -8,6 +8,7 @@
     import type { ILayout } from "../../lib/layouts";
     import { getSystem } from "../../lib/systems";
     import { svgLib } from "../../lib/svgLib";
+import type { IGlyph } from "src/lib/systems/_base";
 
     export let layoutID: string;
 
@@ -15,12 +16,13 @@
     const layout = allLayouts.find(x => x.id === layoutID);
     const svgCore = svgLib.find(x => x.id === "coreSys")!;
     const sysFtl = $ship.systems.find(x => x.name === "ftl")!;
-    const hasFtl: boolean =  sysFtl !== undefined;
+    const hasFtl: boolean = sysFtl !== undefined;
     let hasFtlAdv = false;
-    if ( (sysFtl.hasOwnProperty("advanced")) && (sysFtl.advanced) ) {
-            hasFtlAdv = true;
+    let svgFtl: IGlyph;
+    if ( (hasFtl) && (sysFtl.hasOwnProperty("advanced")) && (sysFtl.advanced) ) {
+        hasFtlAdv = true;
+        svgFtl = getSystem(sysFtl, $ship).glyph();
     }
-    const svgFtl = getSystem(sysFtl, $ship).glyph();
     const sysDrive = $ship.systems.find(x => x.name === "drive")!;
     let hasAdvDrive = false;
     if ( (sysDrive.hasOwnProperty("advanced")) && (sysDrive.advanced) ) {
