@@ -8,7 +8,7 @@
     import type { ILayout } from "../../lib/layouts";
     import { getSystem } from "../../lib/systems";
     import { svgLib } from "../../lib/svgLib";
-import type { IGlyph } from "src/lib/systems/_base";
+    import type { IGlyph } from "src/lib/systems/_base";
 
     export let layoutID: string;
 
@@ -191,7 +191,7 @@ import type { IGlyph } from "src/lib/systems/_base";
             {@html $ssdComponents.hull}
             {@html svgCore.svg}
             {@html svgDrive.svg}
-        {#if hasFtl}
+        {#if ( (hasFtl) && (svgFtl !== undefined) )}
             {@html svgFtl.svg}
         {/if}
         </defs>
