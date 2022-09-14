@@ -18,8 +18,18 @@
         $ship = $ship;
     };
 
-    let thrust = 0;
-    let driveAdvanced = false;
+    let thrust: number;
+    let driveAdvanced: boolean;
+    ship.subscribe((obj) => {
+        const drive = obj.systems.find(x => x.name === "drive");
+        if (drive !== undefined) {
+            thrust = drive.thrust as number;
+            driveAdvanced = drive.advanced as boolean;
+        } else {
+            thrust = 0;
+            driveAdvanced = false;
+        }
+    });
     $: {
         const drive = $ship.systems.find(x => x.name === "drive");
         if (drive !== undefined) {
@@ -28,8 +38,19 @@
         }
         $ship = $ship;
     }
-    let ftl = true;
-    let ftlAdvanced = false;
+
+    let ftl: boolean;
+    let ftlAdvanced: boolean;
+    ship.subscribe((obj) => {
+        const idx = obj.systems.findIndex(x => x.name === "ftl");
+        if (idx === -1) {
+            ftl = false;
+            ftlAdvanced = false;
+        } else {
+            ftl = true;
+            ftlAdvanced = obj.systems[idx].advanced as boolean;
+        }
+    });
     $: {
         const idx = $ship.systems.findIndex(x => x.name === "ftl");
         if (idx === -1) {

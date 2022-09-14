@@ -1,7 +1,7 @@
 {
   "name": "ftshipbuilder",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A web-based tool for generating valid Full Thrust ships",
   "author": "Aaron Dalton <aaron@daltons.ca> (https://www.perlkonig.com)",
   "license": "MIT",

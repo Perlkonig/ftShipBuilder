@@ -85,4 +85,8 @@
     </div>
 </div>
 
-<style></style>
+<style>
+    .modal {
+        z-index: 200;
+    }
+</style>
