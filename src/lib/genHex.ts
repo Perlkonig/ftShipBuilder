@@ -1,7 +1,7 @@
 type Arc = "F" | "FS" | "AS" | "A" | "AP" | "FP";
 interface IPoint { x: number; y: number }
 
-const lefts = new Map<Arc, number>([
+export const lefts = new Map<Arc, number>([
     ["F", 240],
     ["FS", 300],
     ["AS", 0],
@@ -9,7 +9,7 @@ const lefts = new Map<Arc, number>([
     ["AP", 120],
     ["FP", 180]
 ]);
-const rights = new Map<Arc, number>([
+export const rights = new Map<Arc, number>([
     ["F", 300],
     ["FS", 0],
     ["AS", 60],
@@ -113,7 +113,7 @@ const genLine = (arc: Arc, side: "L"|"R" = "L"): [IPoint, IPoint] | undefined =>
     return undefined;
 }
 
-const arcList = (start: Arc, dist: number): Arc[] => {
+export const arcList = (start: Arc, dist: number): Arc[] => {
     const list = [start];
     for (let i = 1; i < dist; i++) {
         const next = nextArc(start, i);

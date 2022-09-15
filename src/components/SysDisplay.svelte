@@ -20,6 +20,7 @@
     import Range from "./SysDisplay/Range.svelte";
     import Type from "./SysDisplay/Type.svelte";
     import Turret from "./SysDisplay/Turret.svelte";
+import ArcsExperimental from "./SysDisplay/Arcs.svelte";
 
     interface ISystem {
         name: string;
@@ -120,7 +121,7 @@
             idx={idx}
             minArcs={3}
             maxArcs={3}
-            arcBlacklist={["FS", "AS", "A"]}
+            arcBlacklist={["A"]}
         />
     {:else if sys.name === "ads"}
         <Arcs
@@ -135,7 +136,7 @@
             idx={idx}
             minArcs={3}
             maxArcs={3}
-            arcBlacklist={["FS", "AS", "A"]}
+            arcBlacklist={["A"]}
         />
         <Magazine
             prop={prop}
@@ -223,15 +224,15 @@
             min={1}
             max={6}
         />
-        <Arcs
-            prop={prop}
-            idx={idx}
-            minArcs={1}
-        />
         <Modifier
             prop={prop}
             idx={idx}
             choices={[["short", "Short Range"], ["long", "Long Range"]]}
+        />
+        <Arcs
+            prop={prop}
+            idx={idx}
+            minArcs={1}
         />
     {:else if sys.name === "gravitic"}
         <Class

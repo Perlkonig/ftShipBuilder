@@ -128,7 +128,7 @@ export class Kgun extends System {
         let svg = genHex(id, this.numArcs, this.leftArc, undefined, insert);
         // If long range, fill the centre hex
         if (this.modifier === "long") {
-            svg = svg.replace(`<polygon points="403.05,478.4878357199728 196.95000000000005,478.48783571997285 93.9,300 196.94999999999993,121.51216428002724 403.05,121.5121642800272 506.1,299.99999999999994" fill="white" stroke="#000000" stroke-width="20" stroke-miterlimit="10"/>`, `<polygon points="403.05,478.4878357199728 196.95000000000005,478.48783571997285 93.9,300 196.94999999999993,121.51216428002724 403.05,121.5121642800272 506.1,299.99999999999994" fill="black" stroke="#000000" stroke-width="20" stroke-miterlimit="10"/>`);
+            svg = svg.replace(`<polygon points="403.05,478.4878357199728 196.95000000000005,478.48783571997285 93.9,300 196.94999999999993,121.51216428002724 403.05,121.5121642800272 506.1,299.99999999999994" fill="white" fill-opacity="0" stroke="#000000" stroke-width="20" stroke-miterlimit="10"/>`, `<polygon points="403.05,478.4878357199728 196.95000000000005,478.48783571997285 93.9,300 196.94999999999993,121.51216428002724 403.05,121.5121642800272 506.1,299.99999999999994" fill="black" fill-opacity="1" stroke="#000000" stroke-width="20" stroke-miterlimit="10"/>`);
         // If short range, change the viewbox
         } else if (this.modifier === "short") {
             svg = svg.replace(`viewBox="-1 -1 602 602"`, `viewBox="-26 24 652 652"`);
