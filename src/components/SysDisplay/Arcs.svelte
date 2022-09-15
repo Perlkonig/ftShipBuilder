@@ -111,7 +111,7 @@
                 }
             }
             if (targetArc !== undefined) {
-                if (targetArc === dragSelected.id) {
+                if ( (targetArc === dragSelected.id) || (! selectedArcs.includes(dragSelected.id as Arcs)) ) {
                     handleClick(dragSelected.id as Arcs);
                 } else {
                     handleClick(dragSelected.id as Arcs, targetArc)
