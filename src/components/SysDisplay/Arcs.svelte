@@ -124,7 +124,7 @@
     const getMousePosition = (e: MouseEvent | TouchEvent): IPoint => {
         var CTM = svgDisplay.getScreenCTM();
         let realE: MouseEvent | Touch;
-        if (e.hasOwnProperty("touches")) {
+        if ("touches" in e) {
             realE = (e as TouchEvent).touches[0];
         } else {
             realE = e as MouseEvent;
