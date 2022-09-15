@@ -2,8 +2,6 @@
     import { afterUpdate, onMount } from "svelte";
     import { ship } from "../../stores/writeShip";
     import type {Arcs} from "../../schemas/ship";
-    import { getSystem } from "../../lib/systems";
-    import type { System } from "../../lib/systems";
     import { arcList, lefts, rights } from "../../lib/genHex";
     import robustPointInPolygon from "robust-point-in-polygon";
 
@@ -88,36 +86,27 @@
 
     let svgDisplay: SVGSVGElement;
     let dragSelected: SVGPolygonElement;
-    let droppedArc: Arcs;
+    let targetArc: Arcs;
     const startDrag = (e: MouseEvent | TouchEvent) => {
         dragSelected = e.target as SVGPolygonElement;
+        targetArc = (e.target as SVGPolygonElement).id as Arcs;
     }
 
     const drag = (e: MouseEvent | TouchEvent) => {
         if (dragSelected !== undefined) {
             e.preventDefault();
-        }
-    }
-
-    const endDrag = (e: MouseEvent | TouchEvent) => {
-        if (dragSelected !== undefined) {
-            const coord = getMousePosition(e);
-            let targetArc: Arcs;
-            for (const poly of polyPts) {
-                const result = robustPointInPolygon(poly[1].map(pt => [pt.x, pt.y]), [coord.x, coord.y]);
-                if (result < 1) {
-                    targetArc = poly[0];
-                    break;
+            if ("touches" in e) {
+                const coord = getMousePosition(e);
+                for (const poly of polyPts) {
+                    const result = robustPointInPolygon(poly[1].map(pt => [pt.x, pt.y]), [coord.x, coord.y]);
+                    if (result < 1) {
+                        targetArc = poly[0];
+                        break;
+                    }
                 }
+            } else {
+                targetArc = (e.target as SVGPolygonElement).id as Arcs;
             }
-            if (targetArc !== undefined) {
-                if ( (targetArc === dragSelected.id) || (! selectedArcs.includes(dragSelected.id as Arcs)) ) {
-                    handleClick(dragSelected.id as Arcs);
-                } else {
-                    handleClick(dragSelected.id as Arcs, targetArc)
-                }
-            }
-            dragSelected = undefined;
         }
     }
 
@@ -133,6 +122,20 @@
             x: (realE.clientX - CTM.e) / CTM.a,
             y: (realE.clientY - CTM.f) / CTM.d
         };
+    }
+
+    const endDrag = (e: MouseEvent | TouchEvent) => {
+        if (dragSelected !== undefined) {
+            if (targetArc !== undefined) {
+                if ( (targetArc === dragSelected.id) || (! selectedArcs.includes(dragSelected.id as Arcs)) ) {
+                    handleClick(dragSelected.id as Arcs);
+                } else {
+                    handleClick(dragSelected.id as Arcs, targetArc)
+                }
+            }
+            dragSelected = undefined;
+        }
+        e.preventDefault();
     }
 
     // This is ugly, brute-force work. No elegance here.
@@ -226,7 +229,6 @@
         }
         $ship = $ship;
         dragSelected = undefined;
-        droppedArc = undefined;
     };
 </script>
 
@@ -244,7 +246,7 @@
 </div>
 
 <div class="arcSelector">
-    <svg viewBox="-1 -1 602 602" bind:this="{svgDisplay}" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}">
+    <svg viewBox="-1 -1 602 602" bind:this="{svgDisplay}" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:touchstart="{startDrag}" on:touchmove="{drag}" on:touchend="{endDrag}" on:touchcancel="{endDrag}">
     {#each polyStrs as p}
         {#if arcBlacklist.includes(p[0])}
             <polygon id="{p[0]}" points="{p[1]}" stroke="black" fill="black"/>

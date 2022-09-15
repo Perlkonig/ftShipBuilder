@@ -7,6 +7,7 @@
     import SysDisplay from "./SysDisplay.svelte";
     import MassPts from "./MassPts.svelte";
     import { systemList, ordnanceList, weaponList, getSpecial, getSystem, sortNames } from "../lib/systems";
+    import { toggle_class } from "svelte/internal";
 
     const addArmour = () => {
         $ship.armour.push(1);
@@ -224,6 +225,27 @@
         saveName = "";
         $savedShips = $savedShips;
     }
+
+    let showSystems = true;
+    let showOrdnance = true;
+    let showWeapons = true;
+    let showFighters = true;
+    const toggle = (flag: string) => {
+        switch (flag) {
+            case "systems":
+                showSystems = ! showSystems;
+                break;
+            case "ordnance":
+                showOrdnance = ! showOrdnance;
+                break;
+            case "weapons":
+                showWeapons = ! showWeapons;
+                break;
+            case "fighters":
+                showFighters = ! showFighters;
+                break;
+        }
+    }
 </script>
 
 <div class="columns">
@@ -294,7 +316,7 @@
                 obj={getSpecial("hull", $ship)}
             />
 
-            <div class="field is-grouped">
+            <div class="field topPadding">
                 <div class="control">
                 {#if $ship.armour.length < 5}
                     <button class="button is-primary" on:click="{addArmour}">
@@ -400,7 +422,23 @@
 
     <div class="column">
         <section class="section">
-            <h2 class="subtitle" title="Systems that appear on your SSD but that aren't triggered in the ordnance or firing phases">General Systems</h2>
+            <div class ="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <span class="icon" on:click="{() => toggle("systems")}">
+                        {#if showSystems}
+                            <i class="fa-solid fa-chevron-down"></i>
+                        {:else}
+                            <i class="fa-solid fa-chevron-right"></i>
+                        {/if}
+                          </span>
+                    </div>
+                    <div class="level-item">
+                        <h2 class="subtitle" title="Systems that appear on your SSD but that aren't triggered in the ordnance or firing phases">General Systems</h2>
+                    </div>
+                </div>
+            </div>
+        {#if showSystems}
             <div class="field">
                 <label class="label" for="shipSystems">Select a system to add</label>
                 <div class="control">
@@ -427,10 +465,28 @@
                 {/if}
             {/each}
             </section>
+        {/if}
         </section>
 
         <section class="section">
-            <h2 class="subtitle" title="Systems that are triggered during the ordnance phase">Ordnance</h2>
+            <div class ="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <span class="icon" on:click="{() => toggle("ordnance")}">
+                        {#if showOrdnance}
+                            <i class="fa-solid fa-chevron-down"></i>
+                        {:else}
+                            <i class="fa-solid fa-chevron-right"></i>
+                        {/if}
+                          </span>
+                    </div>
+                    <div class="level-item">
+                        <h2 class="subtitle" title="Systems that are triggered during the ordnance phase">Ordnance</h2>
+                    </div>
+                </div>
+            </div>
+
+        {#if showOrdnance}
             <div class="field">
                 <label class="label" for="ordnanceSystems">Select a system to add</label>
                 <div class="control">
@@ -457,10 +513,28 @@
                 {/if}
             {/each}
             </section>
+        {/if}
         </section>
 
         <section class="section">
-            <h2 class="subtitle" title="Systems that are triggered during the firing phase">Weapons (Offensive and Defensive)</h2>
+            <div class ="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <span class="icon" on:click="{() => toggle("weapons")}">
+                        {#if showWeapons}
+                            <i class="fa-solid fa-chevron-down"></i>
+                        {:else}
+                            <i class="fa-solid fa-chevron-right"></i>
+                        {/if}
+                          </span>
+                    </div>
+                    <div class="level-item">
+                        <h2 class="subtitle" title="Systems that are triggered during the firing phase">Weapons (Offensive and Defensive)</h2>
+                    </div>
+                </div>
+            </div>
+
+        {#if showWeapons}
             <div class="field">
                 <label class="label" for="weaponSystems">Select a system to add</label>
                 <div class="control">
@@ -487,11 +561,29 @@
                 {/if}
             {/each}
             </section>
+        {/if}
         </section>
 
     {#if ( (emptyHangars > 0) || ($ship.fighters.length > 0) )}
         <section class="section">
-            <h2 class="subtitle">Fighters</h2>
+            <div class ="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <span class="icon" on:click="{() => toggle("fighters")}">
+                        {#if showFighters}
+                            <i class="fa-solid fa-chevron-down"></i>
+                        {:else}
+                            <i class="fa-solid fa-chevron-right"></i>
+                        {/if}
+                          </span>
+                    </div>
+                    <div class="level-item">
+                        <h2 class="subtitle">Fighters</h2>
+                    </div>
+                </div>
+            </div>
+
+        {#if showFighters}
             <div class="content">
                 <p>
                     You have {emptyHangars} empty hangar{emptyHangars != 1 ? "s" : ""} awaiting fighters.
@@ -519,6 +611,7 @@
                 />
             {/each}
             </section>
+        {/if}
         </section>
     {/if}
 
@@ -559,5 +652,8 @@
     .alert {
         color: red;
         font-style: italic;
+    }
+    .topPadding {
+        padding-top: 1em;
     }
 </style>

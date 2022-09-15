@@ -138,9 +138,7 @@
 </script>
 
 {#if ( ($ship.hasOwnProperty("mass")) && ($ship.mass !== undefined) )}
-<section class="section">
-    <h2 class="subtitle">Status</h2>
-
+<div class="status">
     {#if results !== undefined}
         <div class="container">
             <span class="tag is-success is-light">{results.mass} mass</span>
@@ -164,5 +162,12 @@
     {/if}
         </div>
     {/if}
-</section>
+</div>
 {/if}
+
+<style>
+    .status {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+</style>
