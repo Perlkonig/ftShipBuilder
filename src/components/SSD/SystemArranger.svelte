@@ -249,7 +249,7 @@
     const getMousePosition = (e: MouseEvent | TouchEvent): IPoint => {
         var CTM = svgDisplay.getScreenCTM();
         let realE: MouseEvent | Touch;
-        if (e.hasOwnProperty("touches")) {
+        if ("touches" in e) {
             realE = (e as TouchEvent).touches[0];
         } else {
             realE = e as MouseEvent;
@@ -292,7 +292,7 @@
 </div>
 
 <div class="ssd">
-    <svg viewBox="-1 -1 {block.width + 2} {block.height + 2}" width="100%" height="100%" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:mouseleave="{endDrag}" on:touchstart="{startDrag}" on:touchmove="{drag}" on:touchend="{endDrag}" on:touchleave="{endDrag}" on:touchcancel="{endDrag}" bind:this="{svgDisplay}">
+    <svg viewBox="-1 -1 {block.width + 2} {block.height + 2}" width="100%" height="100%" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:mouseleave="{endDrag}" on:touchstart="{startDrag}" on:touchmove="{drag}" on:touchend="{endDrag}" on:touchcancel="{endDrag}" bind:this="{svgDisplay}">
         <defs>
         {#each sysDistinct as g}
             {@html g.svg}
