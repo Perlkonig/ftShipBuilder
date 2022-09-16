@@ -9,6 +9,7 @@
     import type { ISystemSVG } from "../../lib/svgLib";
     import { nanoid } from "nanoid";
     import { getSystem } from "../../lib/systems";
+    import { afterUpdate } from "svelte";
 
     export let layoutID: string;
 
@@ -128,8 +129,8 @@
                     if (obj !== undefined) {
                         const xTurret = (s.x as number) * layout.cellsize;
                         const yTurret = (s.y as number) * layout.cellsize;
-                        const wTurret = s.glyph.width * layout.cellsize;
-                        const hTurret = s.glyph.height * layout.cellsize;
+                        const wTurret = (s.glyph as ISystemSVG).width * layout.cellsize;
+                        const hTurret = (s.glyph as ISystemSVG).height * layout.cellsize;
                         const x1 = xTurret + (wTurret / 2);
                         const y1 = yTurret + (hTurret / 2);
 
@@ -240,11 +241,44 @@
                 sys.y = newy;
                 $ship = $ship;
             }
+            findOverlapWith(dragSelected);
             dragSelected = undefined;
             maxx = maxy = undefined;
             exportLayout();
         }
     }
+
+    let usedElements: SVGUseElement[] = [];
+    const findOverlapWith = (dropped: SVGUseElement) => {
+        const droppedRect = dropped.getBoundingClientRect();
+        for (const used of usedElements) {
+            if (used.id === dropped.id) { continue; }
+            if (used !== undefined) {
+                const otherRect = used.getBoundingClientRect();
+                if (overlapping(droppedRect, otherRect)) {
+                    dropped.classList.add("svgHighlight");
+                    used.classList.add("svgHighlight");
+                }
+            }
+        }
+    };
+
+    const findAllOverlaps = () => {
+        for (const used of usedElements) {
+            findOverlapWith(used);
+        }
+    };
+
+    afterUpdate(() => {
+        findAllOverlaps();
+    });
+
+    const overlapping = (r1: DOMRect, r2: DOMRect): boolean => {
+        return !((r2.left >= r1.right) ||
+           (r2.right <= r1.left) ||
+           (r2.top >= r1.bottom) ||
+           (r2.bottom <= r1.top));
+    };
 
     const getMousePosition = (e: MouseEvent | TouchEvent): IPoint => {
         var CTM = svgDisplay.getScreenCTM();
@@ -272,9 +306,6 @@
         }
         for (const sys of systems) {
             s += `<use id="${sys.id}" href="#svg_${sys.glyph.id}" x="${sys.x * layout.cellsize}" y="${sys.y * layout.cellsize}" width="${sys.glyph.width * layout.cellsize}" height="${sys.glyph.height * layout.cellsize}" />`;
-            if (sys.name === "bay") {
-                s += `<text x="${(sys.x * layout.cellsize) + ((sys.glyph.width * layout.cellsize) / 2)}" y="${(sys.y * layout.cellsize) + ((sys.glyph.height * layout.cellsize) * 0.75)}" dominant-baseline="middle" text-anchor="middle" font-size="${(sys.glyph.height * layout.cellsize) * 0.25}">${sys.capacity}</text>`;
-            }
         }
         s += `</symbol>`;
         $ssdComponents.systems = s;
@@ -309,11 +340,11 @@
         </g>
 
     {#each lines as line}
-        <line x1="{line[0].x}" y1="{line[0].y}" x2="{line[1].x}" y2="{line[1].y}" stroke="black" stroke-width="5" />
+        <line x1="{line[0].x}" y1="{line[0].y}" x2="{line[1].x}" y2="{line[1].y}" stroke="black" stroke-width="5"/>
     {/each}
 
-    {#each systems as sys}
-        <use id="{sys.id}" href="#svg_{sys.glyph.id}" x="{sys.x * layout.cellsize}" y="{sys.y * layout.cellsize}" width="{sys.glyph.width * layout.cellsize}" height="{sys.glyph.height * layout.cellsize}" class="draggable confined" />
+    {#each systems as sys, i}
+        <use id="{sys.id}" href="#svg_{sys.glyph.id}" x="{sys.x * layout.cellsize}" y="{sys.y * layout.cellsize}" width="{sys.glyph.width * layout.cellsize}" height="{sys.glyph.height * layout.cellsize}" class="draggable confined" bind:this="{usedElements[i]}"/>
     {/each}
     </svg>
 </div>
@@ -326,5 +357,9 @@
     }
     .draggable {
         cursor: move;
+    }
+    :global(.svgHighlight) {
+        fill-opacity: 0.5;
+        fill: red;
     }
 </style>
