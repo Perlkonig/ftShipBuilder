@@ -40,7 +40,7 @@
     let pngDataStr: string;
     let pngCanvas: HTMLCanvasElement;
     $: if (fullSsdSvg !== undefined) {
-        svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(fullSsdSvg.outerHTML);
+        svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(fullSsdSvg.outerHTML.replaceAll(`href=`, `xlink:href=`));
 
         genPgn();
     }

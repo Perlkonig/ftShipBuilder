@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
 * Added highlighting feature for overlapping elements.
+
+### Fixed
+
+* Injecting `xlink:` into the exported SVG so it will work immediately in most editing apps.
 
 ## [v1.2.1] - 2022-09-15
 
