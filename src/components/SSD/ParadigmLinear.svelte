@@ -227,7 +227,7 @@
         if (nameElement !== undefined) {
             var bb = nameElement.getBBox();
             var widthTransform = pxWidth * 0.9 / bb.width;
-            var heightTransform = pxHeight * 0.9 / bb.height;
+            var heightTransform = ((cellsize * 1.5) * 0.9) / bb.height;
             var value = widthTransform < heightTransform ? widthTransform : heightTransform;
             nameElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
             const currx = parseFloat(nameElement.getAttribute("x"));
