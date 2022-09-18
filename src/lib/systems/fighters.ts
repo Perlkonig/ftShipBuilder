@@ -109,6 +109,52 @@ export class Fighters extends System {
         return base;
     }
 
+    cpv() {
+        let base = 0;
+        // +30 across the board
+        switch (this.type) {
+            case "light":
+            case "lightInterceptor":
+            case "standard":
+            case "interceptor":
+                base += 48;
+                break;
+            case "attack":
+            case "missile":
+            case "lightAttack":
+                base += 54;
+                break;
+            case "multiRole":
+                base += 60;
+            case "torpedo":
+            case "MKP":
+                base += 66;
+                break;
+            case "graser":
+            case "plasma":
+                base += 72;
+                break;
+        }
+        // Keeping with Continuum points except for longRange, which is increased from +1 to +3
+        for (const m of this.mods) {
+            switch (m) {
+                case "robot":
+                    base -= 6;
+                    break;
+                case "fast":
+                case "ftl":
+                    base += 6;
+                    break;
+                case "longRange":
+                case "heavy":
+                    base += 18;
+                    break;
+            }
+        }
+        return base;
+    }
+
+
     glyph() {
         return undefined;
    }

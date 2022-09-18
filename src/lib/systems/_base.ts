@@ -30,6 +30,10 @@ export abstract class System {
     abstract mass(): number;
     abstract points(): number;
     abstract glyph(): ISystemSVG | undefined;
+
+    cpv(): number {
+        return this.points();
+    }
 }
 
 export abstract class SpecialSystem {
@@ -41,4 +45,8 @@ export abstract class SpecialSystem {
 
     abstract mass(): number;
     abstract points(): number;
+
+    cpv(): number {
+        return this.points();
+    }
 }

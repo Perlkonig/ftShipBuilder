@@ -13,6 +13,7 @@ export type Numarcs = number;
  */
 export interface FullThrustShip {
   points?: number;
+  cpv?: number;
   mass?: number;
   hull?: {
     points: number;

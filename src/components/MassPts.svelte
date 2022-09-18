@@ -6,5 +6,6 @@
 
 <div class="container">
     <span class="tag is-success is-light">{obj.mass()} mass</span>
-    <span class="tag is-info is-light">{obj.points()} points</span>
+    <span class="tag is-info is-light">{obj.points()} NPV</span>
+    <span class="tag is-info is-light">{obj.cpv()} CPV</span>
 </div>

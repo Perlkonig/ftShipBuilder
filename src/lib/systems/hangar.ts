@@ -54,6 +54,10 @@ export class Hangar extends System {
         }
     }
 
+    cpv() {
+        return this.mass();
+    }
+
     glyph() {
         const fighter = this.ship.fighters.find(x => x.hangar === this.id);
         let insert = "";

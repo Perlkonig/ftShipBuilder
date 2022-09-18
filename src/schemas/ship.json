@@ -20,6 +20,10 @@
             "type": "integer",
             "minimum": 0
         },
+        "cpv": {
+            "type": "integer",
+            "minimum": 1
+        },
         "mass": {
             "type": "integer",
             "minimum": 5

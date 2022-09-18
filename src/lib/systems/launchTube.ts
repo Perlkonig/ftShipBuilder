@@ -32,6 +32,10 @@ export class LaunchTube extends System {
         return pts;
     }
 
+    cpv() {
+        return this.mass();
+    }
+
     glyph() {
         if (this.hasCatapult) {
             return {

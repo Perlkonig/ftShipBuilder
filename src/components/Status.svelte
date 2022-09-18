@@ -12,6 +12,7 @@
     interface IMassPts {
         mass: number;
         points: number;
+        cpv: number;
     };
 
     let results: IMassPts;
@@ -24,6 +25,7 @@
     const calcAllMassPts = (shipObj: FullThrustShip): IMassPts => {
         let mass = 0;
         let points = 0;
+        let cpv = 0;
 
         if (! shipObj.hasOwnProperty("mass")) {
             return undefined;
@@ -33,6 +35,7 @@
             const obj = getSpecial(id, shipObj);
             mass += obj.mass();
             points += obj.points();
+            cpv += obj.cpv();
         }
 
         for (const group of ["systems", "ordnance", "weapons"]) {
@@ -40,13 +43,15 @@
                 for (const sys of shipObj[group] as ISystem[]) {
                     const obj = getSystem(sys, shipObj);
                     mass += obj.mass();
-                    points += obj.points()
+                    points += obj.points();
+                    cpv += obj.cpv();
                 }
             }
         }
 
         shipObj.points = points;
-        return {mass, points};
+        shipObj.cpv = cpv;
+        return {mass, points, cpv};
     }
 
     let errors: string[];
@@ -142,7 +147,8 @@
     {#if results !== undefined}
         <div class="container">
             <span class="tag is-success is-light">{results.mass} mass</span>
-            <span class="tag is-info is-light">{results.points} points</span>
+            <span class="tag is-info is-light">{results.points} NPV</span>
+            <span class="tag is-info is-light">{results.cpv} CPV</span>
         </div>
 
         <div class="container">
