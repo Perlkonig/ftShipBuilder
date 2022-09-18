@@ -8,7 +8,7 @@ export class Fusion extends System {
     public numArcs: ArcNum = 1;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("fusion", ship);
+        super(data, ship);
         if (data.hasOwnProperty("leftArc")) {
             this.leftArc = data.leftArc as Arc;
         }

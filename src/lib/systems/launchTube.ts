@@ -6,7 +6,7 @@ export class LaunchTube extends System {
     public hasCatapult = false;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("launchTube", ship);
+        super(data, ship);
         if (data.hasOwnProperty("catapult")) {
             this.hasCatapult = data.catapult as boolean;
         }

@@ -11,7 +11,7 @@ export class Beam extends System {
     public numArcs: ArcNum = 6;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("beam", ship);
+        super(data, ship);
         if (data.hasOwnProperty("class")) {
             this.class = data.class as Class;
         }

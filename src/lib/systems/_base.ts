@@ -1,14 +1,9 @@
 import type { FullThrustShip } from "src/schemas/ship";
+import { nanoid } from "nanoid";
+import type { ISystemSVG } from "../svgLib";
 
 export type Arc = "F"|"FS"|"FP"|"A"|"AS"|"AP";
 export type ArcNum = 1|2|3|4|5|6;
-
-export interface IGlyph {
-    id: string;
-    svg: string;
-    height: number;
-    width: number;
-}
 
 export interface ISystem {
     name: string;
@@ -17,17 +12,24 @@ export interface ISystem {
 
 export abstract class System {
     public readonly name: string;
-    protected readonly ship: FullThrustShip
+    protected readonly ship: FullThrustShip;
+    public uid: string;
 
-    constructor(name: string, ship: FullThrustShip) {
-        this.name = name;
+    constructor(data: ISystem, ship: FullThrustShip) {
+        this.name = data.name;
+        if ( (data.hasOwnProperty("id")) && (data.id !== undefined) ) {
+            this.uid = data.id as string;
+        } else {
+            this.uid = nanoid(5);
+            data.id = this.uid;
+        }
         this.ship = ship;
     }
 
     abstract fullName(): string;
     abstract mass(): number;
     abstract points(): number;
-    abstract glyph(): IGlyph | undefined;
+    abstract glyph(): ISystemSVG | undefined;
 }
 
 export abstract class SpecialSystem {

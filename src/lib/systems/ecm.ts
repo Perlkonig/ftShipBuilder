@@ -6,7 +6,7 @@ export class Ecm extends System {
     public area = false;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("ecm", ship);
+        super(data, ship);
         if (data.hasOwnProperty("area")) {
             this.area = data.area as boolean;
         }

@@ -6,7 +6,7 @@ export class Missile extends System {
     public modifier: "none" | "er" | "twostage" = "none";
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("missile", ship);
+        super(data, ship);
         if (data.hasOwnProperty("modifier")) {
             this.modifier = data.modifier as "er" | "twostage";
         }

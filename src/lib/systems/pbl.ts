@@ -12,7 +12,7 @@ export class Pbl extends System {
     public modifier: "none" | "short" | "long" = "none";
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("pbl", ship);
+        super(data, ship);
         if (data.hasOwnProperty("class")) {
             this.class = data.class as Class;
         }

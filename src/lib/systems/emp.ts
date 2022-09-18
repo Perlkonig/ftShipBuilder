@@ -11,7 +11,7 @@ export class Emp extends System {
     public numArcs: ArcNum = 6;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("emp", ship);
+        super(data, ship);
         if (data.hasOwnProperty("class")) {
             this.class = data.class as Class;
         }

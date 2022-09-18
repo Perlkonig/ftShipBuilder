@@ -1,6 +1,6 @@
 import type { FullThrustShip } from "src/schemas/ship";
 import { System } from "./_base";
-import type { ISystem, Arc, ArcNum, IGlyph } from "./_base";
+import type { ISystem, Arc, ArcNum } from "./_base";
 import { genHex } from "../genHex";
 
 type Class = 1|2|3|4|5|6;
@@ -12,7 +12,7 @@ export class Kgun extends System {
     public modifier: "none" | "short" | "long" = "none";
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("kgun", ship);
+        super(data, ship);
         if (data.hasOwnProperty("modifier")) {
             this.modifier = data.modifier as "none" | "short" | "long";
         }

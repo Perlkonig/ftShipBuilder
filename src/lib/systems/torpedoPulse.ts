@@ -9,7 +9,7 @@ export class TorpedoPulse extends System {
     public modifier: "none" | "short" | "long" = "none";
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("torpedoPulse", ship);
+        super(data, ship);
         if (data.hasOwnProperty("leftArc")) {
             this.leftArc = data.leftArc as Arc;
         }

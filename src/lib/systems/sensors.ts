@@ -6,7 +6,7 @@ export class Sensors extends System {
     public advanced = false;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("sensors", ship);
+        super(data, ship);
         if (data.hasOwnProperty("advanced")) {
             this.advanced = data.advanced as boolean;
         }

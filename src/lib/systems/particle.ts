@@ -8,7 +8,7 @@ export class Particle extends System {
     public numArcs: ArcNum = 6;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("particle", ship);
+        super(data, ship);
         if (data.hasOwnProperty("leftArc")) {
             this.leftArc = data.leftArc as Arc;
         }

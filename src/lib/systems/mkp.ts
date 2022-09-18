@@ -7,7 +7,7 @@ export class Mkp extends System {
     public arc: Arc = "F";
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("mkp", ship);
+        super(data, ship);
         if (data.hasOwnProperty("arc")) {
             this.arc = data.arc as Arc;
         }

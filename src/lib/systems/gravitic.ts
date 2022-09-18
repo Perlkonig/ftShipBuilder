@@ -11,7 +11,7 @@ export class Gravitic extends System {
     public numArcs: ArcNum = 6;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("gravitic", ship);
+        super(data, ship);
         if (data.hasOwnProperty("class")) {
             this.class = data.class as Class;
         }

@@ -7,7 +7,7 @@ type Ranges = "short" | "medium" | "long";
 export class SpinalPlasma extends System {
     public range: Ranges = "short";
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("spinalPlasma", ship);
+        super(data, ship);
         if (data.hasOwnProperty("range")) {
             this.range = data.range as Ranges;
         }

@@ -1,6 +1,6 @@
 import type { FullThrustShip } from "src/schemas/ship";
 import { System } from "./_base";
-import type { ISystem, Arc, ArcNum, IGlyph } from "./_base";
+import type { ISystem, Arc, ArcNum } from "./_base";
 import { genArcs } from "../genArcs";
 
 type Class = 1|2|3|4;
@@ -13,7 +13,7 @@ export class Graser extends System {
     public highIntensity = false;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("graser", ship);
+        super(data, ship);
         if (data.hasOwnProperty("heavy")) {
             this.heavy = data.heavy as boolean;
         }

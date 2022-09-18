@@ -1,14 +1,16 @@
 <script lang="ts">
     import { Canvg } from "canvg";
     import { afterUpdate, beforeUpdate } from 'svelte';
-    import { ship } from "../../stores/writeShip";
-    import { savedLayouts } from "../../stores/writeStoredLayouts";
-    import { ssdComponents } from "../../stores/writeSsd";
-    import { layouts } from "../../lib/layouts";
-    import type { ILayout } from "../../lib/layouts";
-    import { getSystem } from "../../lib/systems";
-    import { svgLib } from "../../lib/svgLib";
-    import type { IGlyph, ISystem } from "src/lib/systems/_base";
+    import { ship } from "@/stores/writeShip";
+    import { savedLayouts } from "@/stores/writeStoredLayouts";
+    import { ssdComponents } from "@/stores/writeSsd";
+    import { layouts } from "@/lib/layouts";
+    import type { ILayout } from "@/lib/layouts";
+    import { getSystem } from "@/lib/systems";
+    import { svgLib } from "@/lib/svgLib";
+    import { genSvg } from "@/lib/hull";
+    import type { ISystem } from "src/lib/systems/_base";
+    import type { ISystemSVG } from "@/lib/svgLib";
 
     export let layoutID: string;
 
@@ -17,7 +19,7 @@
     const svgCore = svgLib.find(x => x.id === "coreSys")!;
     const sysFtl: ISystem = $ship.systems.find(x => x.name === "ftl");
     let hasFtlAdv = false;
-    let svgFtl: IGlyph;
+    let svgFtl: ISystemSVG;
     if ( (sysFtl !== undefined) && (sysFtl.hasOwnProperty("advanced")) && (sysFtl.advanced) ) {
         hasFtlAdv = true;
     }
@@ -34,7 +36,6 @@
 
     let nameElement: SVGTextElement;
     let statsElement: SVGTextElement;
-    let thrustElement: SVGTextElement;
     let fullSsdSvg: SVGElement;
     let svgDataStr: string;
     let pngDataStr: string;
@@ -55,87 +56,7 @@
     };
 
     const genHull = () => {
-        const cf = Math.ceil($ship.mass / 20);
-        const interval = Math.ceil($ship.hull.points / cf);
-        const boxes: number[] = [];
-        for (let i = 0; i < $ship.hull.points; i++) {
-            if ( ((i + 1) % interval === 0) || (i === $ship.hull.points - 1) ) {
-                boxes.push(1);
-            } else {
-                boxes.push(0);
-            }
-        }
-        const hullRows: number[][] = [];
-        let baselen = Math.floor($ship.hull.points / $ship.hull.rows);
-        let delta = $ship.hull.points % $ship.hull.rows;
-        for (let i = 0; i < $ship.hull.rows; i++) {
-            if (baselen > boxes.length) { baselen = boxes.length; }
-            const node = boxes.splice(0, baselen);
-            if (delta > 0) {
-                node.push(...boxes.splice(0, 1));
-                delta--;
-            }
-            hullRows.push(node);
-        }
-
-        const blocksHigh = Math.floor(layout.blockHull.height / layout.cellsize);
-        const svgHull = svgLib.find(x => x.id === "hull")!;
-        const svgHullCrew = svgLib.find(x => x.id === "hullCrew")!;
-        const svgArmour = svgLib.find(x => x.id === "armour")!;
-        const svgStealth = svgLib.find(x => x.id === "stealthHull");
-        let s = `<symbol id="_ssdHull" viewBox="-1 -1 ${layout.blockHull.width + 2} ${layout.blockHull.height + 2}">`;
-        s += `<defs>`;
-        if ($ship.hull.stealth !== "0") {
-            s += svgStealth.svg;
-        }
-        s += svgHull.svg;
-        s += svgHullCrew.svg;
-        if ( ($ship.hasOwnProperty("armour")) && ($ship.armour.length > 0) ) {
-            s += svgArmour.svg;
-        }
-        s += `</defs>`;
-
-        // Hull boxes
-        hullRows.reverse();
-        for (let row = 0; row < hullRows.length; row++) {
-            const boxes = hullRows[row];
-            const y = (blocksHigh - (row + 1)) * layout.cellsize;
-            for (let col = 0; col < boxes.length; col++) {
-                const x = col * layout.cellsize;
-                let id = "hull";
-                let width = svgHull.width * layout.cellsize;
-                let height = svgHull.height * layout.cellsize
-                if (boxes[col] === 1 ) {
-                    id = "hullCrew";
-                    width = svgHullCrew.width * layout.cellsize;
-                    height = svgHullCrew.height * layout.cellsize
-                }
-                s += `<use href="#svg_${id}" x="${x}" y="${y}" width="${width}" height="${height}" />`;
-
-            }
-            if (
-                    ( ($ship.hull.stealth === "2") &&
-                        ( (hullRows.length - (row + 1) === 2) ||
-                        (hullRows.length - (row + 1) === 0) ) ) ||
-                    ( ($ship.hull.stealth === "1") &&
-                        ( (hullRows.length - (row + 1) === 1)) ) ) {
-                    s += `<use href="#svg_stealthHull" x="${boxes.length * layout.cellsize}" y="${y}" width="${svgStealth.width * layout.cellsize}" height="${svgStealth.height * layout.cellsize}" />`;
-            }
-        }
-
-        // Armour circles
-        for (let row = 0; row < $ship.armour.length; row++) {
-            const y = (blocksHigh - ($ship.hull.rows + 1) - row) * layout.cellsize;
-            for (let col = 0; col < $ship.armour[row]; col++) {
-                const x = col * layout.cellsize;
-                const width = svgArmour.width * layout.cellsize;
-                const height = svgArmour.height * layout.cellsize;
-                s += `<use href="#svg_armour" x="${x}" y="${y}" width="${width}" height="${height}" />`;
-            }
-        }
-        s += `</symbol>`;
-
-        $ssdComponents.hull = s;
+        $ssdComponents.hull = genSvg($ship, layout.cellsize, {height: layout.blockHull.height, width: layout.blockHull.width});
         $ssdComponents = $ssdComponents;
     };
 
@@ -169,17 +90,6 @@
             statsElement.setAttribute("x", (currx / value).toString());
             statsElement.setAttribute("y", (curry / value).toString());
         }
-        if (thrustElement !== undefined) {
-            var bb = thrustElement.getBBox();
-            var widthTransform = layout.blockDrive.width * 0.75 / bb.width;
-            var heightTransform = layout.blockDrive.height * 0.75 / bb.height;
-            var value = widthTransform < heightTransform ? widthTransform : heightTransform;
-            thrustElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
-            const currx = parseFloat(thrustElement.getAttribute("x"));
-            const curry = parseFloat(thrustElement.getAttribute("y"));
-            thrustElement.setAttribute("x", (currx / value).toString());
-            thrustElement.setAttribute("y", (curry / value).toString());
-        }
         coreHeightOffset = (layout.blockCore.height * coreOffsetFactor) / 2;
         coreWidthOffset = (layout.blockCore.width * coreOffsetFactor) / 2;
     });
@@ -210,10 +120,8 @@
 {/if}
 {#if hasAdvDrive}
     <use href="#svg_driveAdv" x="{layout.blockDrive.minx}" y="{layout.blockDrive.miny}" width="{layout.blockDrive.width}" height="{layout.blockDrive.height}" />
-    <text x="{layout.blockDrive.minx + (layout.blockDrive.width / 2)}" y="{layout.blockDrive.miny + (layout.blockDrive.height / 2) + (layout.blockDrive.height * 0.05)}" bind:this="{thrustElement}" dominant-baseline="middle" text-anchor="middle">{totalThrust}</text>
 {:else}
     <use href="#svg_drive" x="{layout.blockDrive.minx}" y="{layout.blockDrive.miny}" width="{layout.blockDrive.width}" height="{layout.blockDrive.height}" />
-    <text x="{layout.blockDrive.minx + (layout.blockDrive.width / 2)}" y="{layout.blockDrive.miny + (layout.blockDrive.height / 2) + (layout.blockDrive.height * 0.1)}" bind:this="{thrustElement}" dominant-baseline="middle" text-anchor="middle">{totalThrust}</text>
 {/if}
 </svg>
 </div>

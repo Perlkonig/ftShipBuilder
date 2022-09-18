@@ -1,5 +1,7 @@
 // A collection of SVGs that are unattached to any specific system object.
 
+import type { FullThrustShip } from "@/schemas/ship";
+
 export interface ISystemSVG {
     id: string;
     svg: string;

@@ -1,6 +1,7 @@
 import type { FullThrustShip } from "src/schemas/ship";
 import { System } from "./_base";
 import type { ISystem } from "./_base";
+import type { ISystemSVG } from "../svgLib";
 
 export class Magazine extends System {
     public modifier: "none" | "er" | "twostage" = "none";
@@ -8,7 +9,7 @@ export class Magazine extends System {
     public id: string;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("magazine", ship);
+        super(data, ship);
         if (data.hasOwnProperty("capacity")) {
             this.capacity = data.capacity as number;
         }
@@ -47,6 +48,31 @@ export class Magazine extends System {
             return 12 * this.capacity;
         } else {
             return 6 * this.capacity;
+        }
+    }
+
+    missileGlyph(): ISystemSVG {
+        if (this.modifier === "er") {
+            return {
+                id: `individualSalvoER`,
+                svg: `<symbol id="svg_individualSalvoER" viewBox="430.5 148 99 99"><polygon stroke="#000000" fill="black" stroke-width="4.1006" stroke-miterlimit="10" points="480,161.2 501.3,237 480,223.7 458.6,237"/></symbol>`,
+                width: 1,
+                height: 1
+            };
+        } else if (this.modifier === "twostage") {
+            return {
+                id: `individualSalvoMS`,
+                svg: `<symbol id="svg_individualSalvoMS" viewBox="405 279 150 150"><polygon fill="none" stroke="#000000" stroke-width="5" stroke-miterlimit="10" points="433.7,375.5 480,285.5 526.3,375.5 495.4,361.7 526.3,420.5 480,390.3 433.7,420.5 464,361.7"/></symbol>`,
+                width: 1,
+                height: 1
+            };
+        } else {
+            return {
+                id: `individualSalvo`,
+                svg: `<symbol id="svg_individualSalvo" viewBox="430.5 148 99 99"><polygon stroke="#000000" fill="white" stroke-width="4.1006" stroke-miterlimit="10" points="480,161.2 501.3,237 480,223.7 458.6,237"/></symbol>`,
+                width: 1,
+                height: 1
+            };
         }
     }
 

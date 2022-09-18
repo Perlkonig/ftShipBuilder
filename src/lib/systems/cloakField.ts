@@ -3,8 +3,8 @@ import { System } from "./_base";
 import type { ISystem } from "./_base";
 
 export class CloakField extends System {
-    constructor(_data: ISystem, ship: FullThrustShip) {
-        super("cloakField", ship);
+    constructor(data: ISystem, ship: FullThrustShip) {
+        super(data, ship);
     }
 
     fullName() {

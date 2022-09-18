@@ -4,7 +4,7 @@ import type { ISystem } from "./_base";
 
 export class SpinalWave extends System {
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("spinalWave", ship);
+        super(data, ship);
     }
 
     fullName() {

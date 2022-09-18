@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { ship } from "../../stores/writeShip";
-    import { snapToGrid } from "../../stores/writeSnap";
-    import { savedLayouts } from "../../stores/writeStoredLayouts";
-    import { ssdComponents } from "../../stores/writeSsd";
-    import { layouts } from "../../lib/layouts";
-    import type { ILayout } from "../../lib/layouts";
-    import type { IBox } from "../../lib/layouts";
-    import type { ISystemSVG } from "../../lib/svgLib";
+    import { ship } from "@/stores/writeShip";
+    import { snapToGrid } from "@/stores/writeSnap";
+    import { savedLayouts } from "@/stores/writeStoredLayouts";
+    import { ssdComponents } from "@/stores/writeSsd";
+    import { layouts } from "@/lib/layouts";
+    import type { ILayout } from "@/lib/layouts";
+    import type { IBox } from "@/lib/layouts";
+    import type { ISystemSVG } from "@/lib/svgLib";
     import { nanoid } from "nanoid";
-    import { getSystem } from "../../lib/systems";
+    import { getSystem } from "@/lib/systems";
     import { afterUpdate } from "svelte";
 
     export let layoutID: string;

@@ -1,6 +1,6 @@
 import type { FullThrustShip } from "src/schemas/ship";
 import { System } from "./_base";
-import type { ISystem, Arc, ArcNum, IGlyph } from "./_base";
+import type { ISystem, Arc, ArcNum } from "./_base";
 import { genHex } from "../genHex";
 import { getSystem } from ".";
 
@@ -11,7 +11,7 @@ export class Turret extends System {
     public weapons: string[] = [];
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("turret", ship);
+        super(data, ship);
         if (data.hasOwnProperty("leftArc")) {
             this.leftArc = data.leftArc as Arc;
         }

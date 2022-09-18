@@ -9,7 +9,7 @@ export class SalvoLauncher extends System {
     public magazine: string;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("salvoLauncher", ship);
+        super(data, ship);
         if (data.hasOwnProperty("leftArc")) {
             this.leftArc = data.leftArc as "F"|"FP"|"AP";
         }

@@ -9,7 +9,7 @@ export class Hangar extends System {
     public critRules = false;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("hangar", ship);
+        super(data, ship);
         if (data.hasOwnProperty("id")) {
             this.id = data.id as string;
         }

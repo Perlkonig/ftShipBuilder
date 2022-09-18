@@ -8,7 +8,7 @@ export class Bay extends System {
     public id: string;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("bay", ship);
+        super(data, ship);
         if (data.hasOwnProperty("capacity")) {
             this.capacity = data.capacity as number;
         }

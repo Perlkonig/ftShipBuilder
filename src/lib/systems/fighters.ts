@@ -34,7 +34,7 @@ export class Fighters extends System {
     public hangar: string;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("fighters", ship);
+        super(data, ship);
         if (data.hasOwnProperty("type")) {
             this.type = data.type as FighterType;
         }

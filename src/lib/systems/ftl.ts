@@ -6,7 +6,7 @@ export class Ftl extends System {
     public advanced = false;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("ftl", ship);
+        super(data, ship);
         if (data.hasOwnProperty("advanced")) {
             this.advanced = data.advanced as boolean;
         }

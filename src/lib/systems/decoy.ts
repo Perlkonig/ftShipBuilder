@@ -6,7 +6,7 @@ export class Decoy extends System {
     public type: "cruiser" | "capital" = "cruiser";
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("decoy", ship);
+        super(data, ship);
         if (data.hasOwnProperty("type")) {
             this.type = data.type as "cruiser" | "capital";
         }

@@ -7,7 +7,7 @@ export class Screen extends System {
     public area = false;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("screen", ship);
+        super(data, ship);
         if (data.hasOwnProperty("advanced")) {
             this.advanced = data.advanced as boolean;
         }

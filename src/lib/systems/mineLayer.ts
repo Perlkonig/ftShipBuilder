@@ -1,11 +1,12 @@
 import type { FullThrustShip } from "src/schemas/ship";
 import { System } from "./_base";
 import type { ISystem } from "./_base";
+import type { ISystemSVG } from "../svgLib";
 
 export class MineLayer extends System {
     public capacity = 2;
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("mineLayer", ship);
+        super(data, ship);
         if (data.hasOwnProperty("capacity")) {
             this.capacity = data.capacity as number;
         }
@@ -21,6 +22,15 @@ export class MineLayer extends System {
 
     points() {
         return 6 + (2 * this.capacity);
+    }
+
+    individualMine(): ISystemSVG {
+        return {
+            id: "mineIndividual",
+            svg: `<symbol id="svg_mineIndividual" width="79" height="79" viewBox="440.5 244 79 79"><polygon fill="none" stroke="#000000" stroke-width="7" stroke-miterlimit="10" points="480,315.8 466.7,293.6 453.5,271.5 480,271.5 506.5,271.5 493.3,293.6"/><line fill="none" stroke="#000000" stroke-width="7" stroke-miterlimit="10" x1="480" y1="269.3" x2="480" y2="244.3"/><line fill="none" stroke="#000000" stroke-width="7" stroke-miterlimit="10" x1="466.6" y1="292.4" x2="445" y2="304.9"/><line fill="none" stroke="#000000" stroke-width="7" stroke-miterlimit="10" x1="493.4" y1="292.4" x2="515" y2="304.9"/></symbol>`,
+            width: 1,
+            height: 1
+        }
     }
 
     glyph() {

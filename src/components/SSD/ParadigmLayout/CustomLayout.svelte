@@ -1,7 +1,7 @@
 <script lang="ts">
     import { afterUpdate, createEventDispatcher } from "svelte";
-    import type { ILayout, IBox } from "../../lib/layouts";
-    import { savedLayouts } from "../../stores/writeStoredLayouts";
+    import type { ILayout, IBox } from "@/lib/layouts";
+    import { savedLayouts } from "@/stores/writeStoredLayouts";
 
     const dispatch = createEventDispatcher();
 

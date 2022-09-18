@@ -8,7 +8,7 @@ export class RocketPod extends System {
     public numArcs = 3;
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("rocketPod", ship);
+        super(data, ship);
         if (data.hasOwnProperty("leftArc")) {
             this.leftArc = data.leftArc as "F"|"FP"|"AP";
         }

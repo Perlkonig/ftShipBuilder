@@ -11,7 +11,7 @@ export class Pulser extends System {
     public range: Range = "undefined";
 
     constructor(data: ISystem, ship: FullThrustShip) {
-        super("pulser", ship);
+        super(data, ship);
         if (data.hasOwnProperty("leftArc")) {
             this.leftArc = data.leftArc as Arc;
         }

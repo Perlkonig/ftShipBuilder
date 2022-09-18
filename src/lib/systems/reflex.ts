@@ -3,8 +3,8 @@ import { System } from "./_base";
 import type { ISystem } from "./_base";
 
 export class Reflex extends System {
-    constructor(_data: ISystem, ship: FullThrustShip) {
-        super("reflex", ship);
+    constructor(data: ISystem, ship: FullThrustShip) {
+        super(data, ship);
     }
 
     fullName() {
