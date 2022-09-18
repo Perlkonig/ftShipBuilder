@@ -109,7 +109,7 @@
         </defs>
     <rect x="0" y="0" width="{layout.width}" height="{layout.height}" stroke="black" fill="white" />
     <text x="{layout.blockName.minx + (layout.blockName.width / 2)}" y="{layout.blockName.miny + (layout.blockName.height / 2)}" bind:this="{nameElement}" dominant-baseline="middle" text-anchor="middle">{$ship.class} "{$ship.name}"</text>
-    <text x="{layout.blockStats.minx + (layout.blockStats.width / 2)}" y="{layout.blockStats.miny + (layout.blockStats.height / 2)}" bind:this="{statsElement}" dominant-baseline="middle" text-anchor="middle">Mass: {$ship.mass}, NPV: {$ship.points}</text>
+    <text x="{layout.blockStats.minx + (layout.blockStats.width / 2)}" y="{layout.blockStats.miny + (layout.blockStats.height / 2)}" bind:this="{statsElement}" dominant-baseline="middle" text-anchor="middle">Mass: {$ship.mass}, NPV: {$ship.points}, CPV: {$ship.cpv}</text>
     <use href="#_ssdSystems" x="{layout.blockSystems.minx}" y="{layout.blockSystems.miny}" width="{layout.blockSystems.width}" height="{layout.blockSystems.height}" />
     <use href="#_ssdHull" x="{layout.blockHull.minx}" y="{layout.blockHull.miny}" width="{layout.blockHull.width}" height="{layout.blockHull.height}" />
     <use href="#svg_coreSys" x="{layout.blockCore.minx + coreWidthOffset}" y="{layout.blockCore.miny + coreHeightOffset}" width="{layout.blockCore.width * (1 - coreOffsetFactor)}" height="{layout.blockCore.height * (1 - coreOffsetFactor)}" />

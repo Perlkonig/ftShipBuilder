@@ -440,7 +440,7 @@
     currRow += hullRows + 1;
 
     // Stats
-    svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Mass: ${ship.mass} NPV: ${ship.points}</text>`;
+    svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Mass: ${ship.mass} NPV: ${ship.points} CPV: ${ship.cpv}</text>`;
     currRow++;
 
     // Drives & Core
