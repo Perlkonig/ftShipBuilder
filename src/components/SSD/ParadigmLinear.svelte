@@ -235,10 +235,12 @@
             nameElement.setAttribute("x", (currx / value).toString());
             nameElement.setAttribute("y", (curry / value).toString());
         }
+        footerFill.setAttribute("fill", "white")
         const ctx = pngCanvas.getContext("2d");
         const v = Canvg.fromString(ctx, svgDisplay.outerHTML);
         v.render();
         pngDataStr = pngCanvas.toDataURL("image/png");
+        footerFill.setAttribute("fill", "white")
     });
 
     interface IBuffer {
@@ -444,8 +446,7 @@
     currRow++;
 
     // Drives & Core
-    svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize * 3}" stroke="none" fill="black"/>`;
-
+    // Background fill now in the SVG itself so I can change it programmatically.
     let svgCombined: string;
     if (compact) {
         if (svgFtl !== undefined) {
@@ -472,7 +473,9 @@
     let pngDataStr: string;
     let pngCanvas: HTMLCanvasElement;
     $: if (svgDisplay !== undefined) {
+        footerFill.setAttribute("fill", "white")
         svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgDisplay.outerHTML.replaceAll(`href=`, `xlink:href=`));
+        footerFill.setAttribute("fill", "black")
     }
 
     let ssdDiv: HTMLDivElement;
@@ -486,6 +489,8 @@
     $: if (ssdDiv !== undefined) {
         ssdDiv.style.height = `${ssdHeight}rem`;
     }
+
+    let footerFill: SVGRectElement;
 </script>
 
 {#key ssdHeight}
@@ -512,6 +517,10 @@
 
         <!-- Name plate can go here so it can be autosized, but the rest is in the <script> tag -->
         <text bind:this="{nameElement}" x="{cellsize * 0.2}" y="{cellsize * 0.75}" dominant-baseline="middle" font-size="{cellsize}" class="futureFont">{ship.class} "{ship.name}"</text>
+
+        <rect x="0" y="{(totalRows - 3) * cellsize}" width="{pxWidth}" height="{cellsize * 3}" stroke="none" fill="black" bind:this="{footerFill}"/>
+
+
 
         <!-- The body was generated in the <script> section for reasons. Insert it here wholesale.-->
         {@html svgBody}

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Fixed nameplate scaling.
+* Linear layout footer now exports white instead of black. Nothing I can do about the fonts, though.
 
 ## [v1.3.0] - 2022-09-17
 
