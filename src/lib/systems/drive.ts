@@ -43,14 +43,14 @@ export class Drive extends System {
         if (this.advanced) {
             return {
                 id: "driveAdv",
-                svg: `<symbol id="svg_driveAdv" viewBox="245 45 470 470"><polygon fill="none" stroke="#000000" stroke-width="14" stroke-miterlimit="10" points="706.8,390.2 480,500.4 253.2,390.2 253.2,169.8 480,59.6 706.8,169.8"/><text x="480" y="320" dominant-baseline="middle" text-anchor="middle" font-size="400">${this.thrust}</text></symbol>`,
+                svg: `<symbol id="svg_driveAdv" viewBox="245 45 470 470"><polygon fill="white" stroke="#000000" stroke-width="14" stroke-miterlimit="10" points="706.8,390.2 480,500.4 253.2,390.2 253.2,169.8 480,59.6 706.8,169.8"/><text x="480" y="320" dominant-baseline="middle" text-anchor="middle" font-size="400">${this.thrust}</text></symbol>`,
                 height: 1,
                 width: 1
             }
         } else {
             return {
                 id: "drive",
-                svg: `<symbol id="svg_drive" viewBox="164 -35.5 629 629"><polygon fill="none" stroke="#000000" stroke-width="26" stroke-miterlimit="10" points="779,526 180,526 180,215.8 479.5,34 779,215.8"/><text x="479.5" y="343.52" dominant-baseline="middle" text-anchor="middle" font-size="400">${this.thrust}</text></symbol>`,
+                svg: `<symbol id="svg_drive" viewBox="164 -35.5 629 629"><polygon fill="white" stroke="#000000" stroke-width="26" stroke-miterlimit="10" points="779,526 180,526 180,215.8 479.5,34 779,215.8"/><text x="479.5" y="343.52" dominant-baseline="middle" text-anchor="middle" font-size="400">${this.thrust}</text></symbol>`,
                 height: 1,
                 width: 1
             }

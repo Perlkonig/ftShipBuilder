@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added CPV calculations from <https://fullthrust.star-ranger.com/CPV.htm> and <http://fullthrust.star-ranger.com/FighterGroups.htm>. Bays, hangars, and launch tubes are considered "non-combat mass," hangars and tubes are 1 CPV per mass, and fighters gain a base 30 CPV across the board, and long-range fighters go up an additional 2 points per fighter.
+* Added a "notes" feature. Can optionally be placed in the freeform SSD.
 
 ### Fixed
 

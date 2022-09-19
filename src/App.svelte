@@ -30,7 +30,7 @@
       <a href="https://github.com/Perlkonig/ftShipBuilder">Fork me on GitHub!</a>
     </p>
     <p>
-      Buy me a coffee at <a href="https://paypal.me/abstractplay">paypal.me/abstractplay</a>. Thank you!
+      I believe in the "value for value" model. If you find this tool valuable, consider a donation proportional to that value: <a href="https://paypal.me/abstractplay">paypal.me/abstractplay</a>. Thank you!
     </p>
   </div>
 </footer>

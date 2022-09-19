@@ -66,7 +66,7 @@
                     I also hang out at the <a href="https://discord.gg/fXC3grNN9C">Full Thrust Gamers Discord server</a>.
                 </p>
                 <p>
-                    If you feel so inclined, you can buy me a coffee at <a href="https://paypal.me/abstractplay">paypal.me/abstractplay</a>. Thank you!
+                    I believe in the "value for value" model. If you find this tool valuable, consider a donation proportional to that value: <a href="https://paypal.me/abstractplay">paypal.me/abstractplay</a>. Thank you!
                   </p>
             </div>
         </section>

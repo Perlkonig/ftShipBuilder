@@ -1,13 +1,11 @@
 <script lang="ts">
     import { nanoid } from "nanoid";
-    // import pako from "pako";
-    // import { Buffer } from "buffer";
     import { ship } from "../stores/writeShip";
     import { savedShips } from "../stores/writeStoredShips";
     import SysDisplay from "./SysDisplay.svelte";
     import MassPts from "./MassPts.svelte";
+    import SvelteMarkdown from "svelte-markdown";
     import { systemList, ordnanceList, weaponList, getSpecial, getSystem, sortNames } from "../lib/systems";
-    import { toggle_class } from "svelte/internal";
 
     const addArmour = () => {
         $ship.armour.push(1);
@@ -418,6 +416,26 @@
                 </div>
             </div>
         </section>
+
+        <!--
+        <section class="section">
+            <h2 class="subtitle">Ship Notes</h2>
+
+            <div class="field">
+                <label class="label" for="notes">Add any narrative notes you may wish to add to your SSD. Use <a href="https://www.markdownguide.org/">Markdown</a> for formatting.</label>
+                <div class="control">
+                    <textarea id="notes" class="textarea" placeholder="Enter Markdown-encoded text here" bind:value="{$ship.notes}" rows="3"></textarea>
+                </div>
+            </div>
+
+        {#if $ship.notes !== undefined}
+            <div class="notesPreview content">
+                <SvelteMarkdown source={$ship.notes} />
+            </div>
+        {/if}
+        </section>
+        -->
+
     </div> <!-- Column -->
 
     <div class="column">
@@ -656,4 +674,8 @@
     .topPadding {
         padding-top: 1em;
     }
+    /* .notesPreview {
+        border: 1px solid black;
+        padding: 1rem;
+    } */
 </style>
