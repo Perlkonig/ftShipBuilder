@@ -5,11 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v2.0.0] - 2022-09-21
 
 ### BREAKING CHANGE
 
 The layout system has been almost completely rewritten. Your saved ships are fine, but their SSDs are not. You will have to rearrange your systems. The new system is extensible, so this sort of break should never happen again.
+
+If you are having issues, try exporting *just* the ship (there is now a button for that) and reimporting it to start fresh.
 
 ### Added
 
@@ -19,8 +21,8 @@ The layout system has been almost completely rewritten. Your saved ships are fin
 
 ### Fixed
 
-* Fixed nameplate scaling.
-* Linear layout footer now exports white instead of black. Nothing I can do about the fonts, though.
+* Fixed nameplate scaling in the linear layout.
+* In the linear layout, the default SVG export will render perfectly in the browser. In the "adjusted" SVG and PNG exports, the footer has been changed to white for visibility. Nothing I can do about the fonts, though.
 
 ## [v1.3.0] - 2022-09-17
 

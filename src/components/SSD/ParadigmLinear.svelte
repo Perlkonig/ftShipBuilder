@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Canvg } from "canvg";
-    import { afterUpdate } from "svelte";
+    import { afterUpdate, createEventDispatcher, onMount } from "svelte";
     import type { FullThrustShip } from "@/schemas/ship";
     import { svgLib } from "@/lib/svgLib";
     import type { ISystemSVG } from "@/lib/svgLib";
@@ -14,6 +14,8 @@
     import type { MineLayer } from "@/lib/systems/mineLayer";
 
     export let ship: FullThrustShip;
+
+    const dispatch = createEventDispatcher();
 
     // Calculate the size of the hull display.
     // Below a certain threshold, the compact display will be used (drives to the side).
@@ -222,8 +224,12 @@
         }
     }
 
+    let injectXlink: boolean;
+    let svgDataStr: string;
+    let pngDataStr: string;
+    let pngCanvas: HTMLCanvasElement;
     let nameElement: SVGTextElement;
-    afterUpdate(() => {
+    onMount(() => {
         if (nameElement !== undefined) {
             var bb = nameElement.getBBox();
             var widthTransform = pxWidth * 0.9 / bb.width;
@@ -235,12 +241,30 @@
             nameElement.setAttribute("x", (currx / value).toString());
             nameElement.setAttribute("y", (curry / value).toString());
         }
-        footerFill.setAttribute("fill", "white")
-        const ctx = pngCanvas.getContext("2d");
-        const v = Canvg.fromString(ctx, svgDisplay.outerHTML);
-        v.render();
-        pngDataStr = pngCanvas.toDataURL("image/png");
-        footerFill.setAttribute("fill", "white")
+    })
+
+    afterUpdate(() => {
+        if (svgDisplay !== undefined) {
+            footerFill.setAttribute("fill", "white")
+            const ctx = pngCanvas.getContext("2d");
+            const v = Canvg.fromString(ctx, svgDisplay.outerHTML);
+            v.render();
+            pngDataStr = pngCanvas.toDataURL("image/png");
+            footerFill.setAttribute("fill", "black");
+
+            let text: string;
+            if (injectXlink) {
+                footerFill.setAttribute("fill", "white")
+                text = svgDisplay.outerHTML;
+                text = text.replaceAll(`href=`, `xlink:href=`);
+                footerFill.setAttribute("fill", "black")
+            } else {
+                text = svgDisplay.outerHTML;
+                text = text.replace(`<svg `, `<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" `);
+                text = text.replace(`<defs>`, `<defs><st` + `yle type="text/css"><![CDATA[ @import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap'); .futureFont { font-family: "Zen Dots" } .svgInvert { filter: invert(1); } ]]></style>`);
+            }
+            svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(text);
+        }
     });
 
     interface IBuffer {
@@ -472,15 +496,6 @@
         svgBody += `<use href="#_internalLinearCombined" x="0" y="${currRow * cellsize}" height="${cellsize * 3}" width="${pxWidth}" class="svgInvert" />`;
     }
 
-    let svgDataStr: string;
-    let pngDataStr: string;
-    let pngCanvas: HTMLCanvasElement;
-    $: if (svgDisplay !== undefined) {
-        footerFill.setAttribute("fill", "white")
-        svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgDisplay.outerHTML.replaceAll(`href=`, `xlink:href=`));
-        footerFill.setAttribute("fill", "black")
-    }
-
     let ssdDiv: HTMLDivElement;
     let ssdHeight = 30;
     const enlarge = () => {
@@ -523,8 +538,6 @@
 
         <rect x="0" y="{(totalRows - 3) * cellsize}" width="{pxWidth}" height="{cellsize * 3}" stroke="none" fill="black" bind:this="{footerFill}"/>
 
-
-
         <!-- The body was generated in the <script> section for reasons. Insert it here wholesale.-->
         {@html svgBody}
 
@@ -536,9 +549,20 @@
 
 <div class="level paddingTop">
     <div class="level-item">
-        <a href="{svgDataStr}" download="SSD.svg">
-            <button class="button">Download SVG</button>
-        </a>
+        <div class="field">
+            <div class="control">
+            <a href="{svgDataStr}" download="SSD.svg">
+                <button class="button">Download SVG</button>
+            </a>
+            </div>
+            <div class="control">
+                <label class="checkbox">
+                    <input type="checkbox" bind:checked="{injectXlink}">
+                    Adjust for apps (<a on:click="{() => dispatch("message", {msg: "showSvg"})
+                    }">read more</a>)
+                  </label>
+            </div>
+        </div>
     </div>
     <div class="level-item">
         <button class="button" on:click="{enlarge}"><i class="fa-solid fa-plus"></i></button>
@@ -554,7 +578,7 @@
 
 <div class="content">
     <p>
-        Layout inspired by <a href="https://zacgaming.wordpress.com/2021/05/02/ssd_templates/">Zac</a>. Font is <a href="https://fonts.google.com/specimen/Zen+Dots">Zen Dots</a>. Sadly, neither of the exported formats have the correct font or inverted footer. If desired, you can use the +/- buttons to make the image the largest possible size for a screen capture.
+        Layout inspired by <a href="https://zacgaming.wordpress.com/2021/05/02/ssd_templates/">Zac</a>. Font is <a href="https://fonts.google.com/specimen/Zen+Dots">Zen Dots</a>. The exported SVG will render properly in a browser, but the "adjusted" SVG and the PNG will not show the correct font or inverted footer. If desired, you can use the +/- buttons to make the image the largest possible size for a screen capture.
     </p>
 </div>
 

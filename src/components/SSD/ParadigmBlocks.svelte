@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, createEventDispatcher } from "svelte";
     import { ship } from "@/stores/writeShip";
     import type { ILayout, IBlocks } from "@/stores/writeShip";
     import { savedLayouts } from "@/stores/writeStoredLayouts";
@@ -8,6 +8,8 @@
     import Assembled from "./ParadigmBlocks/Assembled.svelte";
     import SystemArranger from "./ParadigmBlocks/SystemArranger.svelte";
     import CustomLayout from "./ParadigmBlocks/CustomLayout.svelte";
+
+    const dispatch = createEventDispatcher();
 
     let layout: IBlocks;
     onMount(() => {
@@ -156,7 +158,9 @@
     <h2 class="subtitle">Assembled SSD</h2>
     {#if (selected !== undefined) }
         {#key layout}
-        <Assembled />
+        <Assembled
+            on:message
+        />
         {/key}
     {/if}
 {/key}

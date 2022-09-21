@@ -5,9 +5,11 @@
     import { svgLib, shipOutlines } from "@/lib/svgLib";
     import type { ISystemSVG } from "@/lib/svgLib";
     import { getSystem } from "@/lib/systems";
-    import { afterUpdate, onMount, tick } from "svelte";
+    import { afterUpdate, onMount, createEventDispatcher } from "svelte";
     import { formRows, genSvg } from "@/lib/hull";
     import type { ILayout, IFreeform, IElement } from "@/stores/writeShip";
+
+    const dispatch = createEventDispatcher();
 
     let layout: IFreeform;
     onMount(() => {
@@ -56,11 +58,13 @@
         tempText.textContent = text;
         secretSvg.append(tempText);
         const bbox = tempText.getBBox();
+        const bufferWidth = bbox.width * 0.06;
+        const bufferHeight = bbox.height * 0.06;
         tempText.remove();
         // <rect x="${bbox.x}" y="${bbox.y}" width="${bbox.width}" height="${bbox.height}" fill="none" stroke="black" />
         return {
             id: symbolid,
-            svg: `<symbol id="${symbolid}" viewBox="${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}"><text x="0" y="0" font-size="17">${text}</text></symbol>`,
+            svg: `<symbol id="${symbolid}" viewBox="${bbox.x - (bufferWidth / 2)} ${bbox.y - (bufferHeight / 2)} ${bbox.width + bufferWidth} ${bbox.height + bufferHeight}"><text x="0" y="0" font-size="17">${text}</text></symbol>`,
             width: bbox.width,
             height: bbox.height
         };
@@ -408,7 +412,7 @@
                 element.x = newx;
                 element.y = newy;
                 ($ship.layout as ILayout).freeform = layout;
-                $ship = $ship;
+                layout = layout;
             }
             // findOverlapWith(dragSelected);
             // findAllOverlaps();
@@ -423,6 +427,7 @@
     let pngCanvas: HTMLCanvasElement;
     let secretSvg: SVGSVGElement;
     let svgDisplay: SVGSVGElement;
+    let injectXlink: boolean;
     afterUpdate(() => {
         findAllOverlaps();
     });
@@ -431,13 +436,19 @@
         let text = svgDisplay.outerHTML;
         // remove the gridlines
         text = text.replace(/<g id="grid".*?<\/g>/, "");
-        svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(text.replaceAll(`href=`, `xlink:href=`));
+        // generate PNG before doing the rest
         const ctx = pngCanvas.getContext("2d");
         const v = Canvg.fromString(ctx, text);
         v.render();
         pngDataStr = pngCanvas.toDataURL("image/png");
-    }
 
+        if (injectXlink) {
+            text = text.replaceAll(`href=`, `xlink:href=`);
+        } else {
+            text = text.replace(`<svg `, `<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" `);
+        }
+        svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(text);
+    }
 
     const genRect = (ele: IElement): DOMRect | undefined => {
         return new DOMRect(ele.x, ele.y, ele.width, ele.height);
@@ -625,6 +636,7 @@
             <p class="help">There are elements outside of the SSD boundaries. Clicking the button will pull them onto the canvas.</p>
         </div>
     {/if}
+    {#key layout}
         <div class="ssd">
             <svg viewBox="-1 -1 {layout.width + 2} {layout.height + 2}" width="100%" height="100%" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:mouseleave="{endDrag}" on:touchstart="{startDrag}" on:touchmove="{drag}" on:touchend="{endDrag}" on:touchcancel="{endDrag}" bind:this="{svgDisplay}">
                 <defs>
@@ -668,11 +680,23 @@
                 <rect x="0" y="0" width="{layout.width}" height="{layout.height}" fill="none" stroke="black"/>
             </svg>
         </div>
+        {/key}
         <div class="level paddingTop">
             <div class="level-item">
-                <a href="{svgDataStr}" download="SSD.svg">
-                    <button class="button">Download SVG</button>
-                </a>
+                <div class="field">
+                    <div class="control">
+                    <a href="{svgDataStr}" download="SSD.svg">
+                        <button class="button">Download SVG</button>
+                    </a>
+                    </div>
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" bind:checked="{injectXlink}">
+                            Adjust for apps (<a on:click="{() => dispatch("message", {msg: "showSvg"})
+                            }">read more</a>)
+                        </label>
+                    </div>
+                </div>
             </div>
             <div class="level-item">
                 <a href="{pngDataStr}" download="SSD.png">

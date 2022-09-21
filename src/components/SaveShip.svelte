@@ -25,7 +25,7 @@
         const noLayoutString = JSON.stringify(ship, (k, v) => {
             if (k === "glyph") {
                 return undefined;
-            } else if (k === "layout") {
+            } else if ( (k === "layout") || (k === "x") || (k === "y") ) {
                 return undefined;
             } else {
                 return v;
