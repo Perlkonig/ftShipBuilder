@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { afterUpdate, createEventDispatcher } from "svelte";
+    import { afterUpdate, createEventDispatcher, onMount } from "svelte";
     import type { ILayout, IBox } from "@/lib/layouts";
     import { savedLayouts } from "@/stores/writeStoredLayouts";
 
@@ -19,6 +19,10 @@
         blockStats: {minx: 0, miny: 0, width: 0, height: 0},
         blockSystems: {minx: 0, miny: 0, width: 0, height: 0}
     };
+
+    onMount(() => {
+        inputCellsize = newLayout.cellsize;
+    })
 
     let xs: number[] = [];
     let ys: number[] = [];
@@ -85,6 +89,17 @@
     const cancel = () => {
         dispatch("message", {msg: "close"})
     }
+
+    // The following is required to prevent a STATUS_BREAKPOINT crash in Chrome
+    // when the cellsize value is 0 or simply deleted.
+    let inputCellsize: number;
+    const setCellsize = () => {
+        if ( (inputCellsize === undefined) || (inputCellsize < 1) ) {
+            inputCellsize = 100;
+        }
+        newLayout.cellsize = inputCellsize;
+        newLayout = newLayout
+    }
 </script>
 
 <div class="columns">
@@ -138,7 +153,7 @@
         <div class="field">
             <label class="label" for="cellsize">Cell size</label>
             <div class="control">
-                <input class="input" id="cellsize" type="number" placeholder="Cell size" min="0" step="{newLayout.cellsize}" bind:value="{newLayout.cellsize}">
+                <input class="input" id="cellsize" type="number" placeholder="Cell size" min="1"  bind:value="{inputCellsize}" on:change="{setCellsize}">
             </div>
             <p class="help">A cell is the smallest element of an SSD (e.g., a hull box). The smaller the cell size relative to the height/width, the more elements will fit on the layout.</p>
         </div>

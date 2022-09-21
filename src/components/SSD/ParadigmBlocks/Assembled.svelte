@@ -1,21 +1,16 @@
 <script lang="ts">
     import { Canvg } from "canvg";
-    import { afterUpdate, beforeUpdate } from 'svelte';
+    import { afterUpdate, beforeUpdate, onMount } from 'svelte';
     import { ship } from "@/stores/writeShip";
-    import { savedLayouts } from "@/stores/writeStoredLayouts";
+    import type { ILayout as ILayoutSystem } from "@/stores/writeShip";
     import { ssdComponents } from "@/stores/writeSsd";
-    import { layouts } from "@/lib/layouts";
-    import type { ILayout } from "@/lib/layouts";
     import { getSystem } from "@/lib/systems";
     import { svgLib } from "@/lib/svgLib";
     import { genSvg } from "@/lib/hull";
     import type { ISystem } from "src/lib/systems/_base";
     import type { ISystemSVG } from "@/lib/svgLib";
 
-    export let layoutID: string;
-
-    const allLayouts: ILayout[] = [...layouts, ...$savedLayouts];
-    const layout = allLayouts.find(x => x.id === layoutID);
+    let layout = ($ship.layout as ILayoutSystem).blocks;
     const svgCore = svgLib.find(x => x.id === "coreSys")!;
     const sysFtl: ISystem = $ship.systems.find(x => x.name === "ftl");
     let hasFtlAdv = false;
@@ -43,12 +38,10 @@
     $: if (fullSsdSvg !== undefined) {
         svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(fullSsdSvg.outerHTML.replaceAll(`href=`, `xlink:href=`));
 
-        genPgn();
+        genPng();
     }
 
-    const totalThrust = ($ship.systems.find(x => x.name === "drive")!).thrust;
-
-    const genPgn = () => {
+    const genPng = () => {
         const ctx = pngCanvas.getContext("2d");
         const v = Canvg.fromString(ctx, fullSsdSvg.outerHTML);
         v.render();
@@ -56,7 +49,7 @@
     };
 
     const genHull = () => {
-        $ssdComponents.hull = genSvg($ship, layout.cellsize, {height: layout.blockHull.height, width: layout.blockHull.width});
+        $ssdComponents.hull = genSvg($ship, layout.blocks.cellsize, {height: layout.blocks.blockHull.height, width: layout.blocks.blockHull.width});
         $ssdComponents = $ssdComponents;
     };
 
@@ -64,14 +57,11 @@
         genHull();
     });
 
-    let coreWidthOffset = 0;
-    let coreHeightOffset = 0;
-    let coreOffsetFactor = 0.15;
-    afterUpdate(() => {
+    onMount(() => {
         if (nameElement !== undefined) {
             var bb = nameElement.getBBox();
-            var widthTransform = layout.blockName.width * 0.9 / bb.width;
-            var heightTransform = layout.blockName.height * 0.9 / bb.height;
+            var widthTransform = layout.blocks.blockName.width * 0.9 / bb.width;
+            var heightTransform = layout.blocks.blockName.height * 0.9 / bb.height;
             var value = widthTransform < heightTransform ? widthTransform : heightTransform;
             nameElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
             const currx = parseFloat(nameElement.getAttribute("x"));
@@ -81,8 +71,8 @@
         }
         if (statsElement !== undefined) {
             var bb = statsElement.getBBox();
-            var widthTransform = layout.blockStats.width * 0.9 / bb.width;
-            var heightTransform = layout.blockStats.height * 0.9 / bb.height;
+            var widthTransform = layout.blocks.blockStats.width * 0.9 / bb.width;
+            var heightTransform = layout.blocks.blockStats.height * 0.9 / bb.height;
             var value = widthTransform < heightTransform ? widthTransform : heightTransform;
             statsElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
             const currx = parseFloat(statsElement.getAttribute("x"));
@@ -90,14 +80,20 @@
             statsElement.setAttribute("x", (currx / value).toString());
             statsElement.setAttribute("y", (curry / value).toString());
         }
-        coreHeightOffset = (layout.blockCore.height * coreOffsetFactor) / 2;
-        coreWidthOffset = (layout.blockCore.width * coreOffsetFactor) / 2;
+    })
+
+    let coreWidthOffset = 0;
+    let coreHeightOffset = 0;
+    let coreOffsetFactor = 0.15;
+    afterUpdate(() => {
+        coreHeightOffset = (layout.blocks.blockCore.height * coreOffsetFactor) / 2;
+        coreWidthOffset = (layout.blocks.blockCore.width * coreOffsetFactor) / 2;
     });
 </script>
 
 {#if layout !== undefined}
 <div class="ssd">
-    <svg viewBox="-1 -1 {layout.width + 2} {layout.height + 2}" width="100%" height="100%" bind:this="{fullSsdSvg}">
+    <svg viewBox="-1 -1 {layout.blocks.width + 2} {layout.blocks.height + 2}" width="100%" height="100%" bind:this="{fullSsdSvg}">
         <defs>
             {@html $ssdComponents.systems}
             {@html $ssdComponents.hull}
@@ -107,21 +103,21 @@
             {@html svgFtl.svg}
         {/if}
         </defs>
-    <rect x="0" y="0" width="{layout.width}" height="{layout.height}" stroke="black" fill="white" />
-    <text x="{layout.blockName.minx + (layout.blockName.width / 2)}" y="{layout.blockName.miny + (layout.blockName.height / 2)}" bind:this="{nameElement}" dominant-baseline="middle" text-anchor="middle">{$ship.class} "{$ship.name}"</text>
-    <text x="{layout.blockStats.minx + (layout.blockStats.width / 2)}" y="{layout.blockStats.miny + (layout.blockStats.height / 2)}" bind:this="{statsElement}" dominant-baseline="middle" text-anchor="middle">Mass: {$ship.mass}, NPV: {$ship.points}, CPV: {$ship.cpv}</text>
-    <use href="#_ssdSystems" x="{layout.blockSystems.minx}" y="{layout.blockSystems.miny}" width="{layout.blockSystems.width}" height="{layout.blockSystems.height}" />
-    <use href="#_ssdHull" x="{layout.blockHull.minx}" y="{layout.blockHull.miny}" width="{layout.blockHull.width}" height="{layout.blockHull.height}" />
-    <use href="#svg_coreSys" x="{layout.blockCore.minx + coreWidthOffset}" y="{layout.blockCore.miny + coreHeightOffset}" width="{layout.blockCore.width * (1 - coreOffsetFactor)}" height="{layout.blockCore.height * (1 - coreOffsetFactor)}" />
+    <rect x="0" y="0" width="{layout.blocks.width}" height="{layout.blocks.height}" stroke="black" fill="white" />
+    <text x="{layout.blocks.blockName.minx + (layout.blocks.blockName.width / 2)}" y="{layout.blocks.blockName.miny + (layout.blocks.blockName.height / 2)}" bind:this="{nameElement}" dominant-baseline="middle" text-anchor="middle">{$ship.class} "{$ship.name}"</text>
+    <text x="{layout.blocks.blockStats.minx + (layout.blocks.blockStats.width / 2)}" y="{layout.blocks.blockStats.miny + (layout.blocks.blockStats.height / 2)}" bind:this="{statsElement}" dominant-baseline="middle" text-anchor="middle">Mass: {$ship.mass}, NPV: {$ship.points}, CPV: {$ship.cpv}</text>
+    <use href="#_ssdSystems" x="{layout.blocks.blockSystems.minx}" y="{layout.blocks.blockSystems.miny}" width="{layout.blocks.blockSystems.width}" height="{layout.blocks.blockSystems.height}" />
+    <use href="#_ssdHull" x="{layout.blocks.blockHull.minx}" y="{layout.blocks.blockHull.miny}" width="{layout.blocks.blockHull.width}" height="{layout.blocks.blockHull.height}" />
+    <use href="#svg_coreSys" x="{layout.blocks.blockCore.minx + coreWidthOffset}" y="{layout.blocks.blockCore.miny + coreHeightOffset}" width="{layout.blocks.blockCore.width * (1 - coreOffsetFactor)}" height="{layout.blocks.blockCore.height * (1 - coreOffsetFactor)}" />
 {#if hasFtlAdv}
-    <use href="#svg_ftlAdv" x="{layout.blockFtl.minx}" y="{layout.blockFtl.miny}" width="{layout.blockFtl.width}" height="{layout.blockFtl.height}" />
+    <use href="#svg_ftlAdv" x="{layout.blocks.blockFtl.minx}" y="{layout.blocks.blockFtl.miny}" width="{layout.blocks.blockFtl.width}" height="{layout.blocks.blockFtl.height}" />
 {:else if sysFtl !== undefined}
-    <use href="#svg_ftl" x="{layout.blockFtl.minx}" y="{layout.blockFtl.miny}" width="{layout.blockFtl.width}" height="{layout.blockFtl.height}" />
+    <use href="#svg_ftl" x="{layout.blocks.blockFtl.minx}" y="{layout.blocks.blockFtl.miny}" width="{layout.blocks.blockFtl.width}" height="{layout.blocks.blockFtl.height}" />
 {/if}
 {#if hasAdvDrive}
-    <use href="#svg_driveAdv" x="{layout.blockDrive.minx}" y="{layout.blockDrive.miny}" width="{layout.blockDrive.width}" height="{layout.blockDrive.height}" />
+    <use href="#svg_driveAdv" x="{layout.blocks.blockDrive.minx}" y="{layout.blocks.blockDrive.miny}" width="{layout.blocks.blockDrive.width}" height="{layout.blocks.blockDrive.height}" />
 {:else}
-    <use href="#svg_drive" x="{layout.blockDrive.minx}" y="{layout.blockDrive.miny}" width="{layout.blockDrive.width}" height="{layout.blockDrive.height}" />
+    <use href="#svg_drive" x="{layout.blocks.blockDrive.minx}" y="{layout.blocks.blockDrive.miny}" width="{layout.blocks.blockDrive.width}" height="{layout.blocks.blockDrive.height}" />
 {/if}
 </svg>
 </div>
@@ -138,9 +134,15 @@
         </a>
     </div>
 </div>
+<div class="content">
+    <p>
+        Note that the exports will not be identical because they cannot see the applied CSS. This is most evident in text elements.
+    </p>
+</div>
+
 
 <div class="hidden">
-    <canvas width="{layout.width + 2}" height="{layout.height + 2}" bind:this="{pngCanvas}"></canvas>
+    <canvas width="{layout.blocks.width + 2}" height="{layout.blocks.height + 2}" bind:this="{pngCanvas}"></canvas>
 </div>
 {/if}
 

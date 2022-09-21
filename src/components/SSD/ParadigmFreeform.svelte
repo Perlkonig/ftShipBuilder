@@ -1,44 +1,21 @@
 <script lang="ts">
+    import { Canvg } from "canvg";
     import { ship } from "@/stores/writeShip";
     import { snapToGrid } from "@/stores/writeSnap";
-    import { svgLib } from "@/lib/svgLib";
+    import { svgLib, shipOutlines } from "@/lib/svgLib";
     import type { ISystemSVG } from "@/lib/svgLib";
     import { getSystem } from "@/lib/systems";
-    import { afterUpdate, onMount } from "svelte";
+    import { afterUpdate, onMount, tick } from "svelte";
     import { formRows, genSvg } from "@/lib/hull";
-
-    interface IDim {
-        width: number;
-        height: number;
-        x: number;
-        y: number;
-        factor: number | undefined;
-    }
-    interface IElement {
-        id: string;
-        glyphid: string; // ID for the <use> tag
-        width: number;
-        height: number;
-        x: number;
-        y: number;
-    }
-    interface IElements {
-        [k: string]: IElement;
-    }
-    interface IFreeform {
-        width: number;
-        height: number;
-        cellsize: number;
-        nameplate: IDim;
-        stats: IDim;
-        background: string | undefined;
-        elements: IElements;
-    }
+    import type { ILayout, IFreeform, IElement } from "@/stores/writeShip";
 
     let layout: IFreeform;
     onMount(() => {
-        if ( ($ship.layout !== undefined) && (typeof $ship.layout !== "string") ) {
-            layout = $ship.layout as IFreeform;
+        if ( ($ship.layout !== undefined) && (typeof $ship.layout !== "string") && ($ship.layout.hasOwnProperty("freeform")) && (($ship.layout as ILayout).freeform !== undefined) ) {
+            layout = ($ship.layout as ILayout).freeform;
+            if (layout.background === undefined) {
+                layout.background = {svg: undefined, x: 0, y: 0, zoom: 1};
+            }
         } else {
             layout = {
                 width: 3000,
@@ -46,12 +23,16 @@
                 cellsize: 200,
                 nameplate: {width: 2000, height: 200, x: 200, y: 200, factor: 1},
                 stats: {width: 1000, height: 100, x: 200, y: 200, factor: 1},
-                background: undefined,
+                background: {svg: undefined, x: 0, y: 0, zoom: 1},
                 elements: {}
             }
-            $ship.layout = layout;
+            if ( ($ship.layout === undefined) || (typeof $ship.layout === "string") ) {
+                $ship.layout = {} as ILayout;
+            }
+            ($ship.layout as ILayout).freeform = layout;
         }
-        findAllOverlaps();
+        inputCellsize = layout.cellsize;
+        // findAllOverlaps();
     });
 
     interface ISystem {
@@ -356,8 +337,6 @@
                 }
             }
         }
-
-        exportLayout();
     }
 
     const correctOutOfBounds = () => {
@@ -372,7 +351,6 @@
         layout = layout;
     }
 
-    let svgDisplay: SVGSVGElement;
     let dragSelected: SVGUseElement; // | SVGGElement;
     let offset: IPoint;
     let maxx: number;
@@ -429,43 +407,61 @@
                 if (newy >= layout.height) { newy = layout.height - layout.cellsize;}
                 element.x = newx;
                 element.y = newy;
-                $ship.layout = layout;
+                ($ship.layout as ILayout).freeform = layout;
                 $ship = $ship;
             }
-            findOverlapWith(dragSelected);
+            // findOverlapWith(dragSelected);
+            // findAllOverlaps();
             dragSelected = undefined;
             maxx = maxy = undefined;
-            exportLayout();
+            // exportLayout();
         }
     }
 
-    let usedElements: SVGUseElement[] = [];
-    const findOverlapWith = (dropped: SVGUseElement) => {
-        const droppedRect = dropped.getBoundingClientRect();
-        for (const used of usedElements) {
+    let svgDataStr: string;
+    let pngDataStr: string;
+    let pngCanvas: HTMLCanvasElement;
+    let secretSvg: SVGSVGElement;
+    let svgDisplay: SVGSVGElement;
+    afterUpdate(() => {
+        findAllOverlaps();
+    });
+
+    $: if (svgDisplay !== undefined) {
+        let text = svgDisplay.outerHTML;
+        // remove the gridlines
+        text = text.replace(/<g id="grid".*?<\/g>/, "");
+        svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(text.replaceAll(`href=`, `xlink:href=`));
+        const ctx = pngCanvas.getContext("2d");
+        const v = Canvg.fromString(ctx, text);
+        v.render();
+        pngDataStr = pngCanvas.toDataURL("image/png");
+    }
+
+
+    const genRect = (ele: IElement): DOMRect | undefined => {
+        return new DOMRect(ele.x, ele.y, ele.width, ele.height);
+    }
+
+    let allOverlaps: Set<string>;
+    const findOverlapWith = (dropped: IElement) => {
+        const droppedRect = genRect(dropped);
+        for (const used of Object.values(layout.elements)) {
             if (used.id === dropped.id) { continue; }
-            if (used !== undefined) {
-                const otherRect = used.getBoundingClientRect();
-                if (overlapping(droppedRect, otherRect)) {
-                    dropped.classList.add("svgHighlight");
-                    used.classList.add("svgHighlight");
-                }
+            const otherRect = genRect(used);
+            if (overlapping(droppedRect, otherRect)) {
+                allOverlaps.add(dropped.id);
+                allOverlaps.add(used.id);
             }
         }
     };
 
     const findAllOverlaps = () => {
-        for (const used of usedElements) {
+        allOverlaps = new Set();
+        for (const used of Object.values(layout.elements)) {
             findOverlapWith(used);
         }
     };
-
-    let pngCanvas: HTMLCanvasElement;
-    let secretSvg: SVGSVGElement;
-    let nameElement: SVGTextElement;
-    afterUpdate(() => {
-        findAllOverlaps();
-    });
 
     const overlapping = (r1: DOMRect, r2: DOMRect): boolean => {
         return !((r2.left >= r1.right) ||
@@ -488,43 +484,54 @@
         };
     }
 
-    const exportLayout = () => {
-        // let s = `<symbol id="_ssdSystems" viewBox="-1 -1 ${layout.width + 2} ${layout.height + 2}">`;
-        // s += `<defs>`;
-        // for (const distinct of sysDistinct) {
-        //     s += distinct.svg;
-        // }
-        // s += `</defs>`;
-        // for (const line of lines) {
-        //     s += `<line x1="${line[0].x}" y1="${line[0].y}" x2="${line[1].x}" y2="${line[1].y}" stroke="black" stroke-width="5" />`;
-        // }
-        // for (const sys of systems) {
-        //     s += `<use id="${sys.id}" href="#svg_${sys.glyph.id}" x="${sys.x * layout.cellsize}" y="${sys.y * layout.cellsize}" width="${sys.glyph.width * layout.cellsize}" height="${sys.glyph.height * layout.cellsize}" />`;
-        // }
-        // s += `</symbol>`;
-        // $ssdComponents.systems = s;
+    let selectedOutline: string;
+    let outlineHelpText: string;
+    const processOutline = () => {
+        if (layout.background === undefined) {
+            layout.background = {svg: undefined, x: 0, y: 0, zoom: 1};
+        }
+        if ( (selectedOutline === undefined) || (selectedOutline.length === 0) ) {
+            layout.background.svg = undefined;
+        } else {
+            const outline = shipOutlines.find(x => x.id === selectedOutline);
+            if (outline !== undefined) {
+                layout.background.svg = outline.svg;
+                outlineHelpText = outline.notes;
+            }
+        }
     };
+
+    // The following is required to prevent a STATUS_BREAKPOINT crash in Chrome
+    // when the cellsize value is 0 or simply deleted.
+    let inputCellsize: number;
+    const setCellsize = () => {
+        if ( (inputCellsize === undefined) || (inputCellsize < 1) ) {
+            inputCellsize = 100;
+        }
+        layout.cellsize = inputCellsize;
+        layout = layout;
+    }
 </script>
 
 {#if (layout !== undefined)}
 <div class="columns">
-    <div class="column">
+    <div class="column is-one-third">
         <div class="field">
             <label class="label" for="totalWidth">Total width</label>
             <div class="control">
-                <input id="totalWidth" class="input" type="number" min="{layout.cellsize}" step="{layout.cellsize}" bind:value="{layout.width}" on:blur="{() => layout = layout}">
+                <input id="totalWidth" class="input" type="number" min="{layout.cellsize}" step="{layout.cellsize}" bind:value="{layout.width}" on:change="{() => layout = layout}">
             </div>
         </div>
         <div class="field">
             <label class="label" for="totalHeight">Total height</label>
             <div class="control">
-                <input id="totalHeight" class="input" type="number" min="{layout.cellsize}" step="{layout.cellsize}" bind:value="{layout.height}" on:blur="{() => layout = layout}">
+                <input id="totalHeight" class="input" type="number" min="{layout.cellsize}" step="{layout.cellsize}" bind:value="{layout.height}" on:change="{() => layout = layout}">
             </div>
         </div>
         <div class="field">
             <label class="label" for="cellsize">Cell size</label>
             <div class="control">
-                <input id="cellsize" class="input" type="number" min="1" bind:value="{layout.cellsize}" on:change="{() => layout = layout}">
+                <input id="cellsize" class="input" type="number" min="1" bind:value="{inputCellsize}" on:change="{setCellsize}">
             </div>
             <p class="help">Biggest determiner of how much can fit in the SSD. This is the size of the smallest elements (e.g., a single hull box).</p>
         </div>
@@ -542,6 +549,64 @@
             </div>
             <p class="help">Set to 0 to disable the stats block.</p>
         </div>
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="label" for="bgSvg">Background image</label>
+                    <div class="control">
+                        <input id="bgSvg" class="input" type="text" bind:value="{layout.background.svg}" on:change="{() => layout = layout}">
+                    </div>
+                    <p class="help">Must be an SVG. Must be provided as a <code>&lt;symbol&gt;</code> tag with a <code>viewBox</code> attribute. Must have an <code>id</code> attribute of <code>_freeformBackground</code>.</p>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label" for="bgSelect">Built-in outlines</label>
+                    <div class="control">
+                        <div class="select">
+                            <select bind:value="{selectedOutline}" on:change="{processOutline}">
+                                <option value="">No Outline</option>
+                            {#each shipOutlines as outline}
+                                <option value="{outline.id}">{outline.name}</option>
+                            {/each}
+                            </select>
+                        </div>
+                    {#if outlineHelpText !== undefined}
+                        <p class="help is-info">{outlineHelpText}</p>
+                    {/if}
+                        <p class="help">If you have outlines you're willing to share, please send them to me!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {#if ( (layout.background !== undefined) && (layout.background.svg !== undefined) && (layout.background.svg.length > 0) )}
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="label" for="bgX">Background X coordinate</label>
+                    <div class="control">
+                        <input id="bgX" class="input" type="number" step="{layout.cellsize}" bind:value="{layout.background.x}" on:change="{() => layout = layout}">
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label" for="bgY">Background Y coordinate</label>
+                    <div class="control">
+                        <input id="bgY" class="input" type="number" step="{layout.cellsize}" bind:value="{layout.background.y}" on:change="{() => layout = layout}">
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label" for="bgZoom">Background zoom</label>
+                    <div class="control">
+                        <input id="bgZoom" class="input" type="number" step="0.1" bind:value="{layout.background.zoom}" on:change="{() => layout = layout}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/if}
     </div>
     <div class="column">
         <div class="field">
@@ -560,15 +625,26 @@
             <p class="help">There are elements outside of the SSD boundaries. Clicking the button will pull them onto the canvas.</p>
         </div>
     {/if}
-        {#key layout}
         <div class="ssd">
             <svg viewBox="-1 -1 {layout.width + 2} {layout.height + 2}" width="100%" height="100%" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:mouseleave="{endDrag}" on:touchstart="{startDrag}" on:touchmove="{drag}" on:touchend="{endDrag}" on:touchcancel="{endDrag}" bind:this="{svgDisplay}">
                 <defs>
                 {#each defs as g}
                     {@html g.svg}
                 {/each}
+                {#if ( (layout.background !== undefined) && (layout.background.svg !== undefined) && (layout.background.svg.length > 0) )}
+                    {@html layout.background.svg}
+                {/if}
                 </defs>
-                <rect x="0" y="0" width="{layout.width}" height="{layout.height}" fill="none" stroke="black"/>
+
+            <!-- White background to start -->
+            <rect x="0" y="0" width="{layout.width}" height="{layout.height}" fill="white" />
+
+            <!-- Background image if provided -->
+            {#if ( (layout.background !== undefined) && (layout.background.svg !== undefined) && (layout.background.svg.length > 0) )}
+                <use href="#_freeformBackground" x="{layout.background.x}" y="{layout.background.y}" width="{layout.width * layout.background.zoom}" height="{layout.height * layout.background.zoom}" />
+            {/if}
+
+            <!-- Grid of cellsize for alignment -->
                 <g id="grid">
             {#each xs as x}
                 <line x1="{x}" y1="0" x2="{x}" y2="{layout.height}" stroke="#c0c0c0"/>
@@ -578,16 +654,37 @@
             {/each}
                 </g>
 
+            <!-- Lines between magazines and launches and turreted weapons outside their turret graphic -->
             {#each lines as line}
                 <line x1="{line[0].x}" y1="{line[0].y}" x2="{line[1].x}" y2="{line[1].y}" stroke="black" stroke-width="5"/>
             {/each}
 
+            <!-- Each system and other element -->
             {#each Object.values(layout.elements) as sys, i}
-                <use id="{sys.id}" href="#{sys.glyphid}" x="{sys.x}" y="{sys.y}" width="{sys.width}" height="{sys.height}" class="draggable" bind:this="{usedElements[i]}"/>
+                <use id="{sys.id}" href="#{sys.glyphid}" x="{sys.x}" y="{sys.y}" width="{sys.width}" height="{sys.height}" class="draggable" class:svgHighlight="{allOverlaps.has(sys.id)}" />
             {/each}
+
+            <!-- And finally the black border -->
+                <rect x="0" y="0" width="{layout.width}" height="{layout.height}" fill="none" stroke="black"/>
             </svg>
         </div>
-        {/key}
+        <div class="level paddingTop">
+            <div class="level-item">
+                <a href="{svgDataStr}" download="SSD.svg">
+                    <button class="button">Download SVG</button>
+                </a>
+            </div>
+            <div class="level-item">
+                <a href="{pngDataStr}" download="SSD.png">
+                    <button class="button">Download PNG</button>
+                </a>
+            </div>
+        </div>
+        <div class="content">
+            <p>
+                Note that the exports will not be identical because they cannot see the applied CSS. This is most evident in text elements.
+            </p>
+        </div>
     </div>
 </div>
 
@@ -614,5 +711,8 @@
     :global(.svgHighlight) {
         fill-opacity: 0.5;
         fill: red;
+    }
+    .paddingTop {
+        padding-top: 1rem;
     }
 </style>
