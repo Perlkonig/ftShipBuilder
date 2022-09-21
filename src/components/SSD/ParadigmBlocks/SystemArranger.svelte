@@ -1,24 +1,16 @@
 <script lang="ts">
     import { ship } from "@/stores/writeShip";
     import { snapToGrid } from "@/stores/writeSnap";
-    import { savedLayouts } from "@/stores/writeStoredLayouts";
     import { ssdComponents } from "@/stores/writeSsd";
-    import { layouts } from "@/lib/layouts";
-    import type { ILayout } from "@/lib/layouts";
+    import type { ILayout as ILayoutSystem, IElement } from "@/stores/writeShip";
     import type { IBox } from "@/lib/layouts";
     import type { ISystemSVG } from "@/lib/svgLib";
-    import { nanoid } from "nanoid";
     import { getSystem } from "@/lib/systems";
     import { afterUpdate } from "svelte";
-
-    export let layoutID: string;
 
     interface ISystem {
         name: string;
         id: string;
-        x: number;
-        y: number;
-        glyph: ISystemSVG;
         [k: string]: unknown;
     }
 
@@ -27,33 +19,33 @@
         y: number;
     }
 
-    const allLayouts: ILayout[] = [...layouts, ...$savedLayouts];
-    const layout = allLayouts.find(x => x.id === layoutID);
+    let layout = ($ship.layout as ILayoutSystem).blocks;
     let block: IBox;
-    let blocksWide: number;
-    let blocksHigh: number;
-    const xs: number[] = [];
-    const ys: number[] = [];
+    let xs: number[] = [];
+    let ys: number[] = [];
     let cellsize = 0;
-    const systems: ISystem[] = [];
-    const sysDistinct: ISystemSVG[] = [];
-    const lines: IPoint[][] = [];
+    let outOfBounds: boolean;
+    let defs: ISystemSVG[] = [];
+    let lines: IPoint[][] = [];
     $: if (layout !== undefined) {
-        block = layout.blockSystems;
-        blocksWide = Math.floor(block.width / layout.cellsize);
-        blocksHigh = Math.floor(block.height / layout.cellsize);
+        xs = [];
+        ys = [];
+        lines = [];
+        block = layout.blocks.blockSystems;
         let currx = cellsize;
         while (currx < block.width) {
             xs.push(currx)
-            currx += layout.cellsize;
+            currx += layout.blocks.cellsize;
         }
         let curry = cellsize;
         while (curry < block.height) {
             ys.push(curry)
-            curry += layout.cellsize;
+            curry += layout.blocks.cellsize;
         }
-        // Get full list of all system instances, adding coordinates and IDs as necessary.
+
+        // Get full list of all system instances and add to layout
         // Also add distinct glyphs to the `sysDistinct` array.
+        const seenIds: Set<string> = new Set();
         for (const set of ["systems", "ordnance", "weapons"]) {
             const ignore = ["drive", "ftl"];
             const sysSet = $ship[set] as ISystem[];
@@ -61,48 +53,75 @@
                 if (ignore.includes(sys.name)) {
                     continue;
                 }
-                if ( (! sys.hasOwnProperty("id")) || (sys.id === undefined) ) {
-                    sys.id = nanoid(5);
-                }
-                if ( (! sys.hasOwnProperty("x")) || (sys.x === undefined) ) {
-                    sys.x = 1;
-                } else if (sys.x >= blocksWide) {
-                    sys.x = blocksWide - 1;
-                }
-                if ( (! sys.hasOwnProperty("y")) || (sys.y === undefined) ) {
-                    sys.y = 1;
-                } else if (sys.y >= blocksHigh) {
-                    sys.y = blocksHigh - 1;
-                }
-                const svg = getSystem(sys, $ship).glyph();
+                const obj = getSystem(sys, $ship);
+                seenIds.add(obj.uid);
+                const svg = obj.glyph();
                 if (svg !== undefined) {
-                    sys.glyph = svg;
-                    const idx = sysDistinct.findIndex(x => x.id === svg.id);
+                    const idx = defs.findIndex(x => x.id === svg.id);
                     if (idx === -1) {
-                        sysDistinct.push(svg);
+                        defs.push(svg);
                     }
                 }
-                systems.push(sys as ISystem);
+                if (! layout.elements.hasOwnProperty(obj.uid)) {
+                    layout.elements[obj.uid] = {
+                        id: obj.uid,
+                        glyphid: `svg_${svg.id}`,
+                        width: svg.width * layout.blocks.cellsize,
+                        height: svg.height * layout.blocks.cellsize,
+                        x: layout.blocks.cellsize,
+                        y: layout.blocks.cellsize
+                    };
+                } else {
+                    layout.elements[obj.uid].glyphid = `svg_${svg.id}`;
+                    layout.elements[obj.uid].width = svg.width * layout.blocks.cellsize;
+                    layout.elements[obj.uid].height = svg.height * layout.blocks.cellsize;
+                }
+            }
+        }
+
+        // prune unused glyphs
+        const unused: string[] = [];
+        for (const key in layout.elements) {
+            if ( (! seenIds.has(key)) && (! key.startsWith("#")) ) {
+                unused.push(key);
+            }
+        }
+        for (const id of unused) {
+            delete layout.elements[id];
+        }
+
+        // Look for glyphs that are now out of bounds
+        outOfBounds = false;
+        for (const key in layout.elements) {
+            if ( (layout.elements[key].x < 0) || (layout.elements[key].x > block.width) ) {
+                outOfBounds = true;
+                break;
+            }
+            if ( (layout.elements[key].y < 0) || (layout.elements[key].y > block.height) ) {
+                outOfBounds = true;
+                break;
             }
         }
 
         // Find launcher/magazine combos and draw lines between them
-        for (const sys of systems){
+        for (const sys of $ship.ordnance){
             if (sys.name === "salvoLauncher") {
                 if ( (sys.hasOwnProperty("magazine")) && (sys.magazine !== undefined) ) {
-                    const mag = systems.find(x => x.id === sys.magazine);
+                    const launchObj = getSystem(sys, $ship);
+                    const mag = $ship.systems.find(x => x.id === sys.magazine);
                     if (mag !== undefined) {
-                        const xLaunch = sys.x * layout.cellsize;
-                        const yLaunch = sys.y * layout.cellsize;
-                        const wLaunch = sys.glyph.width * layout.cellsize;
-                        const hLaunch = sys.glyph.height * layout.cellsize;
+                        const magObj = getSystem(mag, $ship);
+                        const xLaunch = layout.elements[launchObj.uid].x;
+                        const yLaunch = layout.elements[launchObj.uid].y;
+                        const wLaunch = launchObj.glyph().width * layout.blocks.cellsize;
+                        const hLaunch = launchObj.glyph().height * layout.blocks.cellsize;
                         const x1 = xLaunch + (wLaunch / 2);
                         const y1 = yLaunch + (hLaunch / 2);
 
-                        const xMag = mag.x * layout.cellsize;
-                        const yMag = mag.y * layout.cellsize;
-                        const wMag = mag.glyph.width * layout.cellsize;
-                        const hMag = mag.glyph.height * layout.cellsize;
+                        const xMag = layout.elements[magObj.uid].x;
+                        const yMag = layout.elements[magObj.uid].y;
+                        const wMag = magObj.glyph().width * layout.blocks.cellsize;
+                        const hMag = magObj.glyph().height * layout.blocks.cellsize;
                         const x2 = xMag + (wMag / 2);
                         const y2 = yMag + (hMag / 2);
 
@@ -115,6 +134,7 @@
         // Find turret/weapon combos and draw lines between them if they are not layered.
         for (const s of $ship.systems) {
             if (s.name === "turret") {
+                const tObj = getSystem(s, $ship);
                 for (const id of s.weapons) {
                     let obj: any;
                     let idx = $ship.ordnance.findIndex(x => x.id === id);
@@ -127,17 +147,18 @@
                         }
                     }
                     if (obj !== undefined) {
-                        const xTurret = (s.x as number) * layout.cellsize;
-                        const yTurret = (s.y as number) * layout.cellsize;
-                        const wTurret = (s.glyph as ISystemSVG).width * layout.cellsize;
-                        const hTurret = (s.glyph as ISystemSVG).height * layout.cellsize;
+                        const wObj = getSystem(obj, $ship);
+                        const xTurret = layout.elements[tObj.uid].x;
+                        const yTurret = layout.elements[tObj.uid].y;
+                        const wTurret = tObj.glyph().width * layout.blocks.cellsize;
+                        const hTurret = tObj.glyph().height * layout.blocks.cellsize;
                         const x1 = xTurret + (wTurret / 2);
                         const y1 = yTurret + (hTurret / 2);
 
-                        const xWeapon = obj.x * layout.cellsize;
-                        const yWeapon = obj.y * layout.cellsize;
-                        const wWeapon = obj.glyph.width * layout.cellsize;
-                        const hWeapon = obj.glyph.height * layout.cellsize;
+                        const xWeapon = layout.elements[wObj.uid].x;
+                        const yWeapon = layout.elements[wObj.uid].y;
+                        const wWeapon = wObj.glyph().width * layout.blocks.cellsize;
+                        const hWeapon = wObj.glyph().height * layout.blocks.cellsize;
                         const x2 = xWeapon + (wWeapon / 2);
                         const y2 = yWeapon + (hWeapon / 2);
 
@@ -153,32 +174,23 @@
         exportLayout();
     }
 
+    const correctOutOfBounds = () => {
+        for (const key in layout.elements) {
+            if ( (layout.elements[key].x < 0) || (layout.elements[key].x > block.width) ) {
+                layout.elements[key].x = layout.blocks.cellsize;
+            }
+            if ( (layout.elements[key].y < 0) || (layout.elements[key].y > block.height) ) {
+                layout.elements[key].y = layout.blocks.cellsize;
+            }
+        }
+        layout = layout;
+    }
+
     let svgDisplay: SVGSVGElement;
     let dragSelected: SVGUseElement; // | SVGGElement;
     let offset: IPoint;
-    // let transform: SVGTransform;
     let maxx: number;
     let maxy: number;
-
-    // See view-source:https://raw.githubusercontent.com/petercollingridge/code-for-blog/master/svg-interaction/draggable/draggable_groups.svg
-    // const initDrag = (e: MouseEvent | TouchEvent) => {
-    //     offset = getMousePosition(e);
-
-    //     // Make sure the first transform on the element is a translate transform
-    //     const transforms = dragSelected.transform.baseVal;
-
-    //     if ( (transforms.length === 0) || (transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) ) {
-    //         // Create an transform that translates by (0, 0)
-    //         const translate = svgDisplay.createSVGTransform();
-    //         translate.setTranslate(0, 0);
-    //         dragSelected.transform.baseVal.insertItemBefore(translate, 0);
-    //     }
-
-    //     // Get initial translation
-    //     transform = transforms.getItem(0);
-    //     offset.x -= transform.matrix.e;
-    //     offset.y -= transform.matrix.f;
-    // }
 
     const startDrag = (e: MouseEvent | TouchEvent) => {
         if ((e.target as SVGUseElement).classList.contains("draggable")) {
@@ -188,8 +200,8 @@
             offset.y -= parseFloat(dragSelected.getAttribute("y"));
             if (dragSelected.classList.contains("confined")) {
                 let bbox = dragSelected.getBBox();
-                maxx = block.width - bbox.width;
-                maxy = block.height - bbox.height;
+                maxx = layout.blocks.width - bbox.width;
+                maxy = layout.blocks.height - bbox.height;
             }
         }
     }
@@ -214,57 +226,51 @@
     const endDrag = (e: MouseEvent | TouchEvent) => {
         if (dragSelected !== undefined) {
             const draggedId = dragSelected.getAttribute("id");
-            let sys: ISystem;
-            for (const prop of ["systems", "weapons", "ordnance"]) {
-                sys = ($ship[prop] as ISystem[]).find(s => s.id === draggedId);
-                if (sys !== undefined) {
-                    break;
-                }
-            }
-            if (sys !== undefined) {
-                const width = Math.floor(block.width / layout.cellsize);
-                const height = Math.floor(block.height / layout.cellsize);
+            let element = layout.elements[draggedId];
+            if (element !== undefined) {
                 let newx: number;
                 let newy: number;
                 if ($snapToGrid) {
-                    newx = Math.round(parseFloat(dragSelected.getAttribute("x")) / layout.cellsize);
-                    newy = Math.round(parseFloat(dragSelected.getAttribute("y")) / layout.cellsize);
+                    newx = Math.round(parseFloat(dragSelected.getAttribute("x")) / layout.blocks.cellsize) * layout.blocks.cellsize;
+                    newy = Math.round(parseFloat(dragSelected.getAttribute("y")) / layout.blocks.cellsize) * layout.blocks.cellsize;
                 } else {
-                    newx = parseFloat(dragSelected.getAttribute("x")) / layout.cellsize;
-                    newy = parseFloat(dragSelected.getAttribute("y")) / layout.cellsize;
+                    newx = parseFloat(dragSelected.getAttribute("x"));
+                    newy = parseFloat(dragSelected.getAttribute("y"));
                 }
                 if (newx < 0) { newx = 0; }
-                if (newx >= width) { newx = width - 1; }
+                if (newx >= block.width) { newx = block.width - layout.blocks.cellsize; }
                 if (newy < 0) { newy = 0;}
-                if (newy >= height) { newy = height - 1;}
-                sys.x = newx;
-                sys.y = newy;
-                $ship = $ship;
+                if (newy >= block.height) { newy = block.height - layout.blocks.cellsize;}
+                element.x = newx;
+                element.y = newy;
+                layout = layout;
             }
-            findOverlapWith(dragSelected);
             dragSelected = undefined;
             maxx = maxy = undefined;
             exportLayout();
         }
     }
 
-    let usedElements: SVGUseElement[] = [];
-    const findOverlapWith = (dropped: SVGUseElement) => {
-        const droppedRect = dropped.getBoundingClientRect();
-        for (const used of usedElements) {
+    const genRect = (ele: IElement): DOMRect => {
+        return new DOMRect(ele.x, ele.y, ele.width, ele.height);
+    }
+
+    let allOverlaps: Set<string> = new Set();
+    const findOverlapWith = (dropped: IElement) => {
+        const droppedRect = genRect(dropped);
+        for (const used of Object.values(layout.elements)) {
             if (used.id === dropped.id) { continue; }
-            if (used !== undefined) {
-                const otherRect = used.getBoundingClientRect();
-                if (overlapping(droppedRect, otherRect)) {
-                    dropped.classList.add("svgHighlight");
-                    used.classList.add("svgHighlight");
-                }
+            const otherRect = genRect(used);
+            if (overlapping(droppedRect, otherRect)) {
+                allOverlaps.add(dropped.id);
+                allOverlaps.add(used.id);
             }
         }
     };
 
     const findAllOverlaps = () => {
-        for (const used of usedElements) {
+        allOverlaps = new Set();
+        for (const used of Object.values(layout.elements)) {
             findOverlapWith(used);
         }
     };
@@ -297,15 +303,15 @@
     const exportLayout = () => {
         let s = `<symbol id="_ssdSystems" viewBox="-1 -1 ${block.width + 2} ${block.height + 2}">`;
         s += `<defs>`;
-        for (const distinct of sysDistinct) {
-            s += distinct.svg;
+        for (const def of defs) {
+            s += def.svg;
         }
         s += `</defs>`;
         for (const line of lines) {
             s += `<line x1="${line[0].x}" y1="${line[0].y}" x2="${line[1].x}" y2="${line[1].y}" stroke="black" stroke-width="5" />`;
         }
-        for (const sys of systems) {
-            s += `<use id="${sys.id}" href="#svg_${sys.glyph.id}" x="${sys.x * layout.cellsize}" y="${sys.y * layout.cellsize}" width="${sys.glyph.width * layout.cellsize}" height="${sys.glyph.height * layout.cellsize}" />`;
+        for (const sys of Object.values(layout.elements)) {
+            s += `<use id="${sys.id}" href="#${sys.glyphid}" x="${sys.x}" y="${sys.y}" width="${sys.width}" height="${sys.height}" />`;
         }
         s += `</symbol>`;
         $ssdComponents.systems = s;
@@ -322,10 +328,11 @@
     </div>
 </div>
 
+{#key layout}
 <div class="ssd">
     <svg viewBox="-1 -1 {block.width + 2} {block.height + 2}" width="100%" height="100%" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:mouseleave="{endDrag}" on:touchstart="{startDrag}" on:touchmove="{drag}" on:touchend="{endDrag}" on:touchcancel="{endDrag}" bind:this="{svgDisplay}">
         <defs>
-        {#each sysDistinct as g}
+        {#each defs as g}
             {@html g.svg}
         {/each}
         </defs>
@@ -343,10 +350,20 @@
         <line x1="{line[0].x}" y1="{line[0].y}" x2="{line[1].x}" y2="{line[1].y}" stroke="black" stroke-width="5"/>
     {/each}
 
-    {#each systems as sys, i}
-        <use id="{sys.id}" href="#svg_{sys.glyph.id}" x="{sys.x * layout.cellsize}" y="{sys.y * layout.cellsize}" width="{sys.glyph.width * layout.cellsize}" height="{sys.glyph.height * layout.cellsize}" class="draggable confined" bind:this="{usedElements[i]}"/>
+    {#each Object.values(layout.elements) as sys, i}
+        <use id="{sys.id}" href="#{sys.glyphid}" x="{sys.x}" y="{sys.y}" width="{sys.width}" height="{sys.height}" class="draggable confined" class:svgHighlight="{allOverlaps.has(sys.id)}" />
     {/each}
     </svg>
+</div>
+{/key}
+{/if}
+
+{#if outOfBounds}
+<div class="field">
+    <div class="control">
+        <button class="button is-danger" on:click="{correctOutOfBounds}">Correct Overflow</button>
+    </div>
+    <p class="help">There are elements outside of the SSD boundaries. Clicking the button will pull them onto the canvas.</p>
 </div>
 {/if}
 

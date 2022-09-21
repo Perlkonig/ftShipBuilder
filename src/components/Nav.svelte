@@ -13,13 +13,15 @@
     </div>
     <div id="navbarBasicExample" class="navbar-menu">
         <div class="navbar-start">
-            <a href={"#"} class="navbar-item" on:click="{() => modalAbout = "is-active"}">
+            <a class="navbar-item" on:click="{() => modalAbout = "is-active"}">
                 About
             </a>
 
-            <a href={"#"} class="navbar-item" on:click="{() => modalFeedback = "is-active"}">
+            <a class="navbar-item" on:click="{() => modalFeedback = "is-active"}">
                 Feedback
             </a>
+
+            <a class="navbar-item" href="https://github.com/Perlkonig/ftShipBuilder/blob/main/CHANGELOG.md" target="_blank">Changelog</a>
         </div>
     </div>
 </nav>
@@ -63,10 +65,10 @@
                     This project is open source. You can view and contribute to the code <a href="https://github.com/Perlkonig/ftShipBuilder">on GitHub</a>. Pull requests are warmly welcomed, as are issue reports.
                 </p>
                 <p>
-                    I also hang out at the <a href="https://discord.gg/fXC3grNN9C">Full Thrust Gamers Discord server</a>.
+                    I hang out at the <a href="https://discord.gg/fXC3grNN9C">Full Thrust Gamers Discord server</a>, and <a href="https://www.perlkonig.com">my personal website</a> gives other ways of reaching me.
                 </p>
                 <p>
-                    If you feel so inclined, you can buy me a coffee at <a href="https://paypal.me/abstractplay">paypal.me/abstractplay</a>. Thank you!
+                    I believe in the "value for value" model. If you find this tool valuable, consider a donation proportional to that value: <a href="https://paypal.me/abstractplay">paypal.me/abstractplay</a>. Thank you!
                   </p>
             </div>
         </section>

@@ -375,31 +375,34 @@
 
     // Weapons
     if (weapons.length > 0) {
-        // name plate
-        svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Weapons</text>`;
-        currRow++;
         const freeWeapons: System[] = [];
         for (const w of weapons) {
             if (! turretedIds.has(w.uid)) {
                 freeWeapons.push(w);
             }
         }
-        const sorted = [...freeWeapons].sort((a, b) => {
-            if (a.name === b.name) {
-                return a.fullName().localeCompare(b.fullName());
-            } else {
-                return a.name.localeCompare(b.name);
-            }
-        });
-        for (let i = 0; i < sorted.length; i++) {
-            const realRow = Math.floor(i / breakPoint);
-            const realCol = i % breakPoint;
-            const sys = sorted[i];
-            const buff = buffInSquare(sys.glyph(), cellsize * 2, true);
-            svgBody += `<use id="${sys.uid}" href="#svg_${sys.glyph().id}" x="${((realCol * 2) * cellsize) + buff.xOffset}" y="${((currRow + (realRow * 2)) * cellsize) + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
-        }
+        if (freeWeapons.length > 0) {
+            // name plate
+            svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Weapons</text>`;
+            currRow++;
 
-        currRow += Math.ceil(sorted.length / breakPoint) * 2;
+            const sorted = [...freeWeapons].sort((a, b) => {
+                if (a.name === b.name) {
+                    return a.fullName().localeCompare(b.fullName());
+                } else {
+                    return a.name.localeCompare(b.name);
+                }
+            });
+            for (let i = 0; i < sorted.length; i++) {
+                const realRow = Math.floor(i / breakPoint);
+                const realCol = i % breakPoint;
+                const sys = sorted[i];
+                const buff = buffInSquare(sys.glyph(), cellsize * 2, true);
+                svgBody += `<use id="${sys.uid}" href="#svg_${sys.glyph().id}" x="${((realCol * 2) * cellsize) + buff.xOffset}" y="${((currRow + (realRow * 2)) * cellsize) + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
+            }
+
+            currRow += Math.ceil(sorted.length / breakPoint) * 2;
+        }
     }
 
     // Turrets

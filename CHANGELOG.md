@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### BREAKING CHANGE
+
+The layout system has been almost completely rewritten. Your saved ships are fine, but their SSDs are not. You will have to rearrange your systems. The new system is extensible, so this sort of break should never happen again.
+
 ### Added
 
+* The freeform layout engine has been added. It gives you full control over the arrangement of your SSD and allows the addition of a background SVG (like a ship outline).
 * Added CPV calculations from <https://fullthrust.star-ranger.com/CPV.htm> and <http://fullthrust.star-ranger.com/FighterGroups.htm>. Bays, hangars, and launch tubes are considered "non-combat mass," hangars and tubes are 1 CPV per mass, and fighters gain a base 30 CPV across the board, and long-range fighters go up an additional 2 points per fighter.
+* You can now download the ship JSON file without the layout information. If that's the only piece you're trying to share, it's just more compact.
 
 ### Fixed
 

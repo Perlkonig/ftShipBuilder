@@ -68,7 +68,7 @@ const genSvg = (id: string, lines: IPoint[][], path: string | undefined = undefi
     if (defs !== undefined) {
         s += `<defs>${defs}</defs>`;
     }
-    s += `<rect x="0" y="0" width="${size}" height="${size}" fill="white" />`;
+    // s += `<rect x="0" y="0" width="${size}" height="${size}" fill="white" />`;
     if (path === undefined) {
         s += `<circle fill="white" stroke="#000000" stroke-width="20" stroke-miterlimit="10" cx="${size / 2}" cy="${size / 2}" r="${rOuter}"/>`
     }

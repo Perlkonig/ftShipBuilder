@@ -1,25 +1,43 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { ship } from "@/stores/writeShip";
+    import type { ILayout, IBlocks } from "@/stores/writeShip";
     import { savedLayouts } from "@/stores/writeStoredLayouts";
     import { layouts } from "@/lib/layouts";
-    import type { ILayout } from "@/lib/layouts";
-    import Assembled from "./ParadigmLayout/Assembled.svelte";
-    import SystemArranger from "./ParadigmLayout/SystemArranger.svelte";
-    import CustomLayout from "./ParadigmLayout/CustomLayout.svelte";
+    import type { ILayout as IBlockLayout } from "@/lib/layouts";
+    import Assembled from "./ParadigmBlocks/Assembled.svelte";
+    import SystemArranger from "./ParadigmBlocks/SystemArranger.svelte";
+    import CustomLayout from "./ParadigmBlocks/CustomLayout.svelte";
 
-    let allLayouts: ILayout[];
+    let layout: IBlocks;
+    onMount(() => {
+        if ( ($ship.layout !== undefined) && (typeof $ship.layout !== "string") && ($ship.layout.hasOwnProperty("blocks")) && (($ship.layout as ILayout).blocks !== undefined) ) {
+            layout = ($ship.layout as ILayout).blocks;
+        } else {
+            layout = {
+                blocks: undefined,
+                elements: {}
+            }
+            if ( ($ship.layout === undefined) || (typeof $ship.layout === "string") ) {
+                $ship.layout = {} as ILayout;
+            }
+            ($ship.layout as ILayout).blocks = layout;
+        }
+    });
+
+    let allLayouts: IBlockLayout[];
     $: allLayouts = [...layouts, ...$savedLayouts];
 
-    let selected: ILayout;
-    $: if ($ship.layout !== undefined) {
-        selected = allLayouts.find(x => x.id === $ship.layout);
+    let selected: IBlockLayout;
+    $: if ( (layout !== undefined) && (layout.blocks !== undefined) ) {
+        selected = allLayouts.find(x => x.id === layout.blocks.id);
     }
 
     let modalLoadJSON: string;
     let layoutJSON: string;
     let loadID: string;
     let delID: string;
-    let editingLayout: ILayout;
+    let editingLayout: IBlockLayout;
 
     const loadLocal = () => {
         editingLayout = $savedLayouts.find(x => x.id === loadID);
@@ -41,13 +59,24 @@
     const handleMessage = (e) => {
         if (e.detail.msg === "close") {
             editingLayout = undefined;
+            selectedLayout = undefined;
             if (e.detail.hasOwnProperty("apply")) {
-                $ship.layout = e.detail.apply;
+                loadLayout(e.detail.apply);
             } else {
-                $ship.layout = undefined;
+                layout.blocks = undefined;
             }
-            $ship = $ship;
+            layout = layout;
         }
+    }
+
+    let selectedLayout: string;
+    const loadLayout = (id: string | undefined = undefined) => {
+        if (id === undefined) {
+            layout.blocks = allLayouts.find(x => x.id === selectedLayout);
+        } else {
+            layout.blocks = allLayouts.find(x => x.id === id);
+        }
+        layout = layout;
     }
 </script>
 
@@ -57,7 +86,7 @@
             <label class="label" for="layouts">Apply a layout</label>
             <div class="control">
                 <div class="select">
-                    <select id="layouts" bind:value={$ship.layout}>
+                    <select id="layouts" bind:value={selectedLayout} on:change="{() => loadLayout()}">
                         <option hidden disabled selected value> -- apply a layout -- </option>
                         <option id="_create" value="_create">(Create custom layout)</option>
                     {#each allLayouts as l}
@@ -108,7 +137,7 @@
     <h2 class="subtitle">SSD Builder</h2>
 
 
-{#if $ship.layout === "_create"}
+{#if selectedLayout === "_create"}
     <CustomLayout on:message="{handleMessage}" />
 {:else if editingLayout !== undefined}
     <CustomLayout
@@ -119,19 +148,15 @@
 {#key $ship}
     <h2 class="subtitle">Arrange Systems</h2>
     {#if (selected !== undefined) }
-        {#key $ship.layout}
-            <SystemArranger
-                layoutID={$ship.layout}
-            />
+        {#key layout}
+            <SystemArranger />
         {/key}
     {/if}
 
     <h2 class="subtitle">Assembled SSD</h2>
     {#if (selected !== undefined) }
-        {#key $ship.layout}
-        <Assembled
-            layoutID={$ship.layout}
-        />
+        {#key layout}
+        <Assembled />
         {/key}
     {/if}
 {/key}
