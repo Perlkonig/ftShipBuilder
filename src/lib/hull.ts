@@ -54,6 +54,7 @@ export const genSvg = (ship: FullThrustShip, cellsize: number, dim: {height: num
     const svgHull = svgLib.find(x => x.id === "hull")!;
     const svgHullCrew = svgLib.find(x => x.id === "hullCrew")!;
     const svgArmour = svgLib.find(x => x.id === "armour")!;
+    const svgArmourRegen = svgLib.find(x => x.id === "armourRegen");
     const svgStealth = svgLib.find(x => x.id === "stealthHull");
     let s = `<symbol id="_ssdHull" viewBox="-1 -1 ${totalWidth + 2} ${totalHeight + 2}">`;
     s += `<defs>`;
@@ -64,6 +65,7 @@ export const genSvg = (ship: FullThrustShip, cellsize: number, dim: {height: num
     s += svgHullCrew.svg;
     if ( (ship.hasOwnProperty("armour")) && (ship.armour.length > 0) ) {
         s += svgArmour.svg;
+        s += svgArmourRegen.svg;
     }
     s += `</defs>`;
 
@@ -98,11 +100,18 @@ export const genSvg = (ship: FullThrustShip, cellsize: number, dim: {height: num
     // Armour circles
     for (let row = 0; row < ship.armour.length; row++) {
         const y = (blocksHigh - (ship.hull.rows + 1) - row) * cellsize;
-        for (let col = 0; col < ship.armour[row]; col++) {
+        for (let col = 0; col < ship.armour[row][0]; col++) {
             const x = col * cellsize;
             const width = svgArmour.width * cellsize;
             const height = svgArmour.height * cellsize;
             s += `<use href="#svg_armour" x="${x}" y="${y}" width="${width}" height="${height}" />`;
+        }
+        const offset = ship.armour[row][0];
+        for (let col = 0; col < ship.armour[row][1]; col++) {
+            const x = (col + offset) * cellsize;
+            const width = svgArmourRegen.width * cellsize;
+            const height = svgArmourRegen.height * cellsize;
+            s += `<use href="#svg_armourRegen" x="${x}" y="${y}" width="${width}" height="${height}" />`;
         }
     }
     s += `</symbol>`;

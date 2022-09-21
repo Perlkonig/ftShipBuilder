@@ -52,11 +52,24 @@
             "additionalProperties": false
         },
         "armour": {
-            "description": "Rows of armour. First element being the innermost layer. No layer can be larger than the first row of hull boxes.",
+            "description": "Rows of armour. First element being the innermost layer. No layer can be larger than the first row of hull boxes. The use of 'oneOf' here is for backwards compatibility.",
             "type": "array",
             "items": {
-                "type": "integer",
-                "minimum": 0
+                "oneOf": [
+                    {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                    }
+                ]
             }
         },
         "systems": {

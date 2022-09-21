@@ -235,11 +235,13 @@
             var widthTransform = pxWidth * 0.9 / bb.width;
             var heightTransform = ((cellsize * 1.5) * 0.9) / bb.height;
             var value = widthTransform < heightTransform ? widthTransform : heightTransform;
-            nameElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
-            const currx = parseFloat(nameElement.getAttribute("x"));
-            const curry = parseFloat(nameElement.getAttribute("y"));
-            nameElement.setAttribute("x", (currx / value).toString());
-            nameElement.setAttribute("y", (curry / value).toString());
+            if (value !== Infinity) {
+                nameElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
+                const currx = parseFloat(nameElement.getAttribute("x"));
+                const curry = parseFloat(nameElement.getAttribute("y"));
+                nameElement.setAttribute("x", (currx / value).toString());
+                nameElement.setAttribute("y", (curry / value).toString());
+            }
         }
     })
 

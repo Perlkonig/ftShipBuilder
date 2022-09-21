@@ -39,7 +39,6 @@
                 </p>
                 <ul>
                     <li>Gunboats are not supported at all, and I don't know they ever will be.</li>
-                    <li>Regenerative armour is currently unavailable, but I'm working on it.</li>
                     <li>Turrets are implemented, but the rules are not clear, so I had to make some calls. You can have multiple arcs open on a turret, but they must be contiguous. Weapons have to be manually placed inside the turret graphic. Lines are drawn to help you.</li>
                 </ul>
                 <p>

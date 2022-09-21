@@ -7,7 +7,7 @@
     import SaveShip from "./SaveShip.svelte";
 
     const addArmour = () => {
-        $ship.armour.push(1);
+        $ship.armour.push([1,0]);
         $ship = $ship;
     };
 
@@ -285,14 +285,26 @@
             </div>
 
             {#each $ship.armour as row, i }
-            <div class="field">
-                <label class="label" for="armour{i}">Armour: Row {i + 1}</label>
-                <div class="control">
-                <input id="armour{i}" class="input" type="number" placeholder="Armour points" min="1" max="{Math.ceil($ship.hull.points / $ship.hull.rows)}" bind:value={$ship.armour[i]}>
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="label" for="armour{i}">Armour: Row {i + 1}</label>
+                        <div class="control">
+                        <input id="armour{i}" class="input" type="number" placeholder="Armour points" min="1" max="{Math.ceil($ship.hull.points / $ship.hull.rows)}" bind:value={$ship.armour[i][0]}>
+                        </div>
+                    {#if ($ship.armour[i][0] + $ship.armour[i][1]) > Math.ceil($ship.hull.points / $ship.hull.rows)}
+                        <p class="help is-danger">You can only have as much armour per row as hull boxes on your first row ({Math.ceil($ship.hull.points / $ship.hull.rows)}).</p>
+                    {/if}
+                    </div>
                 </div>
-            {#if $ship.armour[i] > Math.ceil($ship.hull.points / $ship.hull.rows)}
-                <p class="help is-danger">You can only have as much armour per row as hull boxes on your first row ({Math.ceil($ship.hull.points / $ship.hull.rows)}).</p>
-            {/if}
+                <div class="column">
+                    <div class="field">
+                        <label class="label" for="regenArmour{i}">Regenerative: Row {i + 1}</label>
+                        <div class="control">
+                        <input id="regenArmour{i}" class="input" type="number" placeholder="Regenerative armour points" min="0" max="{Math.ceil($ship.hull.points / $ship.hull.rows)}" bind:value={$ship.armour[i][1]}>
+                        </div>
+                    </div>
+                </div>
             </div>
             {/each}
             <MassPts

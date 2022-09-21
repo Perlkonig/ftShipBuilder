@@ -22,9 +22,9 @@ export interface FullThrustShip {
     streamlining: "none" | "partial" | "full";
   };
   /**
-   * Rows of armour. First element being the innermost layer. No layer can be larger than the first row of hull boxes.
+   * Rows of armour. First element being the innermost layer. No layer can be larger than the first row of hull boxes. The use of 'oneOf' here is for backwards compatibility.
    */
-  armour?: number[];
+  armour?: (number | [number, number])[];
   /**
    * This property contains all systems that get checked on threshold rolls but that are not used during the 'fire' or 'ordnance' phases of play.
    */

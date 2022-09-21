@@ -8,6 +8,7 @@
     const loadJSON = () => {
         $ship = JSON.parse(shipJSON);
         modalLoadJSON = undefined;
+        compatCheck();
     }
 
     let shipID: string;
@@ -18,6 +19,7 @@
         if (entry !== undefined) {
             $ship = JSON.parse(entry.json);
         }
+        compatCheck();
     }
 
     const delLocal = () => {
@@ -25,6 +27,19 @@
         if (idx !== -1) {
             $savedShips.splice(idx, 1);
             $savedShips = $savedShips;
+        }
+    }
+
+    const compatCheck = () => {
+        // Transform old `armour` to new
+        if ( ($ship.hasOwnProperty("armour")) && ($ship.armour !== undefined) ) {
+            for (let i = 0; i < $ship.armour.length; i++) {
+                if (typeof $ship.armour[i] === "number") {
+                    console.log("found old armour");
+                    $ship.armour[i] = [$ship.armour[i] as number, 0];
+                }
+            }
+            console.log($ship.armour);
         }
     }
 </script>

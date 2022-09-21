@@ -18,6 +18,7 @@ If you are having issues, try exporting *just* the ship (there is now a button f
 * The freeform layout engine has been added. It gives you full control over the arrangement of your SSD and allows the addition of a background SVG (like a ship outline).
 * Added CPV calculations from <https://fullthrust.star-ranger.com/CPV.htm> and <http://fullthrust.star-ranger.com/FighterGroups.htm>. Bays, hangars, and launch tubes are considered "non-combat mass," hangars and tubes are 1 CPV per mass, and fighters gain a base 30 CPV across the board, and long-range fighters go up an additional 2 points per fighter.
 * You can now download the ship JSON file without the layout information. If that's the only piece you're trying to share, it's just more compact.
+* Regenerative armour has been added. The rules say you can mix the two types, but it doesn't prescribe how they can be arranged. I had to make a call, so regenerative armour is grouped at the end of any mixed armour layer.
 
 ### Fixed
 
