@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ship } from "../stores/writeShip";
-    import { evaluate, ErrorCode } from "ftlibship";
+    import { evaluate, EvalErrorCode } from "ftlibship";
     import type { IEvaluation } from "ftlibship";
     import { afterUpdate } from "svelte";
 
@@ -18,17 +18,17 @@
         delta = $ship.mass - results.mass;
     });
 
-    const errorMsgs: Map<ErrorCode, string> = new Map([
-        // [ErrorCode.NoMass, "A ship needs mass."],
-        [ErrorCode.BadMass, "The ship's mass must be between 5 and 300."],
-        [ErrorCode.LowHull, "The ship's hull must be at least 10% of total mass."],
-        // [ErrorCode.OverShell, "You have too many rows of shell armour. You cannot have more than 5."],
-        [ErrorCode.OverArmour, "One of your rows of armour is too long. You can't have more armour than you have hull in your top row."],
-        [ErrorCode.OverDCP, "You have allocated too many damage control parties."],
-        [ErrorCode.OverMarine, "You have allocated too many onboard marines."],
-        [ErrorCode.OverCrew, "You have overallocated your crew. You may need to add some berths."],
-        [ErrorCode.OverSpinal, "Your spinal-mounted weapons are too heavy. You can only equip 16 mass of spinal weapons for every 50 total ship mass (rounded up)."],
-        [ErrorCode.OverTurret, "You have too many turrets. You can only have one turret for every 50 total ship mass (rounded up)."],
+    const errorMsgs: Map<EvalErrorCode, string> = new Map([
+        // [EvalErrorCode.NoMass, "A ship needs mass."],
+        [EvalErrorCode.BadMass, "The ship's mass must be between 5 and 300."],
+        [EvalErrorCode.LowHull, "The ship's hull must be at least 10% of total mass."],
+        // [EvalErrorCode.OverShell, "You have too many rows of shell armour. You cannot have more than 5."],
+        [EvalErrorCode.OverArmour, "One of your rows of armour is too long. You can't have more armour than you have hull in your top row."],
+        [EvalErrorCode.OverDCP, "You have allocated too many damage control parties."],
+        [EvalErrorCode.OverMarine, "You have allocated too many onboard marines."],
+        [EvalErrorCode.OverCrew, "You have overallocated your crew. You may need to add some berths."],
+        [EvalErrorCode.OverSpinal, "Your spinal-mounted weapons are too heavy. You can only equip 16 mass of spinal weapons for every 50 total ship mass (rounded up)."],
+        [EvalErrorCode.OverTurret, "You have too many turrets. You can only have one turret for every 50 total ship mass (rounded up)."],
     ]);
 </script>
 

@@ -35,11 +35,9 @@
         if ( ($ship.hasOwnProperty("armour")) && ($ship.armour !== undefined) ) {
             for (let i = 0; i < $ship.armour.length; i++) {
                 if (typeof $ship.armour[i] === "number") {
-                    console.log("found old armour");
-                    $ship.armour[i] = [$ship.armour[i] as number, 0];
+                    $ship.armour[i] = [($ship.armour[i] as unknown) as number, 0];
                 }
             }
-            console.log($ship.armour);
         }
     }
 </script>

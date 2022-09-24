@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v2.0.1] - 2022-09-24
 
 ### Changed
 
@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Developers
 
-* Completely refactored the code again, this time removing all the core ship-handling libraries into a standalone package so I can reuse it in other tools (<https://github.com/Perlkonig/ftLibShip>).
+* Completely refactored the code again, this time removing all the core ship-handling libraries into a standalone package so I can reuse it in other tools (<https://github.com/Perlkonig/ftLibShip>). Users shouldn't notice any changes! If something is broken, [please let me know](https://github.com/Perlkonig/ftShipBuilder/issues).
 
 ## [v2.0.0] - 2022-09-21
 
