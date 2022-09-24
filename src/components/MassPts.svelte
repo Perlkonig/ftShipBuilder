@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { System, SpecialSystem } from "../lib/systems";
+    import type { systems } from "ftlibship";
 
-    export let obj: System | SpecialSystem;
+    export let obj: systems.System | systems.SpecialSystem;
 </script>
 
 <div class="container">

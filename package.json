@@ -14,17 +14,15 @@
   ],
   "type": "module",
   "scripts": {
-    "dev": "set NODE_ENV=development && npm run schemas && vite",
-    "build": "set NODE_ENV=production && npm run schemas && vite build",
+    "dev": "set NODE_ENV=development && vite",
+    "build": "set NODE_ENV=production && vite build",
     "preview": "set NODE_ENV=development && npm run build && vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
-    "schemas": "npx json2ts -i src/schemas/ship.json -o src/schemas/ship.d.ts"
+    "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.1",
     "@tsconfig/svelte": "^3.0.0",
     "@types/robust-point-in-polygon": "^1.0.2",
-    "json-schema-to-typescript": "^11.0.2",
     "svelte": "^3.49.0",
     "svelte-check": "^2.8.0",
     "svelte-preprocess": "^4.10.7",
@@ -35,6 +33,7 @@
   },
   "dependencies": {
     "canvg": "^4.0.1",
+    "ftlibship": "github:perlkonig/ftLibShip#main",
     "nanoid": "^4.0.0",
     "robust-point-in-polygon": "^1.0.3",
     "svelte-markdown": "^0.2.3"

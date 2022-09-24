@@ -2,11 +2,10 @@
     import { Canvg } from "canvg";
     import { ship } from "@/stores/writeShip";
     import { snapToGrid } from "@/stores/writeSnap";
-    import { svgLib, shipOutlines } from "@/lib/svgLib";
-    import type { ISystemSVG } from "@/lib/svgLib";
-    import { getSystem } from "@/lib/systems";
+    import { shipOutlines } from "@/lib/shipOutlines";
+    import type { ISystemSVG } from "ftlibship";
+    import { hull, systems, svgLib } from "ftlibship";
     import { afterUpdate, onMount, createEventDispatcher } from "svelte";
-    import { formRows, genSvg } from "@/lib/hull";
     import type { ILayout, IFreeform, IElement } from "@/stores/writeShip";
 
     const dispatch = createEventDispatcher();
@@ -129,14 +128,14 @@
         }
 
         // Generate fixed system pieces: hull, drive, ftl, core
-        const hullArray = formRows($ship);
+        const hullArray = hull.formRows($ship);
         let hullCols = hullArray[0].length;
         if ($ship.hull.stealth === "2") {
             hullCols++;
         } else if ( ($ship.hull.stealth === "1") && (hullArray[1].length === hullArray[0].length) ) {
             hullCols++;
         }
-        const hullSvg = genSvg($ship, layout.cellsize);
+        const hullSvg = hull.genSvg($ship, layout.cellsize);
         defs.push({
             id: "_ssdHull",
             svg: hullSvg,
@@ -158,7 +157,7 @@
         }
 
         const driveRaw = $ship.systems.find(x => x.name === "drive");
-        const driveObj = getSystem(driveRaw, $ship);
+        const driveObj = systems.getSystem(driveRaw, $ship);
         defs.push(driveObj.glyph());
         if (! layout.elements.hasOwnProperty("#drive")) {
             layout.elements["#drive"] = {
@@ -177,7 +176,7 @@
 
         const ftlRaw = $ship.systems.find(x => x.name === "ftl");
         if (ftlRaw !== undefined) {
-            const ftlObj = getSystem(ftlRaw, $ship);
+            const ftlObj = systems.getSystem(ftlRaw, $ship);
             defs.push(ftlObj.glyph());
             if (! layout.elements.hasOwnProperty("#ftl")) {
                 layout.elements["#ftl"] = {
@@ -224,7 +223,7 @@
                 if (ignore.includes(sys.name)) {
                     continue;
                 }
-                const obj = getSystem(sys, $ship);
+                const obj = systems.getSystem(sys, $ship);
                 seenIds.add(obj.uid);
                 const svg = obj.glyph();
                 if (svg !== undefined) {
@@ -278,10 +277,10 @@
         for (const sys of $ship.ordnance){
             if (sys.name === "salvoLauncher") {
                 if ( (sys.hasOwnProperty("magazine")) && (sys.magazine !== undefined) ) {
-                    const launchObj = getSystem(sys, $ship);
+                    const launchObj = systems.getSystem(sys, $ship);
                     const mag = $ship.systems.find(x => x.id === sys.magazine);
                     if (mag !== undefined) {
-                        const magObj = getSystem(mag, $ship);
+                        const magObj = systems.getSystem(mag, $ship);
                         const xLaunch = layout.elements[launchObj.uid].x;
                         const yLaunch = layout.elements[launchObj.uid].y;
                         const wLaunch = launchObj.glyph().width * layout.cellsize;
@@ -305,7 +304,7 @@
         // Find turret/weapon combos and draw lines between them if they are not layered.
         for (const s of $ship.systems) {
             if (s.name === "turret") {
-                const tObj = getSystem(s, $ship);
+                const tObj = systems.getSystem(s, $ship);
                 for (const id of s.weapons) {
                     let obj: any;
                     let idx = $ship.ordnance.findIndex(x => x.id === id);
@@ -318,7 +317,7 @@
                         }
                     }
                     if (obj !== undefined) {
-                        const wObj = getSystem(obj, $ship);
+                        const wObj = systems.getSystem(obj, $ship);
                         const xTurret = layout.elements[tObj.uid].x;
                         const yTurret = layout.elements[tObj.uid].y;
                         const wTurret = tObj.glyph().width * layout.cellsize;

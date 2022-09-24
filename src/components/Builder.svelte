@@ -1,7 +1,7 @@
 <script lang="ts">
     import { nanoid } from "nanoid";
     import { ship } from "../stores/writeShip";
-    import { systemList, ordnanceList, weaponList, getSpecial, getSystem, sortNames } from "../lib/systems";
+    import { systems } from "ftlibship";
     import SysDisplay from "./SysDisplay.svelte";
     import MassPts from "./MassPts.svelte";
     import SaveShip from "./SaveShip.svelte";
@@ -78,6 +78,7 @@
             } else if (shipSystem === "hangar") {
                 $ship.systems.push({name: "hangar", id: nanoid(5), isRack: false, critRules: false});
             } else if (shipSystem === "magazine") {
+                // @ts-ignore
                 $ship.systems.push({name: "magazine", capacity: 2, id: nanoid(5)});
             } else if (shipSystem === "launchTube") {
                 $ship.systems.push({name: "launchTube", catapult: false});
@@ -110,16 +111,19 @@
             if (shipWeapon === "ads") {
                 $ship.weapons.push({name: shipWeapon, leftArc: "FP", numArcs: 3});
             } else if (["phaser", "transporter", "needle", "beam", "emp", "plasmaCannon", "kgun", "gravitic", "pbl"].includes(shipWeapon)) {
+                // @ts-ignore
                 $ship.weapons.push({name: shipWeapon, class: 1, leftArc: "F", numArcs: 1});
             } else if (["gatling", "particle", "meson", "fusion", "torpedoPulse", "pulser"].includes(shipWeapon)) {
+                // @ts-ignore
                 $ship.weapons.push({name: shipWeapon, leftArc: "F", numArcs: 1});
             } else if (shipWeapon === "submunition") {
-                $ship.weapons.push({name: shipWeapon, leftArc: "FP", numArcs: 3});
+                $ship.weapons.push({name: "submunition", leftArc: "FP", numArcs: 3});
             } else if (shipWeapon === "graser") {
                 $ship.weapons.push({name: "graser", class: 1, leftArc: "F", numArcs: 3, heavy: false, highIntensity: false});
             } else if (shipWeapon === "mkp") {
                 $ship.weapons.push({name: "mkp", arc: "F"});
             } else {
+                // @ts-ignore
                 $ship.weapons.push({name: shipWeapon});
                 $ship = $ship;
             }
@@ -262,7 +266,7 @@
                 <p class="help">4 is the default. 3 means advanced tech. 5 and 6 increases your odds of critical damage, but reduces the point cost.</p>
             </div>
             <MassPts
-                obj={getSpecial("hull", $ship)}
+                obj={systems.getSpecial("hull", $ship)}
             />
 
             <div class="field topPadding">
@@ -308,7 +312,7 @@
             </div>
             {/each}
             <MassPts
-                obj={getSpecial("armour", $ship)}
+                obj={systems.getSpecial("armour", $ship)}
             />
 
             <div class="field">
@@ -324,7 +328,7 @@
                 </div>
             </div>
             <MassPts
-                obj={getSpecial("stealth", $ship)}
+                obj={systems.getSpecial("stealth", $ship)}
             />
 
             <div class="field">
@@ -341,7 +345,7 @@
                 </div>
             </div>
             <MassPts
-                obj={getSpecial("streamlining", $ship)}
+                obj={systems.getSpecial("streamlining", $ship)}
             />
         </section>
 
@@ -360,7 +364,7 @@
                     </label>
                 </div>
                 <MassPts
-                    obj={getSystem($ship.systems.find(x => x.name === "drive"), $ship)}
+                    obj={systems.getSystem($ship.systems.find(x => x.name === "drive"), $ship)}
                 />
                 <div class="control">
                     <label class="checkbox">
@@ -373,7 +377,7 @@
                         Advanced FTL
                     </label>
                     <MassPts
-                        obj={getSystem($ship.systems.find(x => x.name === "ftl"), $ship)}
+                        obj={systems.getSystem($ship.systems.find(x => x.name === "ftl"), $ship)}
                     />
                 {/if}
                 </div>
@@ -425,8 +429,8 @@
                 <div class="control">
                 <div class="select">
                     <select id="shipSystems" bind:value={shipSystem}>
-                    {#each systemList as sysname}
-                        <option value="{sysname}">{sortNames.get(sysname)}</option>
+                    {#each systems.systemList as sysname}
+                        <option value="{sysname}">{systems.sortNames.get(sysname)}</option>
                     {/each}
                     </select>
                 </div>
@@ -438,7 +442,7 @@
             </div>
             <section class="container">
             {#each $ship.systems as sys, i}
-                {#if systemList.includes(sys.name) }
+                {#if systems.systemList.includes(sys.name) }
                 <SysDisplay
                     prop="systems"
                     idx={i}
@@ -473,8 +477,8 @@
                 <div class="control">
                 <div class="select">
                     <select id="ordnanceSystems" bind:value={shipOrdnance}>
-                    {#each ordnanceList as ordname}
-                        <option value="{ordname}">{sortNames.get(ordname)}</option>
+                    {#each systems.ordnanceList as ordname}
+                        <option value="{ordname}">{systems.sortNames.get(ordname)}</option>
                     {/each}
                     </select>
                 </div>
@@ -486,7 +490,7 @@
             </div>
             <section class="container">
             {#each $ship.ordnance as sys, i}
-                {#if ordnanceList.includes(sys.name) }
+                {#if systems.ordnanceList.includes(sys.name) }
                 <SysDisplay
                     prop="ordnance"
                     idx={i}
@@ -521,8 +525,8 @@
                 <div class="control">
                 <div class="select">
                     <select id="weaponSystems" bind:value={shipWeapon}>
-                    {#each weaponList as weaponName}
-                        <option value="{weaponName}">{sortNames.get(weaponName)}</option>
+                    {#each systems.weaponList as weaponName}
+                        <option value="{weaponName}">{systems.sortNames.get(weaponName)}</option>
                     {/each}
                     </select>
                 </div>
@@ -534,7 +538,7 @@
             </div>
             <section class="container">
             {#each $ship.weapons as sys, i}
-                {#if weaponList.includes(sys.name) }
+                {#if systems.weaponList.includes(sys.name) }
                 <SysDisplay
                     prop="weapons"
                     idx={i}

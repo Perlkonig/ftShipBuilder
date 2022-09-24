@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+* Made it easier to associate a magazine with a salvo launcher.
+
+### Developers
+
+* Completely refactored the code again, this time removing all the core ship-handling libraries into a standalone package so I can reuse it in other tools (<https://github.com/Perlkonig/ftLibShip>).
+
 ## [v2.0.0] - 2022-09-21
 
 ### BREAKING CHANGE

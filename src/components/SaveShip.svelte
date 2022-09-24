@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { FullThrustShip } from "@/schemas/ship";
+    import type { FullThrustShip } from "ftlibship";
     import { savedShips } from "@/stores/writeStoredShips";
     import { afterUpdate } from "svelte";
 

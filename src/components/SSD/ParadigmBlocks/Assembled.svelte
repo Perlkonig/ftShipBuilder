@@ -4,24 +4,21 @@
     import { ship } from "@/stores/writeShip";
     import type { ILayout as ILayoutSystem } from "@/stores/writeShip";
     import { ssdComponents } from "@/stores/writeSsd";
-    import { getSystem } from "@/lib/systems";
-    import { svgLib } from "@/lib/svgLib";
-    import { genSvg } from "@/lib/hull";
-    import type { ISystem } from "src/lib/systems/_base";
-    import type { ISystemSVG } from "@/lib/svgLib";
+    import { systems, svgLib, hull } from "ftlibship";
+    import type { ISystemSVG } from "ftlibship";
 
     const dispatch = createEventDispatcher();
 
     let layout = ($ship.layout as ILayoutSystem).blocks;
     const svgCore = svgLib.find(x => x.id === "coreSys")!;
-    const sysFtl: ISystem = $ship.systems.find(x => x.name === "ftl");
+    const sysFtl: systems.ISystem = $ship.systems.find(x => x.name === "ftl");
     let hasFtlAdv = false;
     let svgFtl: ISystemSVG;
     if ( (sysFtl !== undefined) && (sysFtl.hasOwnProperty("advanced")) && (sysFtl.advanced) ) {
         hasFtlAdv = true;
     }
     if (sysFtl !== undefined) {
-        svgFtl = getSystem(sysFtl, $ship).glyph();
+        svgFtl = systems.getSystem(sysFtl, $ship).glyph();
     }
 
     const sysDrive = $ship.systems.find(x => x.name === "drive")!;
@@ -29,7 +26,7 @@
     if ( (sysDrive.hasOwnProperty("advanced")) && (sysDrive.advanced) ) {
         hasAdvDrive = true;
     }
-    const svgDrive = getSystem(sysDrive, $ship).glyph();
+    const svgDrive = systems.getSystem(sysDrive, $ship).glyph();
 
     let nameElement: SVGTextElement;
     let statsElement: SVGTextElement;
@@ -40,7 +37,7 @@
     let injectXlink: boolean;
 
     const genHull = () => {
-        $ssdComponents.hull = genSvg($ship, layout.blocks.cellsize, {height: layout.blocks.blockHull.height, width: layout.blocks.blockHull.width});
+        $ssdComponents.hull = hull.genSvg($ship, layout.blocks.cellsize, {height: layout.blocks.blockHull.height, width: layout.blocks.blockHull.width});
         $ssdComponents = $ssdComponents;
     };
 

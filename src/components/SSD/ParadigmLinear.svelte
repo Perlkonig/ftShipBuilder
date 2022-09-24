@@ -1,17 +1,8 @@
 <script lang="ts">
     import { Canvg } from "canvg";
     import { afterUpdate, createEventDispatcher, onMount } from "svelte";
-    import type { FullThrustShip } from "@/schemas/ship";
-    import { svgLib } from "@/lib/svgLib";
-    import type { ISystemSVG } from "@/lib/svgLib";
-    import { formRows, genSvg } from "@/lib/hull";
-    import { getSystem } from "@/lib/systems";
-    import type { System } from "@/lib/systems";
-    import type { ISystem } from "@/lib/systems/_base";
-    import type { Turret } from "@/lib/systems/turret";
-    import type { Magazine } from "@/lib/systems/magazine";
-    import type { SalvoLauncher } from "@/lib/systems/salvoLauncher";
-    import type { MineLayer } from "@/lib/systems/mineLayer";
+    import { hull, systems as sysLib, svgLib } from "ftlibship";
+    import type { FullThrustShip, ISystemSVG } from "ftlibship";
 
     export let ship: FullThrustShip;
 
@@ -20,12 +11,12 @@
     // Calculate the size of the hull display.
     // Below a certain threshold, the compact display will be used (drives to the side).
     // Otherwise we'll go with the fully flexible display with the drives in the bottom.
-    let hullArray = formRows(ship);
+    let hullArray = hull.formRows(ship);
 
     let hullCols = hullArray[0].length;
     if (ship.hull.stealth === "2") {
         hullCols++;
-    } else if ( (ship.hull.stealth === "1") && (hullArray[1].length === hullArray[0].length) ) {
+    } else if ( (ship.hull.stealth === "1") && (hullArray.length > 1) && (hullArray[1].length === hullArray[0].length) ) {
         hullCols++;
     }
 
@@ -38,42 +29,42 @@
     }
 
     // Get a list of general systems, watching for turrets and magazines
-    const systems: System[] = [];
-    const turrets: Turret[] = [];
-    const mines: MineLayer[] = [];
-    const magazines: Magazine[] = [];
+    const systems: sysLib.System[] = [];
+    const turrets: sysLib.Turret[] = [];
+    const mines: sysLib.MineLayer[] = [];
+    const magazines: sysLib.Magazine[] = [];
     for (const s of ship.systems) {
         if ( (s.name === "drive") || (s.name === "ftl") ) {
             continue;
         }
-        const obj = getSystem(s, ship);
+        const obj = sysLib.getSystem(s, ship);
         if (obj.name === "turret") {
-            turrets.push(obj as Turret);
+            turrets.push(obj as sysLib.Turret);
         } else if (obj.name === "magazine") {
-            magazines.push(obj as Magazine);
+            magazines.push(obj as sysLib.Magazine);
         } else if (obj.name === "mineLayer") {
-            mines.push(obj as MineLayer);
+            mines.push(obj as sysLib.MineLayer);
         } else {
             systems.push(obj);
         }
     }
 
     // Get a list of ordnance
-    const ordnance: System[] = [];
-    const launchers: SalvoLauncher[] = [];
+    const ordnance: sysLib.System[] = [];
+    const launchers: sysLib.SalvoLauncher[] = [];
     for (const s of ship.ordnance) {
-        const obj = getSystem(s, ship);
+        const obj = sysLib.getSystem(s, ship);
         if (obj.name === "salvoLauncher") {
-            launchers.push(obj as SalvoLauncher)
+            launchers.push(obj as sysLib.SalvoLauncher)
         } else {
             ordnance.push(obj);
         }
     }
 
     // Get a list of weapons
-    const weapons: System[] = [];
+    const weapons: sysLib.System[] = [];
     for (const s of ship.weapons) {
-        const obj = getSystem(s, ship);
+        const obj = sysLib.getSystem(s, ship);
         weapons.push(obj);
     }
 
@@ -127,7 +118,7 @@
             // heading
             totalRows++;
             // Find out how many launchers it feeds
-            const feeding: SalvoLauncher[] = [];
+            const feeding: sysLib.SalvoLauncher[] = [];
             for (const l of launchers) {
                 if (l.magazine === m.id) {
                     feeding.push(l);
@@ -150,7 +141,7 @@
                 turretedIds.add(w);
             }
         }
-        const freeWeapons: System[] = [];
+        const freeWeapons: sysLib.System[] = [];
         for (const w of weapons) {
             if (turretedIds.has(w.uid)) {
                 continue;
@@ -181,22 +172,14 @@
     totalRows += 3;
 
     const svgCore = svgLib.find(x => x.id === "coreSys")!;
-    const sysFtl: ISystem = ship.systems.find(x => x.name === "ftl");
-    let hasFtlAdv = false;
+    const sysFtl: sysLib.ISystem = ship.systems.find(x => x.name === "ftl");
     let svgFtl: ISystemSVG;
-    if ( (sysFtl !== undefined) && (sysFtl.hasOwnProperty("advanced")) && (sysFtl.advanced) ) {
-        hasFtlAdv = true;
-    }
     if (sysFtl !== undefined) {
-        svgFtl = getSystem(sysFtl, ship).glyph();
+        svgFtl = sysLib.getSystem(sysFtl, ship).glyph();
     }
 
     const sysDrive = ship.systems.find(x => x.name === "drive")!;
-    let hasAdvDrive = false;
-    if ( (sysDrive.hasOwnProperty("advanced")) && (sysDrive.advanced) ) {
-        hasAdvDrive = true;
-    }
-    const svgDrive = getSystem(sysDrive, ship).glyph();
+    const svgDrive = sysLib.getSystem(sysDrive, ship).glyph();
 
     const sysDistinct: ISystemSVG[] = [];
     for (const set of [systems, turrets, mines, magazines, ordnance, launchers, weapons]) {
@@ -209,13 +192,13 @@
                 }
             }
             if (sys.name === "mineLayer") {
-                const glyph = (sys as MineLayer).individualMine();
+                const glyph = (sys as sysLib.MineLayer).individualMine();
                 const idx = sysDistinct.findIndex(x => x.id === glyph.id);
                 if (idx === -1) {
                     sysDistinct.push(glyph);
                 }
             } else if (sys.name === "magazine") {
-                const glyph = (sys as Magazine).missileGlyph();
+                const glyph = (sys as sysLib.Magazine).missileGlyph();
                 const idx = sysDistinct.findIndex(x => x.id === glyph.id);
                 if (idx === -1) {
                     sysDistinct.push(glyph);
@@ -373,7 +356,7 @@
             // name plate
             svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Magazine</text>`;
             currRow++;
-            const feeding: SalvoLauncher[] = [];
+            const feeding: sysLib.SalvoLauncher[] = [];
             for (const l of launchers) {
                 if (l.magazine === mag.id) {
                     feeding.push(l);
@@ -401,7 +384,7 @@
 
     // Weapons
     if (weapons.length > 0) {
-        const freeWeapons: System[] = [];
+        const freeWeapons: sysLib.System[] = [];
         for (const w of weapons) {
             if (! turretedIds.has(w.uid)) {
                 freeWeapons.push(w);
@@ -437,7 +420,7 @@
             // name plate
             svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Turret</text>`;
             currRow++;
-            const hosting: System[] = [];
+            const hosting: sysLib.System[] = [];
             for (const w of weapons) {
                 if (turret.weapons.includes(w.uid)) {
                     hosting.push(w);
@@ -518,7 +501,7 @@
     <svg bind:this="{svgDisplay}" viewBox="-1 -1 {pxWidth + 2} {pxHeight + 2}" width="100%" height="100%">
         <!-- Add distinct symbol to <defs>-->
         <defs>
-            {@html genSvg(ship, cellsize)}
+            {@html hull.genSvg(ship, cellsize)}
         {#if svgFtl !== undefined}
             {@html svgFtl.svg}
         {/if}

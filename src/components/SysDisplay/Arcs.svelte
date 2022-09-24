@@ -1,13 +1,14 @@
 <script lang="ts">
-    import { afterUpdate, onMount } from "svelte";
+    import { afterUpdate } from "svelte";
     import { ship } from "../../stores/writeShip";
-    import type {Arcs} from "../../schemas/ship";
-    import { arcList, lefts, rights } from "../../lib/genHex";
+    import { hexes } from "ftlibship";
     import robustPointInPolygon from "robust-point-in-polygon";
+
+    type Arc = "F" | "FS" | "FP" | "A" | "AS" | "AP";
 
     interface ISystem {
         name: string;
-        leftArc: Arcs;
+        leftArc: Arc;
         numArcs: number;
         [k: string]: unknown;
     };
@@ -16,12 +17,12 @@
     export let idx: number;
     export let minArcs = 1;
     export let maxArcs = 6;
-    export let arcBlacklist: Arcs[] = [];
+    export let arcBlacklist: Arc[] = [];
 
     let sys: ISystem;
     $: sys = $ship[prop][idx];
 
-    let selectedArcs: Arcs[] = [];
+    let selectedArcs: Arc[] = [];
     let contiguous = true;
     // onMount(() => {
     //     const s = $ship[prop][idx];
@@ -39,12 +40,12 @@
         const s = $ship[prop][idx];
         if (s !== undefined) {
             if (! s.hasOwnProperty("leftArc")) {
-                s.leftArc = "F" as Arcs;
+                s.leftArc = "F" as Arc;
             }
             if (! s.hasOwnProperty("numArcs")) {
                 s.numArcs = 1;
             }
-            selectedArcs = arcList(s.leftArc, s.numArcs);
+            selectedArcs = hexes.arcList(s.leftArc, s.numArcs);
         }
     });
 
@@ -53,7 +54,7 @@
         y: number;
     }
 
-    const polyPts: [Arcs, IPoint[]][] = [
+    const polyPts: [Arc, IPoint[]][] = [
         ["F", [{x: 300, y: 300}, {x: 158.5, y: 54.914810729003904}, {x: 441.5, y:54.914810729003875}]],
         ["FS", [{x: 300, y: 300}, {x: 441.5, y:54.914810729003875}, {x: 583, y:300}]],
         ["AS", [{x: 300, y: 300}, {x: 583, y:300}, {x: 441.5, y:545.0851892709961}]],
@@ -61,13 +62,13 @@
         ["AP", [{x: 300, y: 300}, {x: 158.5, y: 545.0851892709961}, {x: 17, y: 300}]],
         ["FP", [{x: 300, y: 300}, {x: 17, y: 300}, {x: 158.5, y: 54.914810729003904}]],
     ];
-    let polyStrs: [Arcs, string][] = [];
+    let polyStrs: [Arc, string][] = [];
     for (const pair of polyPts) {
         const str = pair[1].map(p => `${p.x},${p.y}`).join(" ");
         polyStrs.push([pair[0], str]);
     }
 
-    const neighboursLeft: Map<Arcs, Arcs> = new Map([
+    const neighboursLeft: Map<Arc, Arc> = new Map([
         ["F", "FP"],
         ["FS", "F"],
         ["AS", "FS"],
@@ -75,7 +76,7 @@
         ["AP", "A"],
         ["FP", "AP"],
     ]);
-    const neighboursRight: Map<Arcs, Arcs> = new Map([
+    const neighboursRight: Map<Arc, Arc> = new Map([
         ["F", "FS"],
         ["FS", "AS"],
         ["AS", "A"],
@@ -86,10 +87,10 @@
 
     let svgDisplay: SVGSVGElement;
     let dragSelected: SVGPolygonElement;
-    let targetArc: Arcs;
+    let targetArc: Arc;
     const startDrag = (e: MouseEvent | TouchEvent) => {
         dragSelected = e.target as SVGPolygonElement;
-        targetArc = (e.target as SVGPolygonElement).id as Arcs;
+        targetArc = (e.target as SVGPolygonElement).id as Arc;
     }
 
     const drag = (e: MouseEvent | TouchEvent) => {
@@ -105,7 +106,7 @@
                     }
                 }
             } else {
-                targetArc = (e.target as SVGPolygonElement).id as Arcs;
+                targetArc = (e.target as SVGPolygonElement).id as Arc;
             }
         }
     }
@@ -127,10 +128,10 @@
     const endDrag = (e: MouseEvent | TouchEvent) => {
         if (dragSelected !== undefined) {
             if (targetArc !== undefined) {
-                if ( (targetArc === dragSelected.id) || (! selectedArcs.includes(dragSelected.id as Arcs)) ) {
-                    handleClick(dragSelected.id as Arcs);
+                if ( (targetArc === dragSelected.id) || (! selectedArcs.includes(dragSelected.id as Arc)) ) {
+                    handleClick(dragSelected.id as Arc);
                 } else {
-                    handleClick(dragSelected.id as Arcs, targetArc)
+                    handleClick(dragSelected.id as Arc, targetArc)
                 }
             }
             dragSelected = undefined;
@@ -139,9 +140,9 @@
     }
 
     // This is ugly, brute-force work. No elegance here.
-    const handleClick = (arc1: Arcs, arc2: Arcs | undefined = undefined) => {
-        let arc: Arcs;
-        let delArc: Arcs;
+    const handleClick = (arc1: Arc, arc2: Arc | undefined = undefined) => {
+        let arc: Arc;
+        let delArc: Arc;
         // In a simple click, arc1 will be defined and arc2 will not.
         // In a drag and drop, arc1 needs to be deactivated, and arc2 activated.
         if (arc2 === undefined) {
@@ -171,8 +172,8 @@
         // Now validate that the list of selected arcs is valid
         let valid = true;
         contiguous = true;
-        let lh: Arcs;
-        let rh: Arcs;
+        let lh: Arc;
+        let rh: Arc;
         // If there are six arcs, we're by definition good.
         if (selected.length === 0) {
             valid = false;
@@ -213,8 +214,8 @@
                 sys.leftArc = "F";
                 sys.numArcs = 6;
             } else {
-                const degLeft = lefts.get(lh)!;
-                let degRight = rights.get(rh)!;
+                const degLeft = hexes.lefts.get(lh)!;
+                let degRight = hexes.rights.get(rh)!;
                 if (degRight < degLeft) {
                     degRight += 360;
                 }

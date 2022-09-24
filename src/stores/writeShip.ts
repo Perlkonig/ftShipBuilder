@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import type { FullThrustShip } from "../schemas/ship";
+import type { FullThrustShip } from "ftlibship";
 import type { ILayout as IBlockLayout } from "@/lib/layouts";
 
 interface IDim {
@@ -48,7 +48,7 @@ export interface ILayout {
 
 const starterShip: FullThrustShip = {
     hull: {points: 1, rows: 4, stealth: "0", streamlining: "none"},
-    armour: [] as number[],
+    armour: [] as [number, number][],
     systems: [
         {
             name: "drive",

@@ -4,8 +4,8 @@
     import { ssdComponents } from "@/stores/writeSsd";
     import type { ILayout as ILayoutSystem, IElement } from "@/stores/writeShip";
     import type { IBox } from "@/lib/layouts";
-    import type { ISystemSVG } from "@/lib/svgLib";
-    import { getSystem } from "@/lib/systems";
+    import type { ISystemSVG } from "ftlibship";
+    import { systems } from "ftlibship";
     import { afterUpdate } from "svelte";
 
     interface ISystem {
@@ -53,7 +53,7 @@
                 if (ignore.includes(sys.name)) {
                     continue;
                 }
-                const obj = getSystem(sys, $ship);
+                const obj = systems.getSystem(sys, $ship);
                 seenIds.add(obj.uid);
                 const svg = obj.glyph();
                 if (svg !== undefined) {
@@ -107,10 +107,10 @@
         for (const sys of $ship.ordnance){
             if (sys.name === "salvoLauncher") {
                 if ( (sys.hasOwnProperty("magazine")) && (sys.magazine !== undefined) ) {
-                    const launchObj = getSystem(sys, $ship);
+                    const launchObj = systems.getSystem(sys, $ship);
                     const mag = $ship.systems.find(x => x.id === sys.magazine);
                     if (mag !== undefined) {
-                        const magObj = getSystem(mag, $ship);
+                        const magObj = systems.getSystem(mag, $ship);
                         const xLaunch = layout.elements[launchObj.uid].x;
                         const yLaunch = layout.elements[launchObj.uid].y;
                         const wLaunch = launchObj.glyph().width * layout.blocks.cellsize;
@@ -134,7 +134,7 @@
         // Find turret/weapon combos and draw lines between them if they are not layered.
         for (const s of $ship.systems) {
             if (s.name === "turret") {
-                const tObj = getSystem(s, $ship);
+                const tObj = systems.getSystem(s, $ship);
                 for (const id of s.weapons) {
                     let obj: any;
                     let idx = $ship.ordnance.findIndex(x => x.id === id);
@@ -147,7 +147,7 @@
                         }
                     }
                     if (obj !== undefined) {
-                        const wObj = getSystem(obj, $ship);
+                        const wObj = systems.getSystem(obj, $ship);
                         const xTurret = layout.elements[tObj.uid].x;
                         const yTurret = layout.elements[tObj.uid].y;
                         const wTurret = tObj.glyph().width * layout.blocks.cellsize;

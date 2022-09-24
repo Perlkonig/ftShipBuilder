@@ -1,18 +1,13 @@
 <script lang="ts">
     import { afterUpdate } from "svelte";
     import { ship } from "../../stores/writeShip";
-    import { getSystem } from "../../lib/systems";
-    import type { Arc, System } from "../../lib/systems";
+    import { systems } from "ftlibship";
     import { nanoid } from "nanoid";
 
     export let prop: string;
     export let idx: number;
 
-    interface ISystem {
-        name: string;
-        id: string;
-        [k: string]: unknown;
-    }
+    type Arc = "F" | "FS" | "FP" | "A" | "AS" | "AP";
 
     type Turret = {
         name: "turret";
@@ -45,7 +40,7 @@
             if (! s.hasOwnProperty("id")) {
                 s.id = nanoid(5);
             }
-            const obj: System = getSystem(s, $ship);
+            const obj: systems.System = systems.getSystem(s, $ship);
             availableWeapons.push({id: s.id as string, name: obj.fullName()});
         }
         for (const s of $ship.weapons) {
@@ -53,7 +48,7 @@
                 s.id = nanoid(5);
             }
             if (! s.name.startsWith("spinal")) {
-                const obj: System = getSystem(s, $ship);
+                const obj: systems.System = systems.getSystem(s, $ship);
                 availableWeapons.push({id: s.id as string, name: obj.fullName()});
             }
         }

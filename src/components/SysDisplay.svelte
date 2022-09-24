@@ -1,7 +1,6 @@
 <script lang="ts">
     import { ship } from "../stores/writeShip";
-    import { getSystem } from "../lib/systems";
-    import type { System } from "../lib/systems";
+    import { systems } from "ftlibship";
     import Aa from './SysDisplay/AA.svelte';
     import Advanced from './SysDisplay/Advanced.svelte';
     import Arcs from "./SysDisplay/Arcs.svelte";
@@ -20,17 +19,11 @@
     import Range from "./SysDisplay/Range.svelte";
     import Type from "./SysDisplay/Type.svelte";
     import Turret from "./SysDisplay/Turret.svelte";
-import ArcsExperimental from "./SysDisplay/Arcs.svelte";
-
-    interface ISystem {
-        name: string;
-        [k: string]: unknown;
-    };
 
     export let prop: string;
     export let idx: number;
-    let sys: System;
-    $: sys = getSystem($ship[prop][idx], $ship);
+    let sys: systems.System;
+    $: sys = systems.getSystem($ship[prop][idx], $ship);
 
     const delSystem = () => {
         ($ship[prop] as unknown[]).splice(idx, 1);
@@ -41,7 +34,7 @@ import ArcsExperimental from "./SysDisplay/Arcs.svelte";
 <article class="media">
     {#if sys.glyph() !== undefined}
     <figure class="media-left" style="width: {sys.glyph().width}rem; height: {sys.glyph().height}rem;">
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.dev/svgjs" height="100%" width="100%">
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="100%" width="100%">
             <defs>
                 {@html sys.glyph().svg}
             </defs>

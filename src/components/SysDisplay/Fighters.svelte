@@ -1,7 +1,7 @@
-<script lang="ts">
+ <script lang="ts">
     import { afterUpdate } from "svelte";
     import { ship } from "../../stores/writeShip";
-    import { type2name, mod2name } from "../../lib/systems/fighters";
+    import { systems } from "ftlibship";
 
     type Fighter = {
         type: "standard" | "interceptor" | "attack" | "torpedo" | "graser" | "plasma" | "MKP" | "missile" | "light";
@@ -49,8 +49,8 @@
         $ship = $ship;
     });
 
-    let fighterTypes = [...type2name.entries()].sort((a, b) => {return a[1].localeCompare(b[1]);});
-    let fighterMods = [...mod2name.entries()].sort((a, b) => {return a[1].localeCompare(b[1]);});
+    let fighterTypes = [...systems.fighterType2Name.entries()].sort((a, b) => {return a[1].localeCompare(b[1]);});
+    let fighterMods = [...systems.fighterMod2Name.entries()].sort((a, b) => {return a[1].localeCompare(b[1]);});
 </script>
 
 <div class="field">

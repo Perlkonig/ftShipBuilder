@@ -1,7 +1,6 @@
 <script lang="ts">
     import { ship } from "../../stores/writeShip";
-    import { getSystem } from "../../lib/systems";
-    import type { System } from "../../lib/systems";
+    import { systems } from "ftlibship";
 
     interface ISystem {
         name: string;
@@ -12,8 +11,8 @@
     export let idx: number;
     let sys: ISystem;
     $: sys = $ship[prop][idx];
-    let obj: System;
-    $: obj = getSystem(sys, $ship);
+    let obj: systems.System;
+    $: obj = systems.getSystem(sys, $ship);
 </script>
 
 <div class="container">

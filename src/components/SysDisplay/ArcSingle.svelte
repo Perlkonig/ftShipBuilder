@@ -1,6 +1,5 @@
 <script lang="ts">
     import { ship } from "@/stores/writeShip";
-    import type {Arcs} from "@/schemas/ship";
 
     interface ISystem {
         name: string;
