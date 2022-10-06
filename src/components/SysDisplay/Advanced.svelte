@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ship } from "../../stores/writeShip";
+    import { ship } from "@/stores/writeShip";
 
     interface ISystem {
         name: string;

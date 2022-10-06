@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ship } from "../../stores/writeShip";
+    import { ship } from "@/stores/writeShip";
 
     interface ISystem {
         name: string;
@@ -26,15 +26,6 @@
         sys.area = ! sys.area;
         $ship = $ship;
     };
-
-    const toggleLevel = () => {
-        if (! sys.hasOwnProperty("level")) {
-            sys.level = 1;
-        }
-        console.log(sys)
-        sys.level = (sys.level == 1 ? 2 : 1);
-        $ship = $ship;
-    };
 </script>
 
 <nav class="level is-mobile">
@@ -51,13 +42,6 @@
             <span class="icon is-small" title="Toggle Area Mode"><i class="fa-solid fa-minimize"></i></span>
         {:else}
             <span class="icon is-small" title="Toggle Area Mode"><i class="fa-solid fa-maximize"></i></span>
-        {/if}
-      </button>
-      <button class="button level-item is-small" on:click="{toggleLevel}">
-        {#if ( (sys.hasOwnProperty("level")) && (sys.level) ) }
-            <span class="icon is-small" title="Toggle Screen Level">L{sys.level}</span>
-        {:else}
-            <span class="icon is-small" title="Toggle Screen Level">(LM)</span>
         {/if}
       </button>
     </div>

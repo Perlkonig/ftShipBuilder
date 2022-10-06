@@ -19,6 +19,7 @@
     import Range from "./SysDisplay/Range.svelte";
     import Type from "./SysDisplay/Type.svelte";
     import Turret from "./SysDisplay/Turret.svelte";
+    import Level from "./SysDisplay/Level.svelte";
 
     export let prop: string;
     export let idx: number;
@@ -60,6 +61,11 @@
         <Aa
             prop={prop}
             idx={idx}
+        />
+        <Level
+            prop={prop}
+            idx={idx}
+            choices={[[1,"Level 1"],[2,"Level 2"]]}
         />
     {:else if sys.name === "mineLayer"}
         <Capacity
