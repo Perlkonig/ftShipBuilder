@@ -86,6 +86,8 @@
                 $ship.systems.push({name: "turret", leftArc: "F", numArcs: 1});
             } else if (shipSystem === "decoy") {
                 $ship.systems.push({name: "decoy", type: "cruiser"});
+            } else if (shipSystem === "screen") {
+                $ship.systems.push({name: "screen", level: 1, area: false, advanced: false, id: nanoid(5)});
             } else {
                 // @ts-ignore
                 $ship.systems.push({name: shipSystem});
