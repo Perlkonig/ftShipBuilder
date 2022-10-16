@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* You can now explicitly assert the level of a specific defensive screen system. I read the rules as saying the number of individual systems determined your screen level (maxing out at 2), but there are other compatible interpretations. Setting the level as `unleveled` uses the level 2 glyphs but the level 1 points. Explicitly setting the level will adjust both the glyph and the points.
+* You can now explicitly assert the level of a specific defensive screen system. I read the rules as saying the number of individual systems determined your screen level (maxing out at 2), but there are other compatible interpretations. Setting the level as `unleveled` uses the level 2 glyphs but the level 1 points. Explicitly setting the level will adjust both the glyph and the points. (Thank you @shadowmouse for the pull request!)
 
 ## [v2.0.1] - 2022-09-24
 
