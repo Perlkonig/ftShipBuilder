@@ -224,18 +224,20 @@
 
             <div class="field">
                 <label class="label" for="class">Ship class</label>
+                <p class="help">Is overwritten by the system if the mass changes.</p>
                 <div class="control">
                     <input id="class" class="input" type="text" placeholder="Ship class" bind:value="{$ship.class}">
                 </div>
-                <p class="help">Is overwritten by the system if the mass changes.</p>
+                
             </div>
 
             <div class="field">
                 <label class="label" for="shipName">Ship name</label>
+                <p class="help">Appears on the SSD in quotes.</p>
                 <div class="control">
                     <input id="shipName" class="input" type="text" placeholder="Ship name" bind:value="{$ship.name}">
                 </div>
-                <p class="help">Appears on the SSD in quotes.</p>
+                
             </div>
 
             <div class="field">
@@ -262,29 +264,23 @@
 
             <div class="field">
                 <label class="label" for="rows">Hull rows</label>
+                <p class="help">4 is the default. 3 means advanced tech. 5 and 6 increases your odds of critical damage, but reduces the point cost.</p>
                 <div class="control">
                 <input id="rows" class="input" type="number" placeholder="Hull rows" min="3" max="6" bind:value={$ship.hull.rows}>
-                </div>
-                <p class="help">4 is the default. 3 means advanced tech. 5 and 6 increases your odds of critical damage, but reduces the point cost.</p>
+                </div>                
             </div>
             <MassPts
                 obj={systems.getSpecial("hull", $ship)}
             />
 
-            <div class="field topPadding">
-                <div class="control">
-                {#if $ship.armour.length < 5}
-                    <button class="button is-primary" on:click="{addArmour}">
+            <div class="field is-grouped topPadding">
+                <div class="control">                
+                    <button class="button is-primary" on:click="{addArmour}" disabled="{$ship.armour.length >= 5}">
                         Add armour row
                     </button>
-                {:else}
-                    <button class="button is-primary" disabled>
-                        Add armour row
-                    </button>
-                {/if}
                 </div>
                 <div class="control">
-                    <button class="button is-danger" on:click="{delArmour}">
+                    <button class="button is-danger" on:click="{delArmour}" disabled="{$ship.armour.length === 0}">
                         Remove armour row
                     </button>
                 </div>
@@ -335,6 +331,7 @@
 
             <div class="field">
                 <label class="label" for="streamlining">Atmospheric streamlining</label>
+                <p class="help">Not indicated on the SSD.</p>
                 <div class="control">
                     <div class="select">
                         <select id="streamlining" bind:value={$ship.hull.streamlining} on:change="{() => $ship = $ship}">
@@ -343,7 +340,7 @@
                             <option value="full">Full</option>
                         </select>
                     </div>
-                    <p class="help">Not indicated on the SSD.</p>
+                    
                 </div>
             </div>
             <MassPts
@@ -426,22 +423,25 @@
                 </div>
             </div>
         {#if showSystems}
-            <div class="field">
-                <label class="label" for="shipSystems">Select a system to add</label>
-                <div class="control">
-                <div class="select">
-                    <select id="shipSystems" bind:value={shipSystem}>
-                    {#each systems.systemList as sysname}
-                        <option value="{sysname}">{systems.sortNames.get(sysname)}</option>
-                    {/each}
-                    </select>
+            <label class="label" for="shipSystems">Select a system to add</label>
+            <p class="help">Some systems have additional options available once equipped.</p>
+            <div class="field has-addons">
+                
+                <div class="control is-expanded">
+                    <div class="select is-fullwidth">
+                        <select id="shipSystems" bind:value={shipSystem}>
+                        {#each systems.systemList as sysname}
+                            <option value="{sysname}">{systems.sortNames.get(sysname)}</option>
+                        {/each}
+                        </select>
+                    </div>
                 </div>
-                </div>
-                <p class="help">Some systems have additional options available once equipped.</p>
+                
                 <div class="control">
                     <button class="button is-primary" on:click="{addSystem}">Add System</button>
                 </div>
             </div>
+            
             <section class="container">
             {#each $ship.systems as sys, i}
                 {#if systems.systemList.includes(sys.name) }
@@ -474,18 +474,18 @@
             </div>
 
         {#if showOrdnance}
-            <div class="field">
-                <label class="label" for="ordnanceSystems">Select a system to add</label>
-                <div class="control">
-                <div class="select">
-                    <select id="ordnanceSystems" bind:value={shipOrdnance}>
-                    {#each systems.ordnanceList as ordname}
-                        <option value="{ordname}">{systems.sortNames.get(ordname)}</option>
-                    {/each}
-                    </select>
-                </div>
-                </div>
-                <p class="help">Some systems have additional options available once equipped.</p>
+            <label class="label" for="ordnanceSystems">Select a system to add</label>
+            <p class="help">Some systems have additional options available once equipped.</p>
+            <div class="field has-addons">                
+                <div class="control is-expanded">
+                    <div class="select is-fullwidth">
+                        <select id="ordnanceSystems" bind:value={shipOrdnance}>
+                        {#each systems.ordnanceList as ordname}
+                            <option value="{ordname}">{systems.sortNames.get(ordname)}</option>
+                        {/each}
+                        </select>
+                    </div>
+                </div>                
                 <div class="control">
                     <button class="button is-primary" on:click="{addOrdnance}">Load Ordnance</button>
                 </div>
@@ -522,18 +522,19 @@
             </div>
 
         {#if showWeapons}
-            <div class="field">
-                <label class="label" for="weaponSystems">Select a system to add</label>
-                <div class="control">
-                <div class="select">
-                    <select id="weaponSystems" bind:value={shipWeapon}>
-                    {#each systems.weaponList as weaponName}
-                        <option value="{weaponName}">{systems.sortNames.get(weaponName)}</option>
-                    {/each}
-                    </select>
+            <label class="label" for="weaponSystems">Select a system to add</label>
+            <p class="help">Some systems have additional options available once equipped.</p>
+            <div class="field has-addons">                
+                <div class="control is-expanded">
+                    <div class="select is-fullwidth">
+                        <select id="weaponSystems" bind:value={shipWeapon}>
+                        {#each systems.weaponList as weaponName}
+                            <option value="{weaponName}">{systems.sortNames.get(weaponName)}</option>
+                        {/each}
+                        </select>
+                    </div>
                 </div>
-                </div>
-                <p class="help">Some systems have additional options available once equipped.</p>
+                
                 <div class="control">
                     <button class="button is-primary" on:click="{addWeapon}">Add weapon</button>
                 </div>
