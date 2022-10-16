@@ -228,7 +228,7 @@
                 <div class="control">
                     <input id="class" class="input" type="text" placeholder="Ship class" bind:value="{$ship.class}">
                 </div>
-                
+
             </div>
 
             <div class="field">
@@ -237,7 +237,7 @@
                 <div class="control">
                     <input id="shipName" class="input" type="text" placeholder="Ship name" bind:value="{$ship.name}">
                 </div>
-                
+
             </div>
 
             <div class="field">
@@ -267,20 +267,20 @@
                 <p class="help">4 is the default. 3 means advanced tech. 5 and 6 increases your odds of critical damage, but reduces the point cost.</p>
                 <div class="control">
                 <input id="rows" class="input" type="number" placeholder="Hull rows" min="3" max="6" bind:value={$ship.hull.rows}>
-                </div>                
+                </div>
             </div>
             <MassPts
                 obj={systems.getSpecial("hull", $ship)}
             />
 
             <div class="field is-grouped topPadding">
-                <div class="control">                
-                    <button class="button is-primary" on:click="{addArmour}" disabled="{$ship.armour.length >= 5}">
+                <div class="control">
+                    <button class="button is-primary is-small" on:click="{addArmour}" disabled="{$ship.armour.length >= 5}">
                         Add armour row
                     </button>
                 </div>
                 <div class="control">
-                    <button class="button is-danger" on:click="{delArmour}" disabled="{$ship.armour.length === 0}">
+                    <button class="button is-danger is-small" on:click="{delArmour}" disabled="{$ship.armour.length === 0}">
                         Remove armour row
                     </button>
                 </div>
@@ -340,7 +340,7 @@
                             <option value="full">Full</option>
                         </select>
                     </div>
-                    
+
                 </div>
             </div>
             <MassPts
@@ -426,7 +426,7 @@
             <label class="label" for="shipSystems">Select a system to add</label>
             <p class="help">Some systems have additional options available once equipped.</p>
             <div class="field has-addons">
-                
+
                 <div class="control is-expanded">
                     <div class="select is-fullwidth">
                         <select id="shipSystems" bind:value={shipSystem}>
@@ -436,12 +436,12 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="control">
                     <button class="button is-primary" on:click="{addSystem}">Add System</button>
                 </div>
             </div>
-            
+
             <section class="container">
             {#each $ship.systems as sys, i}
                 {#if systems.systemList.includes(sys.name) }
@@ -476,7 +476,7 @@
         {#if showOrdnance}
             <label class="label" for="ordnanceSystems">Select a system to add</label>
             <p class="help">Some systems have additional options available once equipped.</p>
-            <div class="field has-addons">                
+            <div class="field has-addons">
                 <div class="control is-expanded">
                     <div class="select is-fullwidth">
                         <select id="ordnanceSystems" bind:value={shipOrdnance}>
@@ -485,7 +485,7 @@
                         {/each}
                         </select>
                     </div>
-                </div>                
+                </div>
                 <div class="control">
                     <button class="button is-primary" on:click="{addOrdnance}">Load Ordnance</button>
                 </div>
@@ -524,7 +524,7 @@
         {#if showWeapons}
             <label class="label" for="weaponSystems">Select a system to add</label>
             <p class="help">Some systems have additional options available once equipped.</p>
-            <div class="field has-addons">                
+            <div class="field has-addons">
                 <div class="control is-expanded">
                     <div class="select is-fullwidth">
                         <select id="weaponSystems" bind:value={shipWeapon}>
@@ -534,7 +534,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="control">
                     <button class="button is-primary" on:click="{addWeapon}">Add weapon</button>
                 </div>
