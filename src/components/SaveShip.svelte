@@ -82,7 +82,7 @@
         <div class="field">
             <label class="label" for="saveName">Save name</label>
             <div class="control">
-                <input id="saveName" class="input" type="text" placeholder="Save name" bind:value="{saveName}">
+                <input id="saveName" class="input" type="text" placeholder="Save name" on:focus={setSaveNameDirty} bind:value="{saveName}">
                 <button class="button" on:click="{saveStorage}">Save Ship to Local Storage</button>
             </div>
         {#if ( (saveName !== undefined) && (saveName.length > 0) )}
