@@ -8,8 +8,17 @@
     let jsonDataStr: string;
     let jsonDataStrNoLayout: string;
     let replacedString: string;
-    let saveName: string;
+
     let duplicated: boolean = true;
+
+    //this seems to work, but feels pretty hacky
+    //makes it so the save name matches the ship name untill the user clicks into the save name, then it no longer stays in sync
+    $: saveNameDirty = false;
+    $: saveName = !saveNameDirty ? ship.name : saveName;
+
+    const setSaveNameDirty = () => {
+        saveNameDirty = true;
+    };
 
     afterUpdate(() => {
         // Remove the embedded SVG glyphs, but keep the x,y coordinates and ids
@@ -33,11 +42,11 @@
         });
         jsonDataStrNoLayout = "data:text/json;charset=utf-8," + encodeURIComponent(noLayoutString);
 
-        if ( (saveName === undefined) || (saveName.length === 0) ) {
-            saveName = ship.name;
-        }
-        if ( (saveName !== undefined) && (saveName !== "") ) {
-            const idx = $savedShips.findIndex(x => x.name === saveName);
+        // if ( (saveName === undefined) || (saveName.length === 0) ) {
+        //     saveName = ship.name;
+        // }
+        if (saveName !== undefined && saveName !== "") {
+            const idx = $savedShips.findIndex((x) => x.name === saveName);
             if (idx !== -1) {
                 duplicated = true;
             } else {
@@ -73,7 +82,7 @@
         <div class="field">
             <label class="label" for="saveName">Save name</label>
             <div class="control">
-                <input id="saveName" class="input" type="text" placeholder="Save name" bind:value="{saveName}">
+                <input id="saveName" class="input" type="text" placeholder="Save name" on:focus={setSaveNameDirty} bind:value="{saveName}">
                 <button class="button" on:click="{saveStorage}">Save Ship to Local Storage</button>
             </div>
         {#if ( (saveName !== undefined) && (saveName.length > 0) )}
