@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.0] - 2022-12-30
+
+### Added
+
+* Added a `civilian` flag that reduces the crew factor from 1/20 to 1/50.
+
+### Fixed
+
+* Fixed a display bug where bays of different masses all showed the same capacity.
+* Long-range kguns now correctly have black as opposed to white backgrounds. (Thanks, @shadowmouse!)
+* The save name now correctly syncs with your ship name until you focus the save name box, at which point you're on your own. (Thanks, @InsaneWookie!)
+
 ## [v2.0.4] - 2022-10-16
 
 ### Changed

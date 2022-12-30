@@ -260,6 +260,13 @@
                 {:else if $ship.hull.points >= ($ship.mass * 0.5)}
                     <p class="help is-warning">Hull rating: SUPER</p>
                 {/if}
+                <div class="control">
+                    <label class="checkbox">
+                        <input type="checkbox" bind:checked="{$ship.civilian}">
+                        Civilian ship (changes the crew factor)
+                    </label>
+                </div>
+
             </div>
 
             <div class="field">
