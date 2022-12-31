@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.2.0] - 2022-12-31
+
+### Added
+
+* Added the "boat bay," intended to carry light non-combat vehicles like shuttles, dropships, and survey craft (see *Continuum*, p. 110). I'm sorry, but gunboats themselves are still unsupported.
+* Added "assault shuttle" to the list of available fighters (see *Continuum*, pp. 75–76). The builder will allow robot assault shuttles, but they are really only legal if your universe allows purely robotic boarding parties. Human boarders cannot access a robotic fighter rack.
+
+### Fixed
+
+* There are some fighter combination that are not valid (e.g., light fighters can't have the "heavy" modification). Checking invalid boxes will now automatically uncheck the box.
+
 ## [v2.1.0] - 2022-12-30
 
 ### Added

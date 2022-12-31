@@ -77,7 +77,7 @@
         <Type
             prop={prop}
             idx={idx}
-            choices={[["passenger","Passenger Berth"],["troop","Troop Berth"],["cargo","Cargo Hold"]]}
+            choices={[["passenger","Passenger Berth"],["troop","Troop Berth"],["cargo","Cargo Hold"],["boat", "Boat Bay"]]}
         />
         <Capacity
             prop={prop}
