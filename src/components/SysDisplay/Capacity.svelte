@@ -24,4 +24,7 @@
         <input id="capacity" class="input" type="number" placeholder="Capacity" min="{min}" bind:value={sys.capacity} on:change="{() => $ship = $ship}">
     {/if}
     </div>
+{#if sys.name === "bay"}
+    <p class="help">For holds and berths, the capacity is its <em>gross mass</em>. While the rules offer specific capacity ratios, using gross mass gives players the flexibility to house rule.</p>
+{/if}
 </div>

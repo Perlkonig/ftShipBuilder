@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.2.1] - 2023-01-03
+
+### Added
+
+* Added help text to the "capacity" field for holds and berths. The builder has always taken the capacity of holds and berths to be its gross mass. While the rules offer various mass-to-capacity ratios, this game is heavily house ruled. Using gross mass offers maximum flexibility.
+
 ## [v2.2.0] - 2022-12-31
 
 ### Added
@@ -14,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-* There are some fighter combination that are not valid (e.g., light fighters can't have the "heavy" modification). Checking invalid boxes will now automatically uncheck the box.
+* There are some fighter combinations that are not valid (e.g., light fighters can't have the "heavy" modification). Checking invalid boxes will now automatically uncheck the box.
 
 ## [v2.1.0] - 2022-12-30
 
