@@ -17,6 +17,7 @@
     import MassPts from './SysDisplay/MassPts.svelte';
     import Modifier from "./SysDisplay/Modifier.svelte";
     import Range from "./SysDisplay/Range.svelte";
+    import Ratio from "./SysDisplay/Ratio.svelte";
     import Type from "./SysDisplay/Type.svelte";
     import Turret from "./SysDisplay/Turret.svelte";
     import Level from "./SysDisplay/Level.svelte";
@@ -83,6 +84,10 @@
             prop={prop}
             idx={idx}
             min={1}
+        />
+        <Ratio
+            prop={prop}
+            idx={idx}
         />
         <Id
             prop={prop}

@@ -25,6 +25,6 @@
     {/if}
     </div>
 {#if sys.name === "bay"}
-    <p class="help">For holds and berths, the capacity is its <em>gross mass</em>. While the rules offer specific capacity ratios, using gross mass gives players the flexibility to house rule.</p>
+    <p class="help">This is the actual capacity of the bay. For example, if you want to accommodate 6 extra marines, enter <code>6</code>. The mass is calculated automatically.</p>
 {/if}
 </div>
