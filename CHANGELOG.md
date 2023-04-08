@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.0.0] - 2023-04-07
+
+### BREAKING CHANGE
+
+Bays have been reworked so the `capacity` property is indeed as described. The mass is calculated by using the ratios given in the rules. But a `ratio` property has also been added so you can customize the mass-to-capacity ratio in a given scenario. The number displayed on the SSD is the capacity of the bay, and the mass is calculated by multiplying the capacity by the ratio.
+
+If you have any saved ships that include bays, load them, correct the capacity, and resave.
+
+### Added
+
+* New `orientation` property lets you now choose "beta" orientation, where all firing arcs are rotated 30 degrees clockwise. All three forward arcs fire starboard and all three aft arcs fire port. All glyphs and arc selectors should adjust automagically.
+
+### Fixed
+
+* CPV now correctly incorporates hull integrity. (Thanks, @mandalon!)
+
 ## [v2.2.2] - 2023-01-16
 
 ### Fixed
