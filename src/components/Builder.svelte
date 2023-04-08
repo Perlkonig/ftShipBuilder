@@ -37,6 +37,10 @@
         $ship = $ship;
     }
 
+    if ($ship.orientation === undefined) {
+        $ship.orientation = "alpha";
+    }
+
     let ftl: boolean;
     let ftlAdvanced: boolean;
     ship.subscribe((obj) => {
@@ -353,6 +357,21 @@
             <MassPts
                 obj={systems.getSpecial("streamlining", $ship)}
             />
+
+            <div class="field">
+                <label class="label" for="orientation">Arc orientation</label>
+                <p class="help">Alpha is the default. Beta rotates the firing arcs 30&deg; clockwise.</p>
+                <div class="control">
+                    <div class="select">
+                        <select id="orientation" bind:value={$ship.orientation} on:change="{() => $ship = $ship}">
+                            <option value="alpha">Alpha</option>
+                            <option value="beta">Beta</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
         </section>
 
         <section class="section">

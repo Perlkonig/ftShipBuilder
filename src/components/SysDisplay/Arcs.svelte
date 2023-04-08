@@ -54,18 +54,36 @@
         y: number;
     }
 
-    const polyPts: [Arc, IPoint[]][] = [
-        ["F", [{x: 300, y: 300}, {x: 158.5, y: 54.914810729003904}, {x: 441.5, y:54.914810729003875}]],
-        ["FS", [{x: 300, y: 300}, {x: 441.5, y:54.914810729003875}, {x: 583, y:300}]],
-        ["AS", [{x: 300, y: 300}, {x: 583, y:300}, {x: 441.5, y:545.0851892709961}]],
-        ["A", [{x: 300, y: 300}, {x: 441.5, y:545.0851892709961}, {x: 158.5, y: 545.0851892709961}]],
-        ["AP", [{x: 300, y: 300}, {x: 158.5, y: 545.0851892709961}, {x: 17, y: 300}]],
-        ["FP", [{x: 300, y: 300}, {x: 17, y: 300}, {x: 158.5, y: 54.914810729003904}]],
-    ];
-    let polyStrs: [Arc, string][] = [];
-    for (const pair of polyPts) {
-        const str = pair[1].map(p => `${p.x},${p.y}`).join(" ");
-        polyStrs.push([pair[0], str]);
+    const deg2rad = (deg: number): number => { return deg * Math.PI / 180; }
+
+    const rotate = (pt: IPoint, deg = 0, originX = 0, originY = 0): IPoint => {
+        const shiftX = pt.x - originX;
+        const shiftY = pt.y - originY;
+        const rad = deg2rad(deg);
+        const newx = (shiftX * Math.cos(rad)) - (shiftY * Math.sin(rad)) + originX;
+        const newy = (shiftY * Math.cos(rad)) + (shiftX * Math.sin(rad)) + originY;
+        return {x: newx, y: newy} as IPoint;
+    }
+
+    let polyPts: [Arc, IPoint[]][];
+    let polyStrs: [Arc, string][];
+    $: {
+        polyPts = [
+            ["F", [{x: 300, y: 300}, {x: 158.5, y: 54.914810729003904}, {x: 441.5, y:54.914810729003875}]],
+            ["FS", [{x: 300, y: 300}, {x: 441.5, y:54.914810729003875}, {x: 583, y:300}]],
+            ["AS", [{x: 300, y: 300}, {x: 583, y:300}, {x: 441.5, y:545.0851892709961}]],
+            ["A", [{x: 300, y: 300}, {x: 441.5, y:545.0851892709961}, {x: 158.5, y: 545.0851892709961}]],
+            ["AP", [{x: 300, y: 300}, {x: 158.5, y: 545.0851892709961}, {x: 17, y: 300}]],
+            ["FP", [{x: 300, y: 300}, {x: 17, y: 300}, {x: 158.5, y: 54.914810729003904}]],
+        ];
+        if ( ($ship.orientation !== undefined) && ($ship.orientation === "beta") ) {
+            polyPts = polyPts.map(pair => [pair[0], pair[1].map(pt => rotate(pt, 30, 300, 300))]);
+        }
+        polyStrs = [];
+        for (const [arc,pts] of polyPts) {
+            const str = pts.map(p => `${p.x},${p.y}`).join(" ");
+            polyStrs.push([arc, str]);
+        }
     }
 
     const neighboursLeft: Map<Arc, Arc> = new Map([
