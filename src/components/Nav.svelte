@@ -1,17 +1,19 @@
 <script lang="ts">
     let modalAbout: string;
     let modalFeedback: string;
+
+    let burgerActive = false;
 </script>
 
 <nav class="navbar" aria-label="main navigation">
     <div class="navbar-brand">
-        <a href={"#"} role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <a href={"#"} role="button" class="navbar-burger{burgerActive ? " is-active" : ""}" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" on:click={() => burgerActive = ! burgerActive}>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>
         </a>
     </div>
-    <div id="navbarBasicExample" class="navbar-menu">
+    <div id="navbarBasicExample" class="navbar-menu{burgerActive ? " is-active" : ""}">
         <div class="navbar-start">
             <a class="navbar-item" on:click="{() => modalAbout = "is-active"}">
                 About

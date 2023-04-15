@@ -151,6 +151,8 @@
         const unique: Set<string> = new Set([...$ship.fighters.map(x => x.hangar)]);
         if (unique.size !== $ship.fighters.length) {
             duplicateHangars = true;
+        } else {
+            duplicateHangars = false;
         }
     }
 
@@ -303,18 +305,15 @@
                     <div class="field">
                         <label class="label" for="armour{i}">Armour: Row {i + 1}</label>
                         <div class="control">
-                        <input id="armour{i}" class="input" type="number" placeholder="Armour points" min="1" max="{Math.ceil($ship.hull.points / $ship.hull.rows)}" bind:value={$ship.armour[i][0]}>
+                        <input id="armour{i}" class="input" type="number" placeholder="Armour points" min="1" bind:value={$ship.armour[i][0]}>
                         </div>
-                    {#if ($ship.armour[i][0] + $ship.armour[i][1]) > Math.ceil($ship.hull.points / $ship.hull.rows)}
-                        <p class="help is-danger">You can only have as much armour per row as hull boxes on your first row ({Math.ceil($ship.hull.points / $ship.hull.rows)}).</p>
-                    {/if}
                     </div>
                 </div>
                 <div class="column">
                     <div class="field">
                         <label class="label" for="regenArmour{i}">Regenerative: Row {i + 1}</label>
                         <div class="control">
-                        <input id="regenArmour{i}" class="input" type="number" placeholder="Regenerative armour points" min="0" max="{Math.ceil($ship.hull.points / $ship.hull.rows)}" bind:value={$ship.armour[i][1]}>
+                        <input id="regenArmour{i}" class="input" type="number" placeholder="Regenerative armour points" min="0" bind:value={$ship.armour[i][1]}>
                         </div>
                     </div>
                 </div>

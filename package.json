@@ -1,7 +1,7 @@
 {
   "name": "ftshipbuilder",
   "private": true,
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "A web-based tool for generating valid Full Thrust ships",
   "author": "Aaron Dalton <aaron@daltons.ca> (https://www.perlkonig.com)",
   "license": "MIT",
@@ -17,12 +17,17 @@
     "dev": "set NODE_ENV=development && vite",
     "build": "set NODE_ENV=production && vite build",
     "preview": "set NODE_ENV=development && npm run build && vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test": "mocha -r ts-node/register tests/**/*.test.ts"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.4",
     "@tsconfig/svelte": "^4.0.1",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.1",
     "@types/robust-point-in-polygon": "^1.0.2",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
     "svelte": "^3.58.0",
     "svelte-check": "^3.2.0",
     "svelte-preprocess": "^5.0.3",
@@ -33,7 +38,7 @@
   },
   "dependencies": {
     "canvg": "^4.0.1",
-    "ftlibship": "github:perlkonig/ftLibShip#v2.0.1",
+    "ftlibship": "github:perlkonig/ftLibShip#v2.0.2",
     "nanoid": "^4.0.2",
     "robust-point-in-polygon": "^1.0.3",
     "svelte-markdown": "^0.2.3"

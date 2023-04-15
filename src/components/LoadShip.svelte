@@ -1,8 +1,11 @@
 <script lang="ts">
     import { ship } from "../stores/writeShip";
     import { savedShips } from "../stores/writeStoredShips";
+    import { presets } from "../stores/readPresets";
+    import type { IPresetFleet } from "../stores/readPresets";
 
     let modalLoadJSON: string;
+    let modalDelShip: string;
     let shipJSON: string;
 
     const loadJSON = () => {
@@ -12,18 +15,36 @@
     }
 
     let shipID: string;
-    let delShip: string;
 
     const loadLocal = () => {
         const entry = $savedShips.find(x => x.name === shipID);
         if (entry !== undefined) {
             $ship = JSON.parse(entry.json);
+            compatCheck();
         }
-        compatCheck();
+    }
+
+    let presetFleetName: string;
+    let presetFleet: IPresetFleet;
+    $: {
+        if ( (presetFleetName !== undefined) && (presetFleetName !== "") ) {
+            presetFleet = $presets.find(f => f.name === presetFleetName);
+        }
+    }
+    let presetShipName: string;
+    const loadPreset = () => {
+        const fleet = $presets.find(f => f.name === presetFleetName);
+        if (fleet !== undefined) {
+            const entry = fleet.ships.find(x => x.name === presetShipName);
+            if (entry !== undefined) {
+                $ship = entry;
+                compatCheck();
+            }
+        }
     }
 
     const delLocal = () => {
-        const idx = $savedShips.findIndex(x => x.name === delShip);
+        const idx = $savedShips.findIndex(x => x.name === shipID);
         if (idx !== -1) {
             $savedShips.splice(idx, 1);
             $savedShips = $savedShips;
@@ -48,7 +69,7 @@
     </div>
     <div class="level-item">
         <div class="field">
-            <label class="label" for="saveName">Load a ship from storage</label>
+            <label class="label" for="saveName">Stored ships</label>
             <div class="control">
                 <div class="select">
                     <select id="saveName" bind:value={shipID}>
@@ -57,23 +78,36 @@
                     {/each}
                     </select>
                 </div>
-                <button class="button" on:click="{loadLocal}">Load Ship</button>
+                <button class="button is-success" on:click="{loadLocal}">Load</button>
+                <button class="button is-danger" on:click="{() => modalDelShip = "is-active"}">DELETE</button>
             </div>
         </div>
     </div>
     <div class="level-item">
         <div class="field">
-            <label class="label" for="delName">Delete a ship from storage</label>
+            <label class="label" for="fleetName">Presets</label>
             <div class="control">
                 <div class="select">
-                    <select id="delName" bind:value={delShip}>
-                    {#each $savedShips as s}
-                        <option id="{s.name}" value="{s.name}">{s.name}</option>
+                    <select id="fleetName" bind:value={presetFleetName}>
+                        <option id="" value=""></option>
+                    {#each $presets.sort((a, b) => a.name.localeCompare(b.name)) as fleet}
+                        <option id="{fleet.name}" value="{fleet.name}">{fleet.name}</option>
                     {/each}
                     </select>
                 </div>
-                <button class="button" on:click="{delLocal}">DELETE Ship</button>
             </div>
+        {#if ( (presetFleetName !== undefined) && (presetFleetName !== "") ) }
+            <div class="control">
+                <div class="select">
+                    <select id="shipName" bind:value={presetShipName}>
+                    {#each presetFleet.ships.sort((a, b) => a.mass - b.mass) as ship}
+                        <option id="{ship.name}" value="{ship.name}">{ship.name} (Mass: {ship.mass}, NPV: {ship.points})</option>
+                    {/each}
+                    </select>
+                </div>
+                <button class="button is-success" on:click="{loadPreset}">Load</button>
+            </div>
+        {/if}
         </div>
     </div>
 </div>
@@ -94,6 +128,22 @@
         <footer class="modal-card-foot">
             <button class="button is-success" on:click="{loadJSON}">Load Ship</button>
             <button class="button" on:click="{() => modalLoadJSON = ""}">Cancel</button>
+        </footer>
+    </div>
+</div>
+
+<div class="modal {modalDelShip}" id="delShip">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Delete Ship from Local Storage</p>
+        </header>
+        <section class="modal-card-body">
+            <p>This cannot be undone! Are you sure?</p>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" on:click="{() => {modalDelShip = ""; delLocal();}}">Yes! Delete Ship</button>
+            <button class="button" on:click="{() => modalDelShip = ""}">No! Cancel</button>
         </footer>
     </div>
 </div>

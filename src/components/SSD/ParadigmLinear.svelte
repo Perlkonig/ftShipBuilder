@@ -14,6 +14,10 @@
     let hullArray = hull.formRows(ship);
 
     let hullCols = hullArray[0].length;
+    // If there's armour, look for situations where there's more armour than hull columns
+    if ( (ship.hasOwnProperty("armour")) && (ship.armour !== undefined) ) {
+        hullCols = Math.max(hullCols, ...ship.armour.map(x => x[0] + x[1]));
+    }
     if (ship.hull.stealth === "2") {
         hullCols++;
     } else if ( (ship.hull.stealth === "1") && (hullArray.length > 1) && (hullArray[1].length === hullArray[0].length) ) {
@@ -207,10 +211,6 @@
         }
     }
 
-    let injectXlink: boolean;
-    let svgDataStr: string;
-    let pngDataStr: string;
-    let pngCanvas: HTMLCanvasElement;
     let nameElement: SVGTextElement;
     onMount(() => {
         if (nameElement !== undefined) {
@@ -228,16 +228,23 @@
         }
     })
 
+    let injectXlink: boolean;
+    let svgDataStr: string;
+    let pngDataStr: string;
+    let pngCanvas: HTMLCanvasElement;
     afterUpdate(() => {
         if (svgDisplay !== undefined) {
             footerFill.setAttribute("fill", "white")
             const ctx = pngCanvas.getContext("2d");
-            const v = Canvg.fromString(ctx, svgDisplay.outerHTML);
+            let text = svgDisplay.outerHTML;
+            text = text.replace(`<svg `, `<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" `);
+            text = text.replace(`<defs>`, `<defs><st` + `yle type="text/css"><![CDATA[ @import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap'); .futureFont { font-family: "Zen Dots" } .svgInvert { filter: invert(1); } ]]></style>`);
+            const v = Canvg.fromString(ctx, text);
             v.render();
             pngDataStr = pngCanvas.toDataURL("image/png");
             footerFill.setAttribute("fill", "black");
 
-            let text: string;
+            // let text: string;
             if (injectXlink) {
                 footerFill.setAttribute("fill", "white")
                 text = svgDisplay.outerHTML;
