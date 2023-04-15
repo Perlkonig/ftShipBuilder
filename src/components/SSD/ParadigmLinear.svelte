@@ -3,6 +3,7 @@
     import { afterUpdate, createEventDispatcher, onMount } from "svelte";
     import { hull, systems as sysLib, svgLib } from "ftlibship";
     import type { FullThrustShip, ISystemSVG } from "ftlibship";
+    import { fontRoboto, fontZen } from "@/lib/css";
 
     export let ship: FullThrustShip;
 
@@ -238,11 +239,11 @@
             const ctx = pngCanvas.getContext("2d");
             let text = svgDisplay.outerHTML;
             text = text.replace(`<svg `, `<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" `);
-            text = text.replace(`<defs>`, `<defs><st` + `yle type="text/css"><![CDATA[ @import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap'); .futureFont { font-family: "Zen Dots" } .svgInvert { filter: invert(1); } ]]></style>`);
+            text = text.replace(`<defs>`, `<defs><st` + `yle type="text/css"><![CDATA[ ${fontZen} ${fontRoboto} text { font-family: "Roboto" } .futureFont { font-family: "Zen Dots" } ]]></style>`);
             const v = Canvg.fromString(ctx, text);
             v.render();
             pngDataStr = pngCanvas.toDataURL("image/png");
-            footerFill.setAttribute("fill", "black");
+            footerFill.setAttribute("fill", "black")
 
             // let text: string;
             if (injectXlink) {
@@ -253,7 +254,7 @@
             } else {
                 text = svgDisplay.outerHTML;
                 text = text.replace(`<svg `, `<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" `);
-                text = text.replace(`<defs>`, `<defs><st` + `yle type="text/css"><![CDATA[ @import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap'); .futureFont { font-family: "Zen Dots" } .svgInvert { filter: invert(1); } ]]></style>`);
+                text = text.replace(`<defs>`, `<defs><st` + `yle type="text/css"><![CDATA[ @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Zen+Dots&display=swap'); text { font-family: "Roboto"} .futureFont { font-family: "Zen Dots" } .svgInvert { filter: invert(1); } ]]></style>`);
             }
             svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(text);
         }
@@ -591,7 +592,7 @@
         filter: invert(1);
     }
     .hidden {
-        display: none;
+        /* display: none; */
     }
     .paddingTop {
         padding-top: 1rem;
