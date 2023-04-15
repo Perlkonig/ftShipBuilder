@@ -1,13 +1,10 @@
 <script lang="ts">
-    import { Canvg } from "canvg";
-    import { afterUpdate, createEventDispatcher, onMount } from "svelte";
+    import { onMount } from "svelte";
     import { hull, systems as sysLib, svgLib } from "ftlibship";
     import type { FullThrustShip, ISystemSVG } from "ftlibship";
-    import { fontRoboto, fontZen } from "@/lib/css";
+    import Export from "./Export.svelte";
 
     export let ship: FullThrustShip;
-
-    const dispatch = createEventDispatcher();
 
     // Calculate the size of the hull display.
     // Below a certain threshold, the compact display will be used (drives to the side).
@@ -213,6 +210,7 @@
     }
 
     let nameElement: SVGTextElement;
+    let statsElement: SVGTextElement;
     onMount(() => {
         if (nameElement !== undefined) {
             var bb = nameElement.getBBox();
@@ -227,38 +225,22 @@
                 nameElement.setAttribute("y", (curry / value).toString());
             }
         }
-    })
-
-    let injectXlink: boolean;
-    let svgDataStr: string;
-    let pngDataStr: string;
-    let pngCanvas: HTMLCanvasElement;
-    afterUpdate(() => {
-        if (svgDisplay !== undefined) {
-            footerFill.setAttribute("fill", "white")
-            const ctx = pngCanvas.getContext("2d");
-            let text = svgDisplay.outerHTML;
-            text = text.replace(`<svg `, `<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" `);
-            text = text.replace(`<defs>`, `<defs><st` + `yle type="text/css"><![CDATA[ ${fontZen} ${fontRoboto} text { font-family: "Roboto" } .futureFont { font-family: "Zen Dots" } ]]></style>`);
-            const v = Canvg.fromString(ctx, text);
-            v.render();
-            pngDataStr = pngCanvas.toDataURL("image/png");
-            footerFill.setAttribute("fill", "black")
-
-            // let text: string;
-            if (injectXlink) {
-                footerFill.setAttribute("fill", "white")
-                text = svgDisplay.outerHTML;
-                text = text.replaceAll(`href=`, `xlink:href=`);
-                footerFill.setAttribute("fill", "black")
-            } else {
-                text = svgDisplay.outerHTML;
-                text = text.replace(`<svg `, `<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" `);
-                text = text.replace(`<defs>`, `<defs><st` + `yle type="text/css"><![CDATA[ @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Zen+Dots&display=swap'); text { font-family: "Roboto"} .futureFont { font-family: "Zen Dots" } .svgInvert { filter: invert(1); } ]]></style>`);
+        if (statsElement !== undefined) {
+            var bb = statsElement.getBBox();
+            if (bb.x + bb.width > pxWidth) {
+                var widthTransform = pxWidth * 0.9 / bb.width;
+                var heightTransform = ((cellsize * 1.5) * 0.9) / bb.height;
+                var value = widthTransform < heightTransform ? widthTransform : heightTransform;
+                if (value !== Infinity) {
+                    statsElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
+                    const currx = parseFloat(statsElement.getAttribute("x"));
+                    const curry = parseFloat(statsElement.getAttribute("y"));
+                    statsElement.setAttribute("x", (currx / value).toString());
+                    statsElement.setAttribute("y", (curry / value).toString());
+                }
             }
-            svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(text);
         }
-    });
+    })
 
     interface IBuffer {
         xOffset: number;
@@ -462,7 +444,7 @@
     currRow += hullRows + 1;
 
     // Stats
-    svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Mass: ${ship.mass} NPV: ${ship.points} CPV: ${ship.cpv}</text>`;
+    const statsRow = currRow;
     currRow++;
 
     // Drives & Core
@@ -489,23 +471,10 @@
         svgBody += `<use href="#_internalLinearCombined" x="0" y="${currRow * cellsize}" height="${cellsize * 3}" width="${pxWidth}" class="svgInvert" />`;
     }
 
-    let ssdDiv: HTMLDivElement;
-    let ssdHeight = 30;
-    const enlarge = () => {
-        ssdHeight+=2;
-    }
-    const shrink = () => {
-        ssdHeight--;
-    }
-    $: if (ssdDiv !== undefined) {
-        ssdDiv.style.height = `${ssdHeight}rem`;
-    }
-
     let footerFill: SVGRectElement;
 </script>
 
-{#key ssdHeight}
-<div class="ssd" bind:this="{ssdDiv}">
+<div class="ssd">
     <svg bind:this="{svgDisplay}" viewBox="-1 -1 {pxWidth + 2} {pxHeight + 2}" width="100%" height="100%">
         <!-- Add distinct symbol to <defs>-->
         <defs>
@@ -529,6 +498,9 @@
         <!-- Name plate can go here so it can be autosized, but the rest is in the <script> tag -->
         <text bind:this="{nameElement}" x="{cellsize * 0.2}" y="{cellsize * 0.75}" dominant-baseline="middle" font-size="{cellsize}" class="futureFont">{ship.class} "{ship.name}"</text>
 
+        <!-- Stats block also has to go here so it can be resized -->
+        <rect x="0" y="{statsRow * cellsize}" width="{pxWidth}" height="{cellsize}" stroke="none" fill="#c0c0c0"/><text bind:this={statsElement} x="{cellsize * 0.2}" y="{(statsRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="{cellsize / 2}" class="futureFont">Mass: {ship.mass} NPV: {ship.points} CPV: {ship.cpv}</text>
+
         <rect x="0" y="{(totalRows - 3) * cellsize}" width="{pxWidth}" height="{cellsize * 3}" stroke="none" fill="black" bind:this="{footerFill}"/>
 
         <!-- The body was generated in the <script> section for reasons. Insert it here wholesale.-->
@@ -538,46 +510,22 @@
         <rect x="0" y="0" height="{pxHeight}" width="{pxWidth}" stroke="black" fill="none" stroke-width="2"/>
     </svg>
 </div>
-{/key}
 
-<div class="level paddingTop">
-    <div class="level-item">
-        <div class="field">
-            <div class="control">
-            <a href="{svgDataStr}" download="SSD.svg">
-                <button class="button">Download SVG</button>
-            </a>
-            </div>
-            <div class="control">
-                <label class="checkbox">
-                    <input type="checkbox" bind:checked="{injectXlink}">
-                    Adjust for apps (<a on:click="{() => dispatch("message", {msg: "showSvg"})
-                    }">read more</a>)
-                  </label>
-            </div>
-        </div>
-    </div>
-    <div class="level-item">
-        <button class="button" on:click="{enlarge}"><i class="fa-solid fa-plus"></i></button>
-        &emsp;
-        <button class="button" on:click="{shrink}"><i class="fa-solid fa-minus"></i></button>
-    </div>
-    <div class="level-item">
-        <a href="{pngDataStr}" download="SSD.png">
-            <button class="button">Download PNG</button>
-        </a>
-    </div>
-</div>
-
-<div class="content">
+<div class="content paddingTop">
     <p>
-        Layout inspired by <a href="https://zacgaming.wordpress.com/2021/05/02/ssd_templates/">Zac</a>. Font is <a href="https://fonts.google.com/specimen/Zen+Dots">Zen Dots</a>. The exported SVG will render properly in a browser, but the "adjusted" SVG and the PNG will not show the correct font or inverted footer. If desired, you can use the +/- buttons to make the image the largest possible size for a screen capture.
+        Layout inspired by <a href="https://zacgaming.wordpress.com/2021/05/02/ssd_templates/">Zac</a>. Font is <a href="https://fonts.google.com/specimen/Zen+Dots">Zen Dots</a>. The exported SVG will render properly in a browser, but the "adjusted" SVG and the PNG will not show the inverted footer.
     </p>
 </div>
 
-<div class="hidden">
-    <canvas width="{pxWidth + 2}" height="{pxHeight + 2}" bind:this="{pngCanvas}"></canvas>
-</div>
+{#key svgDisplay}
+<Export
+    width={pxWidth}
+    height={pxHeight}
+    svgDisplay={svgDisplay}
+    footerRect={footerFill}
+    on:message
+/>
+{/key}
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap');
@@ -590,9 +538,6 @@
     }
     :global(.svgInvert) {
         filter: invert(1);
-    }
-    .hidden {
-        /* display: none; */
     }
     .paddingTop {
         padding-top: 1rem;

@@ -1,14 +1,12 @@
 <script lang="ts">
-    import { Canvg } from "canvg";
     import { ship } from "@/stores/writeShip";
     import { snapToGrid } from "@/stores/writeSnap";
     import { shipOutlines } from "@/lib/shipOutlines";
     import type { ISystemSVG } from "ftlibship";
     import { hull, systems, svgLib } from "ftlibship";
-    import { afterUpdate, onMount, createEventDispatcher } from "svelte";
+    import { afterUpdate, onMount } from "svelte";
     import type { ILayout, IFreeform, IElement } from "@/stores/writeShip";
-
-    const dispatch = createEventDispatcher();
+    import Export from "./Export.svelte";
 
     let layout: IFreeform;
     onMount(() => {
@@ -421,33 +419,11 @@
         }
     }
 
-    let svgDataStr: string;
-    let pngDataStr: string;
-    let pngCanvas: HTMLCanvasElement;
     let secretSvg: SVGSVGElement;
     let svgDisplay: SVGSVGElement;
-    let injectXlink: boolean;
     afterUpdate(() => {
         findAllOverlaps();
     });
-
-    $: if (svgDisplay !== undefined) {
-        let text = svgDisplay.outerHTML;
-        // remove the gridlines
-        text = text.replace(/<g id="grid".*?<\/g>/, "");
-        // generate PNG before doing the rest
-        const ctx = pngCanvas.getContext("2d");
-        const v = Canvg.fromString(ctx, text);
-        v.render();
-        pngDataStr = pngCanvas.toDataURL("image/png");
-
-        if (injectXlink) {
-            text = text.replaceAll(`href=`, `xlink:href=`);
-        } else {
-            text = text.replace(`<svg `, `<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" `);
-        }
-        svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(text);
-    }
 
     const genRect = (ele: IElement): DOMRect | undefined => {
         return new DOMRect(ele.x, ele.y, ele.width, ele.height);
@@ -680,40 +656,17 @@
             </svg>
         </div>
         {/key}
-        <div class="level paddingTop">
-            <div class="level-item">
-                <div class="field">
-                    <div class="control">
-                    <a href="{svgDataStr}" download="SSD.svg">
-                        <button class="button">Download SVG</button>
-                    </a>
-                    </div>
-                    <div class="control">
-                        <label class="checkbox">
-                            <input type="checkbox" bind:checked="{injectXlink}">
-                            Adjust for apps (<a on:click="{() => dispatch("message", {msg: "showSvg"})
-                            }">read more</a>)
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="level-item">
-                <a href="{pngDataStr}" download="SSD.png">
-                    <button class="button">Download PNG</button>
-                </a>
-            </div>
-        </div>
-        <div class="content">
-            <p>
-                Note that the exports will not be identical because they cannot see the applied CSS. This is most evident in text elements.
-            </p>
-        </div>
+        {#key svgDisplay}
+        <Export
+            width={layout.width}
+            height={layout.height}
+            svgDisplay={svgDisplay}
+            on:message
+        />
+        {/key}
     </div>
 </div>
 
-<div class="hidden">
-    <canvas width="{layout.width + 2}" height="{layout.height + 2}" bind:this="{pngCanvas}"></canvas>
-</div>
 {/if}
 
 <div>
@@ -728,14 +681,8 @@
     .draggable {
         cursor: move;
     }
-    .hidden {
-        display: none;
-    }
     :global(.svgHighlight) {
         fill-opacity: 0.5;
         fill: red;
-    }
-    .paddingTop {
-        padding-top: 1rem;
     }
 </style>

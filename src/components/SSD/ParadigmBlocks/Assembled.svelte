@@ -1,13 +1,11 @@
 <script lang="ts">
-    import { Canvg } from "canvg";
-    import { afterUpdate, beforeUpdate, onMount, createEventDispatcher } from 'svelte';
+    import { afterUpdate, beforeUpdate, onMount } from 'svelte';
     import { ship } from "@/stores/writeShip";
     import type { ILayout as ILayoutSystem } from "@/stores/writeShip";
     import { ssdComponents } from "@/stores/writeSsd";
     import { systems, svgLib, hull } from "ftlibship";
     import type { ISystemSVG } from "ftlibship";
-
-    const dispatch = createEventDispatcher();
+    import Export from "../Export.svelte";
 
     let layout = ($ship.layout as ILayoutSystem).blocks;
     const svgCore = svgLib.find(x => x.id === "coreSys")!;
@@ -30,11 +28,7 @@
 
     let nameElement: SVGTextElement;
     let statsElement: SVGTextElement;
-    let fullSsdSvg: SVGElement;
-    let svgDataStr: string;
-    let pngDataStr: string;
-    let pngCanvas: HTMLCanvasElement;
-    let injectXlink: boolean;
+    let fullSsdSvg: SVGSVGElement;
 
     const genHull = () => {
         $ssdComponents.hull = hull.genSvg($ship, layout.blocks.cellsize, {height: layout.blocks.blockHull.height, width: layout.blocks.blockHull.width});
@@ -74,24 +68,6 @@
     let coreHeightOffset = 0;
     let coreOffsetFactor = 0.15;
     afterUpdate(() => {
-        if (fullSsdSvg !== undefined) {
-            let text: string;
-            if (injectXlink) {
-                text = fullSsdSvg.outerHTML;
-                text = text.replaceAll(`href=`, `xlink:href=`);
-
-            } else {
-                text = fullSsdSvg.outerHTML;
-                text = text.replace(`<svg `, `<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" `);
-            }
-            svgDataStr = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(text);
-
-            const ctx = pngCanvas.getContext("2d");
-            const v = Canvg.fromString(ctx, fullSsdSvg.outerHTML);
-            v.render();
-            pngDataStr = pngCanvas.toDataURL("image/png");
-        }
-
         coreHeightOffset = (layout.blocks.blockCore.height * coreOffsetFactor) / 2;
         coreWidthOffset = (layout.blocks.blockCore.width * coreOffsetFactor) / 2;
     });
@@ -128,39 +104,15 @@
 </svg>
 </div>
 
-<div class="level">
-    <div class="level-item">
-        <div class="field">
-            <div class="control">
-            <a href="{svgDataStr}" download="SSD.svg">
-                <button class="button">Download SVG</button>
-            </a>
-            </div>
-            <div class="control">
-                <label class="checkbox">
-                    <input type="checkbox" bind:checked="{injectXlink}">
-                    Adjust for apps (<a on:click="{() => dispatch("message", {msg: "showSvg"})
-                    }">read more</a>)
-                  </label>
-            </div>
-        </div>
-    </div>
-    <div class="level-item">
-        <a href="{pngDataStr}" download="SSD.png">
-            <button class="button">Download PNG</button>
-        </a>
-    </div>
-</div>
-<div class="content">
-    <p>
-        Note that the exports will not be identical because they cannot see the applied CSS. This is most evident in text elements.
-    </p>
-</div>
+{#key fullSsdSvg}
+<Export
+    width={layout.blocks.width}
+    height={layout.blocks.height}
+    svgDisplay={fullSsdSvg}
+    on:message
+/>
+{/key}
 
-
-<div class="hidden">
-    <canvas width="{layout.blocks.width + 2}" height="{layout.blocks.height + 2}" bind:this="{pngCanvas}"></canvas>
-</div>
 {/if}
 
 <style>
@@ -168,9 +120,5 @@
         width: 100%;
         height: 30rem;
         padding-bottom: 1em;
-    }
-
-    .hidden {
-        display: none;
     }
 </style>
