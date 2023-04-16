@@ -46,7 +46,7 @@ export interface ILayout {
     freeform: IFreeform;
 }
 
-const starterShip: FullThrustShip = {
+export const starterShip: FullThrustShip = {
     hull: {points: 1, rows: 4, stealth: "0", streamlining: "none"},
     armour: [] as [number, number][],
     systems: [

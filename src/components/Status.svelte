@@ -23,8 +23,6 @@
         [EvalErrorCode.BadMass, "The ship's mass must be between 5 and 300."],
         [EvalErrorCode.OverMass, "You have equipped more systems than your ship's mass can accommodate."],
         [EvalErrorCode.LowHull, "The ship's hull must be at least 10% of total mass."],
-        [EvalErrorCode.OverShell, "You have too many rows of shell armour. You cannot have more than 5."],
-        [EvalErrorCode.OverArmour, "One of your rows of armour is too long. You can't have more armour than you have hull in your top row."],
         [EvalErrorCode.OverDCP, "You have allocated too many damage control parties."],
         [EvalErrorCode.OverMarine, "You have allocated too many onboard marines."],
         [EvalErrorCode.OverCrew, "You have overallocated your crew. You may need to add some berths."],
@@ -35,34 +33,73 @@
         [EvalErrorCode.OverSpinal, "You have equipped more spinal mount weapons than your ship's mass can accommodate."],
         [EvalErrorCode.OverTurret, "You have equipped more turrets than your ship's mass can accommodate."],
     ]);
+
+    let modalClearShip: string;
+    const clearShip = () => {
+        if (window.location.href.includes("?")) {
+            const idx = window.location.href.indexOf("?");
+            if (idx !== -1) {
+                window.location.href = window.location.href.substring(0, idx);
+            }
+        } else {
+            window.location.reload();
+        }
+    }
 </script>
 
 {#if ( ($ship.hasOwnProperty("mass")) && ($ship.mass !== undefined) )}
 <div class="status">
     {#if results !== undefined}
-        <div class="container">
-            <span class="tag is-success is-light">{results.mass} mass</span>
-            <span class="tag is-info is-light">{results.points} NPV</span>
-            <span class="tag is-info is-light">{results.cpv} CPV</span>
-        </div>
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <div>
+                        <div class="container">
+                            <span class="tag is-success is-light">{results.mass} mass</span>
+                            <span class="tag is-info is-light">{results.points} NPV</span>
+                            <span class="tag is-info is-light">{results.cpv} CPV</span>
+                        </div>
 
-        <div class="container">
-        {#if delta > 0}
-            <span class="tag is-warning">{delta} mass remaining</span>
-        {:else if delta === 0}
-            <span class="tag is-success">{delta} mass remaining</span>
-        {:else}
-            <span class="tag is-danger">Overallocated by {Math.abs(delta)} mass!</span>
-        {/if}
+                        <div class="container">
+                        {#if delta > 0}
+                            <span class="tag is-warning">{delta} mass remaining</span>
+                        {:else if delta === 0}
+                            <span class="tag is-success">{delta} mass remaining</span>
+                        {:else}
+                            <span class="tag is-danger">Overallocated by {Math.abs(delta)} mass!</span>
+                        {/if}
+                        </div>
+                    </div>
+                </div>
+                <div class="level-item">
+                    <button class="button is-small is-light is-danger is-rounded" on:click={() => modalClearShip = "is-active"}>Clear Ship</button>
+                </div>
+            </div>
         </div>
         <div class="content">
-        {#each results.errors as e}
-            <p>{errorMsgs.get(e)}</p>
-        {/each}
+            {#each results.errors as e}
+                <p>{errorMsgs.get(e)}</p>
+            {/each}
         </div>
     {/if}
 </div>
 {/if}
+
+<div class="modal {modalClearShip}" id="delShip">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Clear Current Ship</p>
+        </header>
+        <section class="modal-card-body">
+            <p>This cannot be undone! Are you sure?</p>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" on:click="{() => {modalClearShip = ""; clearShip();}}">Yes! Clear Ship</button>
+            <button class="button" on:click="{() => modalClearShip = undefined}">No! Cancel</button>
+        </footer>
+    </div>
+</div>
 
 <style>
     .status {

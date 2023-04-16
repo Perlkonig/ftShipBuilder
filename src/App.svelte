@@ -1,9 +1,26 @@
 <script lang="ts">
-  import Builder from "./components/Builder.svelte";
-  import Status from "./components/Status.svelte";
-  import SSD from "./components/SSD.svelte";
-  import LoadShip from "./components/LoadShip.svelte";
-  import Nav from "./components/Nav.svelte";
+    import Builder from "./components/Builder.svelte";
+    import Status from "./components/Status.svelte";
+    import SSD from "./components/SSD.svelte";
+    import LoadShip from "./components/LoadShip.svelte";
+    import Nav from "./components/Nav.svelte";
+    import { SvelteToast } from '@zerodevx/svelte-toast'
+    import { onMount } from "svelte";
+
+    const optionsToast = {};
+
+    let shipParam: string;
+    onMount(() => {
+        const idx = window.location.href.indexOf("?");
+        if (idx !== -1) {
+            const params = new URLSearchParams(window.location.href.substring(idx));
+            for (const [k, v] of params.entries()) {
+                if (k.toLocaleLowerCase() === "ship") {
+                    shipParam = v;
+                }
+            }
+        }
+    });
 </script>
 
 <main class="container p-6">
@@ -14,7 +31,11 @@
   <div class="sticky">
     <Status/>
   </div>
+{#if shipParam === undefined}
   <LoadShip/>
+{:else}
+  <LoadShip incomingParam={shipParam}/>
+{/if}
   <div class="container">
     <Builder/>
   </div>
@@ -34,6 +55,8 @@
     </p>
   </div>
 </footer>
+
+<SvelteToast options={optionsToast} />
 
 <style>
   .sticky {

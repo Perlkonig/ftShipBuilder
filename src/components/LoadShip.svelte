@@ -3,15 +3,58 @@
     import { savedShips } from "../stores/writeStoredShips";
     import { presets } from "../stores/readPresets";
     import type { IPresetFleet } from "../stores/readPresets";
+    import LZString from "lz-string";
+    import { toast } from '@zerodevx/svelte-toast';
+    import { onMount } from "svelte";
+
+    export let incomingParam: string|undefined = undefined;
+
+    // I DON'T KNOW WHY I NEED THIS!
+    // The assignment that happens in `onMount` is not triggering a refresh of `<Status/>`
+    // and I don't know why! This kludge will have to hold me over.
+    const wait = () => new Promise(() => setTimeout(() => {$ship = $ship}, 500));
+
+    onMount(() => {
+        if (incomingParam !== undefined) {
+            try {
+                const json = LZString.decompressFromEncodedURIComponent(incomingParam);
+                $ship = JSON.parse(json);
+                compatCheck();
+                toast.push("Ship loaded");
+            } catch (e) {
+                toast.push("Invalid code provided");
+            }
+            wait();
+        }
+    });
 
     let modalLoadJSON: string;
     let modalDelShip: string;
     let shipJSON: string;
 
     const loadJSON = () => {
-        $ship = JSON.parse(shipJSON);
-        modalLoadJSON = undefined;
-        compatCheck();
+        // strip leading whitespace
+        const cleaned = shipJSON.trim();
+        if (cleaned.startsWith("{")) {
+            try {
+                $ship = JSON.parse(cleaned);
+                modalLoadJSON = undefined;
+                compatCheck();
+                toast.push("Ship loaded");
+            } catch (e) {
+                toast.push("Invalid JSON provided", {});
+            }
+        } else {
+            try {
+                const json = LZString.decompressFromEncodedURIComponent(cleaned);
+                $ship = JSON.parse(json);
+                modalLoadJSON = undefined;
+                compatCheck();
+                toast.push("Ship loaded");
+            } catch (e) {
+                toast.push("Invalid code provided");
+            }
+        }
     }
 
     let shipID: string;
@@ -65,7 +108,7 @@
 
 <div class="level">
     <div class="level-item">
-        <button class="button" on:click="{() => modalLoadJSON = "is-active"}">Load a Ship from JSON</button>
+        <button class="button" on:click="{() => modalLoadJSON = "is-active"}">Load a Ship from JSON or Code</button>
     </div>
     <div class="level-item">
         <div class="field">
@@ -73,7 +116,7 @@
             <div class="control">
                 <div class="select">
                     <select id="saveName" bind:value={shipID}>
-                    {#each $savedShips as s}
+                    {#each $savedShips.sort((a, b) => a.name.localeCompare(b.name)) as s}
                         <option id="{s.name}" value="{s.name}">{s.name}</option>
                     {/each}
                     </select>
@@ -116,12 +159,12 @@
     <div class="modal-background"></div>
     <div class="modal-card">
         <header class="modal-card-head">
-            <p class="modal-card-title">Load Ship from JSON</p>
+            <p class="modal-card-title">Load Ship from JSON or Code</p>
         </header>
         <section class="modal-card-body">
             <div class="field">
                 <div class="control">
-                  <textarea class="textarea" id="guessTxt" placeholder="Paste JSON here" bind:value="{shipJSON}"></textarea>
+                  <textarea class="textarea" id="guessTxt" placeholder="Paste JSON or shareable code here" bind:value="{shipJSON}"></textarea>
                 </div>
             </div>
         </section>

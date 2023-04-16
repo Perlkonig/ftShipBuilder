@@ -2,11 +2,15 @@
     import type { FullThrustShip } from "ftlibship";
     import { savedShips } from "@/stores/writeStoredShips";
     import { afterUpdate } from "svelte";
+    import LZString from "lz-string";
+    import { toast } from '@zerodevx/svelte-toast';
 
     export let ship: FullThrustShip;
 
     let jsonDataStr: string;
+    let jsonDataCode: string;
     let jsonDataStrNoLayout: string;
+    let jsonDataCodeNoLayout: string;
     let replacedString: string;
 
     let duplicated: boolean = true;
@@ -30,6 +34,7 @@
             }
         });
         jsonDataStr = "data:text/json;charset=utf-8," + encodeURIComponent(replacedString);
+        jsonDataCode = LZString.compressToEncodedURIComponent(replacedString);
 
         const noLayoutString = JSON.stringify(ship, (k, v) => {
             if (k === "glyph") {
@@ -41,6 +46,7 @@
             }
         });
         jsonDataStrNoLayout = "data:text/json;charset=utf-8," + encodeURIComponent(noLayoutString);
+        jsonDataCodeNoLayout = LZString.compressToEncodedURIComponent(noLayoutString);
 
         // if ( (saveName === undefined) || (saveName.length === 0) ) {
         //     saveName = ship.name;
@@ -61,7 +67,7 @@
             $savedShips.splice(idx, 1);
         }
         $savedShips.push({name: saveName, json: replacedString});
-        alert("Ship saved");
+        toast.push("Ship saved");
         saveName = "";
         $savedShips = $savedShips;
     }
@@ -69,14 +75,28 @@
 
 <div class="level">
     <div class="level-item">
-        <a href="{jsonDataStr}" download="SSD.json">
-            <button class="button">Download Ship + SSD as JSON</button>
-        </a>
+        <div>
+            <p style="text-align: center">
+                <a href="{jsonDataStr}" download="SSD.json">
+                    <button class="button">Download Ship + SSD as JSON</button>
+                </a>
+            </p>
+            <p style="text-align: center">
+                <a href="?ship={jsonDataCode}" target="_NEW">Ship + SSD: Shareable link</a>
+            </p>
+        </div>
     </div>
     <div class="level-item">
-        <a href="{jsonDataStrNoLayout}" download="SSD.json">
-            <button class="button">Download Just Ship as JSON</button>
-        </a>
+        <div>
+            <p style="text-align: center">
+                <a href="{jsonDataStrNoLayout}" download="SSD.json">
+                    <button class="button">Download Just Ship as JSON</button>
+                </a>
+            </p>
+            <p style="text-align: center">
+                <a href="?ship={jsonDataCodeNoLayout}" target="_NEW">Ship Only: Shareable link</a>
+            </p>
+        </div>
     </div>
     <div class="level-item">
         <div class="field">
