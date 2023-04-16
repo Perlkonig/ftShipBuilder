@@ -209,7 +209,7 @@
     }
 </script>
 
-<div class="columns">
+<div class="columns" id="anchorBuilder">
     <div class="column">
         <section class="section">
             <h2 class="subtitle" title="All things hull">Structure</h2>

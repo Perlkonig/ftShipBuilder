@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 * Added the Vapour Shroud system and added all Phalon ships from *Fleet Book 2* to the presets.
+* Added "Jump to" links to the sticky status div.
 
 ## [v3.3.0] - 2023-04-16
 

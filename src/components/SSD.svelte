@@ -13,7 +13,7 @@
     };
 </script>
 
-<div class="tabs is-medium is-boxed is-centered paddingBottom">
+<div class="tabs is-medium is-boxed is-centered paddingBottom" id="anchorSSD">
     <ul>
         <li
             class="{paradigm === "linear" ? "is-active" : ""}"

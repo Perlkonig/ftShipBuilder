@@ -74,6 +74,12 @@
                 <div class="level-item">
                     <button class="button is-small is-light is-danger is-rounded" on:click={() => modalClearShip = "is-active"}>Clear Ship</button>
                 </div>
+                <div class="level-item">
+                    <a href="#anchorSSD" style="font-size: smaller">Jump to SSD</a>
+                </div>
+                <div class="level-item">
+                    <a href="#anchorBuilder" style="font-size: smaller">Jump to Top</a>
+                </div>
             </div>
         </div>
         <div class="content">
