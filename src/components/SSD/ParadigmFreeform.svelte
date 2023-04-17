@@ -6,6 +6,8 @@
     import { hull, systems, svgLib } from "ftlibship";
     import { afterUpdate, onMount } from "svelte";
     import type { ILayout, IFreeform, IElement } from "@/stores/writeShip";
+    import { XMLBuilder, XMLParser, XMLValidator } from "fast-xml-parser";
+    import { toast } from "@zerodevx/svelte-toast";
     import Export from "./Export.svelte";
 
     let layout: IFreeform;
@@ -13,7 +15,7 @@
         if ( ($ship.layout !== undefined) && (typeof $ship.layout !== "string") && ($ship.layout.hasOwnProperty("freeform")) && (($ship.layout as ILayout).freeform !== undefined) ) {
             layout = ($ship.layout as ILayout).freeform;
             if (layout.background === undefined) {
-                layout.background = {svg: undefined, x: 0, y: 0, zoom: 1};
+                layout.background = {svg: undefined, x: 0, y: 0, zoom: 1, opacity: 1};
             }
         } else {
             layout = {
@@ -22,13 +24,16 @@
                 cellsize: 200,
                 nameplate: {width: 2000, height: 200, x: 200, y: 200, factor: 1},
                 stats: {width: 1000, height: 100, x: 200, y: 200, factor: 1},
-                background: {svg: undefined, x: 0, y: 0, zoom: 1},
+                background: {svg: undefined, x: 0, y: 0, zoom: 1, opacity: 1},
                 elements: {}
             }
             if ( ($ship.layout === undefined) || (typeof $ship.layout === "string") ) {
                 $ship.layout = {} as ILayout;
             }
             ($ship.layout as ILayout).freeform = layout;
+            if (layout.background.svg !== undefined) {
+                bgXml = layout.background.svg;
+            }
         }
         inputCellsize = layout.cellsize;
         // findAllOverlaps();
@@ -474,7 +479,7 @@
     let outlineHelpText: string;
     const processOutline = () => {
         if (layout.background === undefined) {
-            layout.background = {svg: undefined, x: 0, y: 0, zoom: 1};
+            layout.background = {svg: undefined, x: 0, y: 0, zoom: 1, opacity: 1};
         }
         if ( (selectedOutline === undefined) || (selectedOutline.length === 0) ) {
             layout.background.svg = undefined;
@@ -482,6 +487,7 @@
             const outline = shipOutlines.find(x => x.id === selectedOutline);
             if (outline !== undefined) {
                 layout.background.svg = outline.svg;
+                bgXml = outline.svg;
                 outlineHelpText = outline.notes;
             }
         }
@@ -496,6 +502,66 @@
         }
         layout.cellsize = inputCellsize;
         layout = layout;
+    }
+
+    let bgXml: string;
+    const processXml = () => {
+        // Process bgXml and put the results into layout.background.svg
+        const result = XMLValidator.validate(bgXml, {
+            allowBooleanAttributes: true
+        });
+        if ( (typeof result === "boolean") && (result === true) ) {
+            let interim = bgXml.trim();
+            // Parse the well-formed XML and do basic sanity check
+            const parser = new XMLParser({
+                ignoreAttributes: false,
+                attributeNamePrefix : "@_",
+                allowBooleanAttributes: true,
+                preserveOrder: true,
+                ignoreDeclaration: true,
+                removeNSPrefix: true,
+            });
+            const output = parser.parse(interim);
+            // Can only be one root tag
+            if (output.length > 1) {
+                toast.push("The background SVG has multiple root nodes.");
+                return;
+            }
+            const root = output[0];
+            // Must be an SVG or symbol tag
+            const rootName = [...Object.keys(root)][0] as string;
+            if ( (rootName !== "svg") && (rootName !== "symbol") ) {
+                toast.push("You must provide either an &lt;svg&gt; or a &lt;symbol&gt; tag.");
+                return;
+            }
+            // Must have a viewbox attribute
+            if (! root[":@"].hasOwnProperty("@_viewBox")) {
+                toast.push("No `viewBox` attribute found.");
+                return;
+            }
+            // Set ID if not present or accurate
+            if ( (! root[":@"].hasOwnProperty("@_id")) || (root[":@"]["@_id"] !== "_freeformBackground") ) {
+                root[":@"]["@_id"] = "_freeformBackground";
+            }
+            // Rename <svg> to <symbol>
+            if (rootName === "svg") {
+                Object.defineProperty(root, "symbol", Object.getOwnPropertyDescriptor(root, "svg"));
+                delete root["svg"];
+            }
+
+            // Save the result
+            const builder = new XMLBuilder({
+                ignoreAttributes: false,
+                attributeNamePrefix : "@_",
+                preserveOrder: true,
+            });
+            const built = builder.build(output);
+            layout.background.svg = built;
+            bgXml = built;
+            layout = layout;
+        } else {
+            toast.push("The background SVG you provided is not well formed.")
+        }
     }
 </script>
 
@@ -540,9 +606,9 @@
                 <div class="field">
                     <label class="label" for="bgSvg">Background image</label>
                     <div class="control">
-                        <input id="bgSvg" class="input" type="text" bind:value="{layout.background.svg}" on:change="{() => layout = layout}">
+                        <input id="bgSvg" class="input" type="text" bind:value="{bgXml}" on:change="{processXml}">
                     </div>
-                    <p class="help">Must be an SVG. Must be provided as a <code>&lt;symbol&gt;</code> tag with a <code>viewBox</code> attribute. Must have an <code>id</code> attribute of <code>_freeformBackground</code>.</p>
+                    <p class="help">Must be an &lt;svg&gt; or &lt;symbol&gt; tag.</p>
                 </div>
             </div>
             <div class="column">
@@ -569,7 +635,7 @@
         <div class="columns">
             <div class="column">
                 <div class="field">
-                    <label class="label" for="bgX">Background X coordinate</label>
+                    <label class="label" for="bgX">Background X</label>
                     <div class="control">
                         <input id="bgX" class="input" type="number" step="{layout.cellsize}" bind:value="{layout.background.x}" on:change="{() => layout = layout}">
                     </div>
@@ -577,7 +643,7 @@
             </div>
             <div class="column">
                 <div class="field">
-                    <label class="label" for="bgY">Background Y coordinate</label>
+                    <label class="label" for="bgY">Background Y</label>
                     <div class="control">
                         <input id="bgY" class="input" type="number" step="{layout.cellsize}" bind:value="{layout.background.y}" on:change="{() => layout = layout}">
                     </div>
@@ -588,6 +654,15 @@
                     <label class="label" for="bgZoom">Background zoom</label>
                     <div class="control">
                         <input id="bgZoom" class="input" type="number" step="0.1" bind:value="{layout.background.zoom}" on:change="{() => layout = layout}">
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field">
+                    <label class="label" for="bgOpacity">Background opacity</label>
+                    <div class="control">
+                        <input id="bgOpacity" class="input" type="number" step="0.1" min="0" max="1" bind:value="{layout.background.opacity}" on:change="{() => layout = layout}">
+                        <p class="help">1 means fully visible. 0 means invisible.</p>
                     </div>
                 </div>
             </div>
@@ -628,7 +703,7 @@
 
             <!-- Background image if provided -->
             {#if ( (layout.background !== undefined) && (layout.background.svg !== undefined) && (layout.background.svg.length > 0) )}
-                <use href="#_freeformBackground" x="{layout.background.x}" y="{layout.background.y}" width="{layout.width * layout.background.zoom}" height="{layout.height * layout.background.zoom}" />
+                <use href="#_freeformBackground" x="{layout.background.x}" y="{layout.background.y}" width="{layout.width * layout.background.zoom}" height="{layout.height * layout.background.zoom}" opacity="{layout.background.opacity}" />
             {/if}
 
             <!-- Grid of cellsize for alignment -->

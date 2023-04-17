@@ -25,6 +25,7 @@ interface IBackground {
     x: number;
     y: number;
     zoom: number;
+    opacity: number;
 }
 export interface IFreeform {
     width: number;
