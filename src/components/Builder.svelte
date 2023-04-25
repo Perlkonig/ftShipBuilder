@@ -43,6 +43,7 @@
 
     let ftl: boolean;
     let ftlAdvanced: boolean;
+    let transferMass = 0;
     ship.subscribe((obj) => {
         const idx = obj.systems.findIndex(x => x.name === "ftl");
         if (idx === -1) {
@@ -68,6 +69,20 @@
             } else {
                 $ship.systems.splice(idx, 1);
             }
+        }
+        $ship = $ship;
+    }
+
+    const updateTransferMass = () => {
+        if ( (transferMass === undefined) || (transferMass === null) ) {
+            transferMass = 0;
+        }
+        if (transferMass % 5 !== 0) {
+            transferMass = Math.ceil(transferMass / 5) * 5;
+        }
+        const idx = $ship.systems.findIndex(x => x.name === "ftl");
+        if (idx !== -1) {
+            $ship.systems[idx].transferMass = transferMass;
         }
         $ship = $ship;
     }
@@ -400,6 +415,13 @@
                         <input type="checkbox" bind:checked="{ftlAdvanced}">
                         Advanced FTL
                     </label>
+                    <div class="field">
+                        <label class="label" for="transferMass">Tug capacity (transfer mass)</label>
+                        <div class="control">
+                            <input id="transferMass" class="input" type="number" placeholder="Tug capacity (transfer mass)" bind:value={transferMass} on:blur={updateTransferMass}>
+                        </div>
+                        <p class="help">Must be a multiple of 5. Ship doesn't update until you exit the field.</p>
+                    </div>
                     <MassPts
                         obj={systems.getSystem($ship.systems.find(x => x.name === "ftl"), $ship)}
                     />

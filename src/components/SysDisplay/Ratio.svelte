@@ -19,7 +19,7 @@
             sys.ratio = undefined;
         }
         if (sys.ratio === undefined) {
-            if (sys.type === "boat") {
+            if ( (sys.type === "boat") || (sys.type === "tender") ) {
                 placeholder = 1.5;
             } else if (sys.type === "passenger") {
                 placeholder = 1/4;
