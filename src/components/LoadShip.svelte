@@ -31,6 +31,7 @@
     let modalLoadJSON: string;
     let modalDelShip: string;
     let shipJSON: string;
+    let fileInput;
 
     const loadJSON = () => {
         // strip leading whitespace
@@ -55,6 +56,14 @@
                 toast.push("Invalid code provided");
             }
         }
+    }
+
+    const readConfigJson = (e) => {
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = (e) => { shipJSON = reader.result.toString(); }
+        reader.onerror = (e) => { toast.push("Error loading provided file. (Not JSON?)", {});  }
     }
 
     let shipID: string;
@@ -165,6 +174,10 @@
             <div class="field">
                 <div class="control">
                   <textarea class="textarea" id="guessTxt" placeholder="Paste JSON or shareable code here" bind:value="{shipJSON}"></textarea>
+                </div>
+                <p> Select JSON File </p>
+                <div class="control">
+                    <input type="file" accept="application/json" class="input" placeholder="Select JSON Ship Config File" bind:this={fileInput} on:change={readConfigJson} on:click={() => { fileInput.value = null; }}/>
                 </div>
             </div>
         </section>
