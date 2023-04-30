@@ -27,21 +27,6 @@
         if (! sys.hasOwnProperty("size")) {
             sys.size = 4;
         }
-        // Force leftArcs
-        switch (sys.numArcs) {
-            case 1:
-            case 2:
-                sys.leftArc = "F";
-                break;
-            case 3:
-            case 4:
-                sys.leftArc = "FP";
-                break;
-            case 5:
-            case 6:
-                sys.leftArc = "AP";
-                break;
-        }
     }
 
     interface ISystemID {
