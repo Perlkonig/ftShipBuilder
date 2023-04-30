@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.5.0] - 2023-04-29
+
+### Changed
+
+* Normalized all the ordnance systems so you can select which three arcs the launcher targets. This change should be backwards compatible.
+
+### Fixed
+
+* Fixed all ordnance arc selectors so the blacked out rear arc is removed in beta orientation.
+* The rules have some special "discounts" for some weapons (i.e., beams, Gatling batteries, and twin particle arrays) if they select one of the pairs of "broadside" arcs. While not explicit, it is logical that this only applies in alpha orientation. So the discount and arc auto-selection for those particular weapons have been disabled for ships in beta orientation.
+
+## [v3.4.1] - 2023-04-28
+
+### Added
+
+* You can now load JSON files from the file system using a standard file input box, including drag and drop. Remember that all processing is local. No files are transferred. Error handling is minimal. (Many thanks to @shadowmouse for the pull request!)
+
 ## [v3.4.0] - 2023-04-25
 
 ### Added

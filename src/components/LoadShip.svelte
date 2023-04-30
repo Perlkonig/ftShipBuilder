@@ -31,7 +31,7 @@
     let modalLoadJSON: string;
     let modalDelShip: string;
     let shipJSON: string;
-    let fileInput;
+    let fileInput: HTMLInputElement;
 
     const loadJSON = () => {
         // strip leading whitespace
@@ -42,6 +42,7 @@
                 modalLoadJSON = undefined;
                 compatCheck();
                 toast.push("Ship loaded");
+                clearLoadJSON();
             } catch (e) {
                 toast.push("Invalid JSON provided", {});
             }
@@ -52,10 +53,17 @@
                 modalLoadJSON = undefined;
                 compatCheck();
                 toast.push("Ship loaded");
+                clearLoadJSON();
             } catch (e) {
                 toast.push("Invalid code provided");
             }
         }
+    }
+
+    const clearLoadJSON = () => {
+        modalLoadJSON = "";
+        shipJSON = null;
+        fileInput.value = null;
     }
 
     const readConfigJson = (e) => {
@@ -183,7 +191,7 @@
         </section>
         <footer class="modal-card-foot">
             <button class="button is-success" on:click="{loadJSON}">Load Ship</button>
-            <button class="button" on:click="{() => modalLoadJSON = ""}">Cancel</button>
+            <button class="button" on:click="{clearLoadJSON}">Cancel</button>
         </footer>
     </div>
 </div>

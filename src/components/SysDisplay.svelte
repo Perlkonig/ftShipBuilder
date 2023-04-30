@@ -108,43 +108,38 @@
             prop={prop}
             idx={idx}
         />
-    {:else if ( (sys.name === "missile") || (sys.name === "salvo") ) }
-        <Modifier
-            prop={prop}
-            idx={idx}
-            choices={[["er", "Long Range"], ["twostage", "Multistage"]]}
-        />
     {:else if sys.name === "mkp"}
         <ArcSingle
             prop={prop}
             idx={idx}
         />
-    {:else if sys.name === "rocketPod"}
+    {:else if ( (sys.name === "rocketPod") || (sys.name === "missile") || (sys.name === "salvo") || (sys.name === "salvoLauncher" ) || (sys.name === "amt") )}
+        {#if ( (sys.name === "missile") || (sys.name === "salvo") )}
+            <Modifier
+                prop={prop}
+                idx={idx}
+                choices={[["er", "Long Range"], ["twostage", "Multistage"]]}
+            />
+        {/if}
         <Arcs
             prop={prop}
             idx={idx}
             minArcs={3}
             maxArcs={3}
-            arcBlacklist={["A"]}
+            arcBlacklist={$ship.orientation === "beta" ? [] : ["A"]}
         />
+        {#if sys.name === "salvoLauncher"}
+            <Magazine
+                prop={prop}
+                idx={idx}
+            />
+        {/if}
     {:else if sys.name === "ads"}
         <Arcs
             prop={prop}
             idx={idx}
             minArcs={3}
             maxArcs={6}
-        />
-    {:else if sys.name === "salvoLauncher"}
-        <Arcs
-            prop={prop}
-            idx={idx}
-            minArcs={3}
-            maxArcs={3}
-            arcBlacklist={["A"]}
-        />
-        <Magazine
-            prop={prop}
-            idx={idx}
         />
     {:else if ( (sys.name.startsWith("spinal")) && (sys.name !== "spinalNova") && (sys.name !== "spinalWave") ) }
         <Range
