@@ -173,6 +173,9 @@
 
     const setClass = () => {
         const m = $ship.mass;
+        if (m < 60) {
+            $ship.flawed = false;
+        }
         if (m <= 10) {
             $ship.class = "Scout";
         } else if (m <= 16) {
@@ -287,7 +290,6 @@
                         Civilian ship (changes the crew factor)
                     </label>
                 </div>
-
             </div>
 
             <div class="field">
@@ -385,6 +387,18 @@
 
                 </div>
             </div>
+
+            {#if $ship.mass !== undefined && $ship.mass >= 60}
+            <div class="field">
+                <div class="control">
+                    <label class="checkbox">
+                        <input type="checkbox" bind:checked={$ship.flawed}>
+                        Flawed design?
+                    </label>
+                </div>
+                <p class="help">Reduces point cost by 20% but makes ship vulnerable to catastrophic failure. See <em>Continuum</em> ruleset, page 113.</p>
+            </div>
+            {/if}
 
         </section>
 

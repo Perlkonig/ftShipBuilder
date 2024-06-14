@@ -31,7 +31,7 @@
     let fullSsdSvg: SVGSVGElement;
 
     const genHull = () => {
-        $ssdComponents.hull = hull.genSvg($ship, layout.blocks.cellsize, {height: layout.blocks.blockHull.height, width: layout.blocks.blockHull.width});
+        $ssdComponents.hull = hull.genSvg($ship, {cellsize: layout.blocks.cellsize, dim: {height: layout.blocks.blockHull.height, width: layout.blocks.blockHull.width}});
         $ssdComponents = $ssdComponents;
     };
 

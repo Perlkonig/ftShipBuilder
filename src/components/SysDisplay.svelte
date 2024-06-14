@@ -221,7 +221,6 @@
             prop={prop}
             idx={idx}
             min={1}
-            max={6}
         />
         <Modifier
             prop={prop}

@@ -35,6 +35,9 @@
     const turrets: sysLib.Turret[] = [];
     const mines: sysLib.MineLayer[] = [];
     const magazines: sysLib.Magazine[] = [];
+    if (ship.flawed !== undefined && ship.flawed) {
+        systems.push(new sysLib.Flawed({name: "_flawed"}, ship));
+    }
     for (const s of ship.systems) {
         if ( (s.name === "drive") || (s.name === "ftl") ) {
             continue;
@@ -478,7 +481,7 @@
     <svg bind:this="{svgDisplay}" viewBox="-1 -1 {pxWidth + 2} {pxHeight + 2}" width="100%" height="100%">
         <!-- Add distinct symbol to <defs>-->
         <defs>
-            {@html hull.genSvg(ship, cellsize)}
+            {@html hull.genSvg(ship, {cellsize})}
         {#if svgFtl !== undefined}
             {@html svgFtl.svg}
         {/if}

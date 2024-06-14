@@ -9,6 +9,7 @@
     import { XMLBuilder, XMLParser, XMLValidator } from "fast-xml-parser";
     import { toast } from "@zerodevx/svelte-toast";
     import Export from "./Export.svelte";
+    import { nanoid } from "nanoid";
 
     let layout: IFreeform;
     onMount(() => {
@@ -138,7 +139,7 @@
         } else if ( ($ship.hull.stealth === "1") && (hullArray[1].length === hullArray[0].length) ) {
             hullCols++;
         }
-        const hullSvg = hull.genSvg($ship, layout.cellsize);
+        const hullSvg = hull.genSvg($ship, {cellsize: layout.cellsize});
         defs.push({
             id: "_ssdHull",
             svg: hullSvg,
@@ -249,6 +250,33 @@
                     layout.elements[obj.uid].width = svg.width * layout.cellsize;
                     layout.elements[obj.uid].height = svg.height * layout.cellsize;
                 }
+            }
+        }
+
+        // add Flawed glyph
+        if ($ship.flawed !== undefined && $ship.flawed) {
+            const obj = new systems.Flawed({name: "flawed", id: "_____flawed_____"}, $ship);
+            seenIds.add(obj.uid);
+            const svg = obj.glyph();
+            if (svg !== undefined) {
+                const idx = defs.findIndex(x => x.id === svg.id);
+                if (idx === -1) {
+                    defs.push(svg);
+                }
+            }
+            if (! layout.elements.hasOwnProperty(obj.uid)) {
+                layout.elements[obj.uid] = {
+                    id: obj.uid,
+                    glyphid: `svg_${svg.id}`,
+                    width: svg.width * layout.cellsize,
+                    height: svg.height * layout.cellsize,
+                    x: layout.cellsize,
+                    y: layout.cellsize
+                };
+            } else {
+                layout.elements[obj.uid].glyphid = `svg_${svg.id}`;
+                layout.elements[obj.uid].width = svg.width * layout.cellsize;
+                layout.elements[obj.uid].height = svg.height * layout.cellsize;
             }
         }
 

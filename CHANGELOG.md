@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.6.0] - 2024-06-14
+
+### Added
+
+* You can now flag a ship has having a flawed design. As per the *Continuum* ruleset, page 113, this reduces the point cost by 20% but renders the ship vulnerable to catastrophic failure. This option is only available to ships mass 60 or greater. A glyph is added to the SSD.
+
+### Changed
+
+* K-guns now have no upper class limit. The extended base cost is outlined in *Fleet Book 2*, page 9. The modifiers for short- and long-range variants are found in the *Continuum* rules, page 43.
+
 ## [v3.5.0] - 2023-04-29
 
 ### Changed

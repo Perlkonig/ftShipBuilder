@@ -79,6 +79,33 @@
             }
         }
 
+        // add Flawed glyph
+        if ($ship.flawed !== undefined && $ship.flawed) {
+            const obj = new systems.Flawed({name: "flawed", id: "_____flawed_____"}, $ship);
+            seenIds.add(obj.uid);
+            const svg = obj.glyph();
+            if (svg !== undefined) {
+                const idx = defs.findIndex(x => x.id === svg.id);
+                if (idx === -1) {
+                    defs.push(svg);
+                }
+            }
+            if (! layout.elements.hasOwnProperty(obj.uid)) {
+                layout.elements[obj.uid] = {
+                    id: obj.uid,
+                    glyphid: `svg_${svg.id}`,
+                    width: svg.width * layout.blocks.cellsize,
+                    height: svg.height * layout.blocks.cellsize,
+                    x: layout.blocks.cellsize,
+                    y: layout.blocks.cellsize
+                };
+            } else {
+                layout.elements[obj.uid].glyphid = `svg_${svg.id}`;
+                layout.elements[obj.uid].width = svg.width * layout.blocks.cellsize;
+                layout.elements[obj.uid].height = svg.height * layout.blocks.cellsize;
+            }
+        }
+
         // prune unused glyphs
         const unused: string[] = [];
         for (const key in layout.elements) {
