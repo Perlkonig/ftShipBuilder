@@ -8,7 +8,7 @@
     import Export from "../Export.svelte";
 
     let layout = ($ship.layout as ILayoutSystem).blocks;
-    const svgCore = svgLib.find(x => x.id === "coreSys")!;
+    const svgCore = svgLib.find(x => x.id === "svglib_coreSys")!;
     const sysFtl: systems.ISystem = $ship.systems.find(x => x.name === "ftl");
     let hasFtlAdv = false;
     let svgFtl: ISystemSVG;
@@ -90,16 +90,16 @@
     <text x="{layout.blocks.blockStats.minx + (layout.blocks.blockStats.width / 2)}" y="{layout.blocks.blockStats.miny + (layout.blocks.blockStats.height / 2)}" bind:this="{statsElement}" dominant-baseline="middle" text-anchor="middle">Mass: {$ship.mass}, NPV: {$ship.points}, CPV: {$ship.cpv}</text>
     <use href="#_ssdSystems" x="{layout.blocks.blockSystems.minx}" y="{layout.blocks.blockSystems.miny}" width="{layout.blocks.blockSystems.width}" height="{layout.blocks.blockSystems.height}" />
     <use href="#_ssdHull" x="{layout.blocks.blockHull.minx}" y="{layout.blocks.blockHull.miny}" width="{layout.blocks.blockHull.width}" height="{layout.blocks.blockHull.height}" />
-    <use href="#svg_coreSys" x="{layout.blocks.blockCore.minx + coreWidthOffset}" y="{layout.blocks.blockCore.miny + coreHeightOffset}" width="{layout.blocks.blockCore.width * (1 - coreOffsetFactor)}" height="{layout.blocks.blockCore.height * (1 - coreOffsetFactor)}" />
+    <use href="#coreSys" x="{layout.blocks.blockCore.minx + coreWidthOffset}" y="{layout.blocks.blockCore.miny + coreHeightOffset}" width="{layout.blocks.blockCore.width * (1 - coreOffsetFactor)}" height="{layout.blocks.blockCore.height * (1 - coreOffsetFactor)}" />
 {#if hasFtlAdv}
-    <use href="#svg_ftlAdv" x="{layout.blocks.blockFtl.minx}" y="{layout.blocks.blockFtl.miny}" width="{layout.blocks.blockFtl.width}" height="{layout.blocks.blockFtl.height}" />
+    <use href="#ftlAdv" x="{layout.blocks.blockFtl.minx}" y="{layout.blocks.blockFtl.miny}" width="{layout.blocks.blockFtl.width}" height="{layout.blocks.blockFtl.height}" />
 {:else if sysFtl !== undefined}
-    <use href="#svg_ftl" x="{layout.blocks.blockFtl.minx}" y="{layout.blocks.blockFtl.miny}" width="{layout.blocks.blockFtl.width}" height="{layout.blocks.blockFtl.height}" />
+    <use href="#ftl" x="{layout.blocks.blockFtl.minx}" y="{layout.blocks.blockFtl.miny}" width="{layout.blocks.blockFtl.width}" height="{layout.blocks.blockFtl.height}" />
 {/if}
 {#if hasAdvDrive}
-    <use href="#svg_driveAdv" x="{layout.blocks.blockDrive.minx}" y="{layout.blocks.blockDrive.miny}" width="{layout.blocks.blockDrive.width}" height="{layout.blocks.blockDrive.height}" />
+    <use href="#driveAdv" x="{layout.blocks.blockDrive.minx}" y="{layout.blocks.blockDrive.miny}" width="{layout.blocks.blockDrive.width}" height="{layout.blocks.blockDrive.height}" />
 {:else}
-    <use href="#svg_drive" x="{layout.blocks.blockDrive.minx}" y="{layout.blocks.blockDrive.miny}" width="{layout.blocks.blockDrive.width}" height="{layout.blocks.blockDrive.height}" />
+    <use href="#drive" x="{layout.blocks.blockDrive.minx}" y="{layout.blocks.blockDrive.miny}" width="{layout.blocks.blockDrive.width}" height="{layout.blocks.blockDrive.height}" />
 {/if}
 </svg>
 </div>

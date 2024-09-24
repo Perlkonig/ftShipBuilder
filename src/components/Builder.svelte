@@ -267,7 +267,7 @@
             <div class="field">
                 <label class="label" for="hull">Hull strength</label>
                 <div class="control">
-                <input id="hull" class="input" type="number" placeholder="Hull strength" bind:value={$ship.hull.points} max="{$ship.mass}">
+                <input name="hull" class="input" type="number" placeholder="Hull strength" bind:value={$ship.hull.points} max="{$ship.mass}">
                 </div>
                 {#if $ship.hull.points < ($ship.mass * 0.1)}
                     <p class="help is-danger">Hull strength must be at least 10% of total mass.</p>

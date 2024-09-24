@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.7.0] - 2024-09-24
+
+### Added
+
+* There is now a rudimentary fleet manager, which includes basic import/export and a standalone HTML view one could customize. This involved significant changes to the underlying rendering code. Please let me know if something does not work as you expect.
+
 ## [v3.6.0] - 2024-06-14
 
 ### Added

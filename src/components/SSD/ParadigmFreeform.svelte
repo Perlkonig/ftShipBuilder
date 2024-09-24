@@ -200,7 +200,7 @@
             delete layout.elements["#ftl"];
         }
 
-        const coreGlyph = svgLib.find(x => x.id === "coreSys");
+        const coreGlyph = svgLib.find(x => x.id === "svglib_coreSys");
         defs.push(coreGlyph);
         if (! layout.elements.hasOwnProperty("#core")) {
             layout.elements["#core"] = {

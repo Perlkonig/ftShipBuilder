@@ -6,6 +6,7 @@
     import Nav from "./components/Nav.svelte";
     import { SvelteToast } from '@zerodevx/svelte-toast'
     import { onMount } from "svelte";
+    import Fleet from "./components/Fleet.svelte";
 
     const optionsToast = {};
 
@@ -42,6 +43,10 @@
   <hr>
   <div class="container">
     <SSD/>
+  </div>
+  <hr>
+  <div>
+    <Fleet/>
   </div>
 </main>
 

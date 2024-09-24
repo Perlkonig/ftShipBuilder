@@ -40,7 +40,7 @@
             <defs>
                 {@html sys.glyph().svg}
             </defs>
-            <use href="#svg_{sys.glyph().id}" x="0" y="0" height="100%" width="100%"></use>
+            <use href="#{sys.glyph().id}" x="0" y="0" height="100%" width="100%"></use>
         </svg>
     </figure>
     {/if}

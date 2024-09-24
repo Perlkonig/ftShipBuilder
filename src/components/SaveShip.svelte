@@ -4,6 +4,7 @@
     import { afterUpdate } from "svelte";
     import LZString from "lz-string";
     import { toast } from '@zerodevx/svelte-toast';
+    import { savedFleet } from "@/stores/writeFleet";
 
     export let ship: FullThrustShip;
 
@@ -71,6 +72,10 @@
         saveName = "";
         $savedShips = $savedShips;
     }
+
+    const saveToFleet = () => {
+        savedFleet.update(val => ({...val, ships: [...val.ships, JSON.parse(JSON.stringify(ship))].sort((a,b) => a.mass - b.mass)}))
+    }
 </script>
 
 <div class="level">
@@ -113,5 +118,8 @@
         {/if}
         {/if}
         </div>
+    </div>
+    <div class="level-item">
+        <button class="button" on:click="{saveToFleet}">Add ship to fleet</button>
     </div>
 </div>

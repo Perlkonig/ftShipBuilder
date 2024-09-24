@@ -1,11 +1,13 @@
 <script lang="ts">
     import { ship } from "../stores/writeShip";
     import { savedShips } from "../stores/writeStoredShips";
+    import { savedFleet } from "../stores/writeFleet";
     import { presets } from "../stores/readPresets";
     import type { IPresetFleet } from "../stores/readPresets";
     import LZString from "lz-string";
     import { toast } from '@zerodevx/svelte-toast';
     import { onMount } from "svelte";
+    import { compatCheck } from "@/lib/compatCheck";
 
     export let incomingParam: string|undefined = undefined;
 
@@ -19,7 +21,7 @@
             try {
                 const json = LZString.decompressFromEncodedURIComponent(incomingParam);
                 $ship = JSON.parse(json);
-                compatCheck();
+                compatCheck($ship);
                 toast.push("Ship loaded");
             } catch (e) {
                 toast.push("Invalid code provided");
@@ -40,7 +42,7 @@
             try {
                 $ship = JSON.parse(cleaned);
                 modalLoadJSON = undefined;
-                compatCheck();
+                compatCheck($ship);
                 toast.push("Ship loaded");
                 clearLoadJSON();
             } catch (e) {
@@ -51,7 +53,7 @@
                 const json = LZString.decompressFromEncodedURIComponent(cleaned);
                 $ship = JSON.parse(json);
                 modalLoadJSON = undefined;
-                compatCheck();
+                compatCheck($ship);
                 toast.push("Ship loaded");
                 clearLoadJSON();
             } catch (e) {
@@ -80,7 +82,7 @@
         const entry = $savedShips.find(x => x.name === shipID);
         if (entry !== undefined) {
             $ship = JSON.parse(entry.json);
-            compatCheck();
+            compatCheck($ship);
         }
     }
 
@@ -98,9 +100,13 @@
             const entry = fleet.ships.find(x => x.name === presetShipName);
             if (entry !== undefined) {
                 $ship = entry;
-                compatCheck();
+                compatCheck($ship);
             }
         }
+    }
+
+    const loadFaction = () => {
+        savedFleet.update(v => ({...v, ships: [...v.ships, ...(JSON.parse(JSON.stringify(presetFleet.ships)))].sort((a,b) => a.mass - b.mass)}));
     }
 
     const delLocal = () => {
@@ -108,17 +114,6 @@
         if (idx !== -1) {
             $savedShips.splice(idx, 1);
             $savedShips = $savedShips;
-        }
-    }
-
-    const compatCheck = () => {
-        // Transform old `armour` to new
-        if ( ($ship.hasOwnProperty("armour")) && ($ship.armour !== undefined) ) {
-            for (let i = 0; i < $ship.armour.length; i++) {
-                if (typeof $ship.armour[i] === "number") {
-                    $ship.armour[i] = [($ship.armour[i] as unknown) as number, 0];
-                }
-            }
         }
     }
 </script>
@@ -165,7 +160,12 @@
                     {/each}
                     </select>
                 </div>
-                <button class="button is-success" on:click="{loadPreset}">Load</button>
+                <button class="button is-success" on:click="{loadPreset}">Load ship</button>
+            </div>
+            <div class="control">
+                <a href="#anchorFleet">
+                    <button class="button is-info is-small" on:click="{loadFaction}">Load entire faction into fleet</button>
+                </a>
             </div>
         {/if}
         </div>

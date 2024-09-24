@@ -78,6 +78,9 @@
                     <a href="#anchorSSD" style="font-size: smaller">Jump to SSD</a>
                 </div>
                 <div class="level-item">
+                    <a href="#anchorFleet" style="font-size: smaller">Jump to Fleet</a>
+                </div>
+                <div class="level-item">
                     <a href="#anchorBuilder" style="font-size: smaller">Jump to Top</a>
                 </div>
             </div>
