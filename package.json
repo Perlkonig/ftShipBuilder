@@ -1,51 +1,52 @@
 {
-  "name": "ftshipbuilder",
-  "private": true,
-  "version": "3.7.0",
-  "description": "A web-based tool for generating valid Full Thrust ships",
-  "author": "Aaron Dalton <aaron@daltons.ca> (https://www.perlkonig.com)",
-  "license": "MIT",
-  "keywords": [
-    "abstractplay",
-    "full thrust",
-    "game",
-    "space",
-    "combat"
-  ],
-  "type": "module",
-  "scripts": {
-    "dev": "set NODE_ENV=development && vite",
-    "build": "set NODE_ENV=production && vite build",
-    "preview": "set NODE_ENV=development && npm run build && vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
-    "test": "mocha -r ts-node/register tests/**/*.test.ts"
-  },
-  "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.0.4",
-    "@tsconfig/svelte": "^4.0.1",
-    "@types/chai": "^4.3.4",
-    "@types/mocha": "^10.0.1",
-    "@types/robust-point-in-polygon": "^1.0.2",
-    "chai": "^4.3.7",
-    "mocha": "^10.2.0",
-    "prettier": "^3.3.3",
-    "prettier-plugin-svelte": "^3.2.6",
-    "svelte": "^3.58.0",
-    "svelte-check": "^3.2.0",
-    "svelte-preprocess": "^5.0.3",
-    "ts-node": "^10.9.1",
-    "tslib": "^2.5.0",
-    "typescript": "^5.0.4",
-    "vite": "^4.2.1"
-  },
-  "dependencies": {
-    "@zerodevx/svelte-toast": "^0.9.3",
-    "canvg": "^4.0.1",
-    "fast-xml-parser": "^4.2.0",
-    "ftlibship": "github:perlkonig/ftLibShip#v2.4.0",
-    "lz-string": "^1.5.0",
-    "nanoid": "^4.0.2",
-    "robust-point-in-polygon": "^1.0.3",
-    "svelte-markdown": "^0.2.3"
-  }
+    "name": "ftshipbuilder",
+    "private": true,
+    "version": "3.7.0",
+    "description": "A web-based tool for generating valid Full Thrust ships",
+    "author": "Aaron Dalton <aaron@daltons.ca> (https://www.perlkonig.com)",
+    "license": "MIT",
+    "keywords": [
+        "abstractplay",
+        "full thrust",
+        "game",
+        "space",
+        "combat"
+    ],
+    "type": "module",
+    "scripts": {
+        "dev": "set NODE_ENV=development && vite",
+        "build": "set NODE_ENV=production && vite build",
+        "preview": "set NODE_ENV=development && npm run build && vite preview",
+        "check": "svelte-check --tsconfig ./tsconfig.json",
+        "format": "prettier --write --plugin prettier-plugin-svelte .",
+        "test": "mocha -r ts-node/register tests/**/*.test.ts"
+    },
+    "devDependencies": {
+        "@sveltejs/vite-plugin-svelte": "^2.0.4",
+        "@tsconfig/svelte": "^4.0.1",
+        "@types/chai": "^4.3.4",
+        "@types/mocha": "^10.0.1",
+        "@types/robust-point-in-polygon": "^1.0.2",
+        "chai": "^4.3.7",
+        "mocha": "^10.2.0",
+        "prettier": "^3.3.3",
+        "prettier-plugin-svelte": "^3.2.6",
+        "svelte": "^3.58.0",
+        "svelte-check": "^3.2.0",
+        "svelte-preprocess": "^5.0.3",
+        "ts-node": "^10.9.1",
+        "tslib": "^2.5.0",
+        "typescript": "^5.0.4",
+        "vite": "^4.2.1"
+    },
+    "dependencies": {
+        "@zerodevx/svelte-toast": "^0.9.3",
+        "canvg": "^4.0.1",
+        "fast-xml-parser": "^4.2.0",
+        "ftlibship": "github:perlkonig/ftLibShip#v2.4.0",
+        "lz-string": "^1.5.0",
+        "nanoid": "^4.0.2",
+        "robust-point-in-polygon": "^1.0.3",
+        "svelte-markdown": "^0.2.3"
+    }
 }

@@ -5,7 +5,7 @@
         name: string;
         class: number;
         [k: string]: unknown;
-    };
+    }
 
     export let prop: string;
     export let idx: number;
@@ -19,10 +19,27 @@
 <div class="field">
     <label class="label" for="class">Weapon class</label>
     <div class="control">
-    {#if max > 0}
-        <input id="class" class="input" type="number" placeholder="Weapon class" min="{min}" max ="{max}" bind:value={sys.class} on:change="{() => $ship = $ship}">
-    {:else}
-        <input id="class" class="input" type="number" placeholder="Weapon class" min="{min}" bind:value={sys.class} on:change="{() => $ship = $ship}">
-    {/if}
+        {#if max > 0}
+            <input
+                id="class"
+                class="input"
+                type="number"
+                placeholder="Weapon class"
+                min="{min}"
+                max="{max}"
+                bind:value="{sys.class}"
+                on:change="{() => ($ship = $ship)}"
+            />
+        {:else}
+            <input
+                id="class"
+                class="input"
+                type="number"
+                placeholder="Weapon class"
+                min="{min}"
+                bind:value="{sys.class}"
+                on:change="{() => ($ship = $ship)}"
+            />
+        {/if}
     </div>
 </div>

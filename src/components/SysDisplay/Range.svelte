@@ -5,7 +5,7 @@
         name: string;
         type: string;
         [k: string]: unknown;
-    };
+    }
 
     export let prop: string;
     export let idx: number;
@@ -13,17 +13,20 @@
 
     let sys: ISystem;
     $: sys = $ship[prop][idx];
-
 </script>
 
 <div class="field">
     <label class="label" for="type">Type</label>
     <div class="control">
         <div class="select">
-            <select id="type" bind:value={sys.range} on:change="{() => $ship = $ship}">
-            {#each choices as c}
-                <option value="{c[0]}">{c[1]}</option>
-            {/each}
+            <select
+                id="type"
+                bind:value="{sys.range}"
+                on:change="{() => ($ship = $ship)}"
+            >
+                {#each choices as c}
+                    <option value="{c[0]}">{c[1]}</option>
+                {/each}
             </select>
         </div>
     </div>

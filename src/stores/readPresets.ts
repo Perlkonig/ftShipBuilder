@@ -8,4 +8,4 @@ export interface IPresetFleet {
     ships: FullThrustShip[];
 }
 
-export const presets = readable((library as unknown) as IPresetFleet[]);
+export const presets = readable(library as unknown as IPresetFleet[]);

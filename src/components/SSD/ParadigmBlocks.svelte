@@ -11,14 +11,22 @@
 
     let layout: IBlocks;
     onMount(() => {
-        if ( ($ship.layout !== undefined) && (typeof $ship.layout !== "string") && ($ship.layout.hasOwnProperty("blocks")) && (($ship.layout as ILayout).blocks !== undefined) ) {
+        if (
+            $ship.layout !== undefined &&
+            typeof $ship.layout !== "string" &&
+            $ship.layout.hasOwnProperty("blocks") &&
+            ($ship.layout as ILayout).blocks !== undefined
+        ) {
             layout = ($ship.layout as ILayout).blocks;
         } else {
             layout = {
                 blocks: undefined,
-                elements: {}
-            }
-            if ( ($ship.layout === undefined) || (typeof $ship.layout === "string") ) {
+                elements: {},
+            };
+            if (
+                $ship.layout === undefined ||
+                typeof $ship.layout === "string"
+            ) {
                 $ship.layout = {} as ILayout;
             }
             ($ship.layout as ILayout).blocks = layout;
@@ -29,8 +37,8 @@
     $: allLayouts = [...layouts, ...$savedLayouts];
 
     let selected: IBlockLayout;
-    $: if ( (layout !== undefined) && (layout.blocks !== undefined) ) {
-        selected = allLayouts.find(x => x.id === layout.blocks.id);
+    $: if (layout !== undefined && layout.blocks !== undefined) {
+        selected = allLayouts.find((x) => x.id === layout.blocks.id);
     }
 
     let modalLoadJSON: string;
@@ -40,21 +48,21 @@
     let editingLayout: IBlockLayout;
 
     const loadLocal = () => {
-        editingLayout = $savedLayouts.find(x => x.id === loadID);
-    }
+        editingLayout = $savedLayouts.find((x) => x.id === loadID);
+    };
 
     const delLocal = () => {
-        const idx = $savedLayouts.findIndex(x => x.id === delID);
+        const idx = $savedLayouts.findIndex((x) => x.id === delID);
         if (idx !== -1) {
             $savedLayouts.splice(idx, 1);
         }
         $savedLayouts = $savedLayouts;
-    }
+    };
 
     const loadJSON = () => {
         editingLayout = JSON.parse(layoutJSON);
         modalLoadJSON = undefined;
-    }
+    };
 
     const handleMessage = (e) => {
         if (e.detail.msg === "close") {
@@ -67,17 +75,17 @@
             }
             layout = layout;
         }
-    }
+    };
 
     let selectedLayout: string;
     const loadLayout = (id: string | undefined = undefined) => {
         if (id === undefined) {
-            layout.blocks = allLayouts.find(x => x.id === selectedLayout);
+            layout.blocks = allLayouts.find((x) => x.id === selectedLayout);
         } else {
-            layout.blocks = allLayouts.find(x => x.id === id);
+            layout.blocks = allLayouts.find((x) => x.id === id);
         }
         layout = layout;
-    }
+    };
 </script>
 
 <div class="level">
@@ -86,83 +94,95 @@
             <label class="label" for="layouts">Apply a layout</label>
             <div class="control">
                 <div class="select">
-                    <select id="layouts" bind:value={selectedLayout} on:change="{() => loadLayout()}">
-                        <option hidden disabled selected value> -- apply a layout -- </option>
-                        <option id="_create" value="_create">(Create custom layout)</option>
-                    {#each allLayouts as l}
-                        <option id="{l.id}" value="{l.id}">{l.name}</option>
-                    {/each}
+                    <select
+                        id="layouts"
+                        bind:value="{selectedLayout}"
+                        on:change="{() => loadLayout()}"
+                    >
+                        <option hidden disabled selected value>
+                            -- apply a layout --
+                        </option>
+                        <option id="_create" value="_create"
+                            >(Create custom layout)</option
+                        >
+                        {#each allLayouts as l}
+                            <option id="{l.id}" value="{l.id}">{l.name}</option>
+                        {/each}
                     </select>
                 </div>
             </div>
         </div>
     </div>
     <div class="level-item">
-        <button class="button" on:click="{() => modalLoadJSON = "is-active"}">Load a Layout from JSON</button>
+        <button class="button" on:click="{() => (modalLoadJSON = 'is-active')}"
+            >Load a Layout from JSON</button
+        >
     </div>
     <div class="level-item">
         <div class="field">
             <label class="label" for="saveName">Edit a saved layout</label>
             <div class="control">
                 <div class="select">
-                    <select id="saveName" bind:value={loadID}>
-                    {#each $savedLayouts as l}
-                        <option id="{l.id}" value="{l.id}">{l.name}</option>
-                    {/each}
+                    <select id="saveName" bind:value="{loadID}">
+                        {#each $savedLayouts as l}
+                            <option id="{l.id}" value="{l.id}">{l.name}</option>
+                        {/each}
                     </select>
                 </div>
-                <button class="button" on:click="{loadLocal}">Edit Layout</button>
+                <button class="button" on:click="{loadLocal}"
+                    >Edit Layout</button
+                >
             </div>
         </div>
     </div>
     <div class="level-item">
         <div class="field">
-            <label class="label" for="delName">Delete a layout from storage</label>
+            <label class="label" for="delName"
+                >Delete a layout from storage</label
+            >
             <div class="control">
                 <div class="select">
-                    <select id="delName" bind:value={delID}>
-                    {#each $savedLayouts as l}
-                        <option id="{l.id}" value="{l.id}">{l.name}</option>
-                    {/each}
+                    <select id="delName" bind:value="{delID}">
+                        {#each $savedLayouts as l}
+                            <option id="{l.id}" value="{l.id}">{l.name}</option>
+                        {/each}
                     </select>
                 </div>
-                <button class="button" on:click="{delLocal}">DELETE Layout</button>
+                <button class="button" on:click="{delLocal}"
+                    >DELETE Layout</button
+                >
             </div>
         </div>
     </div>
 </div>
 
-
 <section class="section">
     <h2 class="subtitle">SSD Builder</h2>
 
-
-{#if selectedLayout === "_create"}
-    <CustomLayout on:message="{handleMessage}" />
-{:else if editingLayout !== undefined}
-    <CustomLayout
-        newLayout={editingLayout}
-        on:message="{handleMessage}"
-    />
-{:else}
-{#key $ship}
-    <h2 class="subtitle">Arrange Systems</h2>
-    {#if (selected !== undefined) }
-        {#key layout}
-            <SystemArranger />
-        {/key}
-    {/if}
-
-    <h2 class="subtitle">Assembled SSD</h2>
-    {#if (selected !== undefined) }
-        {#key layout}
-        <Assembled
-            on:message
+    {#if selectedLayout === "_create"}
+        <CustomLayout on:message="{handleMessage}" />
+    {:else if editingLayout !== undefined}
+        <CustomLayout
+            newLayout="{editingLayout}"
+            on:message="{handleMessage}"
         />
+    {:else}
+        {#key $ship}
+            <h2 class="subtitle">Arrange Systems</h2>
+            {#if selected !== undefined}
+                {#key layout}
+                    <SystemArranger />
+                {/key}
+            {/if}
+
+            <h2 class="subtitle">Assembled SSD</h2>
+            {#if selected !== undefined}
+                {#key layout}
+                    <Assembled on:message />
+                {/key}
+            {/if}
         {/key}
     {/if}
-{/key}
-{/if}
 </section>
 
 <div class="modal {modalLoadJSON}" id="loadJSON">
@@ -174,13 +194,22 @@
         <section class="modal-card-body">
             <div class="field">
                 <div class="control">
-                  <textarea class="textarea" id="guessTxt" placeholder="Paste JSON here" bind:value="{layoutJSON}"></textarea>
+                    <textarea
+                        class="textarea"
+                        id="guessTxt"
+                        placeholder="Paste JSON here"
+                        bind:value="{layoutJSON}"
+                    ></textarea>
                 </div>
             </div>
         </section>
         <footer class="modal-card-foot">
-            <button class="button is-success" on:click="{loadJSON}">Load Layout</button>
-            <button class="button" on:click="{() => modalLoadJSON = ""}">Cancel</button>
+            <button class="button is-success" on:click="{loadJSON}"
+                >Load Layout</button
+            >
+            <button class="button" on:click="{() => (modalLoadJSON = '')}"
+                >Cancel</button
+            >
         </footer>
     </div>
 </div>

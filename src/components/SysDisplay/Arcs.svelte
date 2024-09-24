@@ -11,7 +11,7 @@
         leftArc: Arc;
         numArcs: number;
         [k: string]: unknown;
-    };
+    }
 
     export let prop: string;
     export let idx: number;
@@ -39,10 +39,10 @@
     afterUpdate(() => {
         const s = $ship[prop][idx];
         if (s !== undefined) {
-            if (! s.hasOwnProperty("leftArc")) {
+            if (!s.hasOwnProperty("leftArc")) {
                 s.leftArc = "F" as Arc;
             }
-            if (! s.hasOwnProperty("numArcs")) {
+            if (!s.hasOwnProperty("numArcs")) {
                 s.numArcs = 1;
             }
             selectedArcs = hexes.arcList(s.leftArc, s.numArcs);
@@ -54,34 +54,81 @@
         y: number;
     }
 
-    const deg2rad = (deg: number): number => { return deg * Math.PI / 180; }
+    const deg2rad = (deg: number): number => {
+        return (deg * Math.PI) / 180;
+    };
 
     const rotate = (pt: IPoint, deg = 0, originX = 0, originY = 0): IPoint => {
         const shiftX = pt.x - originX;
         const shiftY = pt.y - originY;
         const rad = deg2rad(deg);
-        const newx = (shiftX * Math.cos(rad)) - (shiftY * Math.sin(rad)) + originX;
-        const newy = (shiftY * Math.cos(rad)) + (shiftX * Math.sin(rad)) + originY;
-        return {x: newx, y: newy} as IPoint;
-    }
+        const newx = shiftX * Math.cos(rad) - shiftY * Math.sin(rad) + originX;
+        const newy = shiftY * Math.cos(rad) + shiftX * Math.sin(rad) + originY;
+        return { x: newx, y: newy } as IPoint;
+    };
 
     let polyPts: [Arc, IPoint[]][];
     let polyStrs: [Arc, string][];
     $: {
         polyPts = [
-            ["F", [{x: 300, y: 300}, {x: 158.5, y: 54.914810729003904}, {x: 441.5, y:54.914810729003875}]],
-            ["FS", [{x: 300, y: 300}, {x: 441.5, y:54.914810729003875}, {x: 583, y:300}]],
-            ["AS", [{x: 300, y: 300}, {x: 583, y:300}, {x: 441.5, y:545.0851892709961}]],
-            ["A", [{x: 300, y: 300}, {x: 441.5, y:545.0851892709961}, {x: 158.5, y: 545.0851892709961}]],
-            ["AP", [{x: 300, y: 300}, {x: 158.5, y: 545.0851892709961}, {x: 17, y: 300}]],
-            ["FP", [{x: 300, y: 300}, {x: 17, y: 300}, {x: 158.5, y: 54.914810729003904}]],
+            [
+                "F",
+                [
+                    { x: 300, y: 300 },
+                    { x: 158.5, y: 54.914810729003904 },
+                    { x: 441.5, y: 54.914810729003875 },
+                ],
+            ],
+            [
+                "FS",
+                [
+                    { x: 300, y: 300 },
+                    { x: 441.5, y: 54.914810729003875 },
+                    { x: 583, y: 300 },
+                ],
+            ],
+            [
+                "AS",
+                [
+                    { x: 300, y: 300 },
+                    { x: 583, y: 300 },
+                    { x: 441.5, y: 545.0851892709961 },
+                ],
+            ],
+            [
+                "A",
+                [
+                    { x: 300, y: 300 },
+                    { x: 441.5, y: 545.0851892709961 },
+                    { x: 158.5, y: 545.0851892709961 },
+                ],
+            ],
+            [
+                "AP",
+                [
+                    { x: 300, y: 300 },
+                    { x: 158.5, y: 545.0851892709961 },
+                    { x: 17, y: 300 },
+                ],
+            ],
+            [
+                "FP",
+                [
+                    { x: 300, y: 300 },
+                    { x: 17, y: 300 },
+                    { x: 158.5, y: 54.914810729003904 },
+                ],
+            ],
         ];
-        if ( ($ship.orientation !== undefined) && ($ship.orientation === "beta") ) {
-            polyPts = polyPts.map(pair => [pair[0], pair[1].map(pt => rotate(pt, 30, 300, 300))]);
+        if ($ship.orientation !== undefined && $ship.orientation === "beta") {
+            polyPts = polyPts.map((pair) => [
+                pair[0],
+                pair[1].map((pt) => rotate(pt, 30, 300, 300)),
+            ]);
         }
         polyStrs = [];
-        for (const [arc,pts] of polyPts) {
-            const str = pts.map(p => `${p.x},${p.y}`).join(" ");
+        for (const [arc, pts] of polyPts) {
+            const str = pts.map((p) => `${p.x},${p.y}`).join(" ");
             polyStrs.push([arc, str]);
         }
     }
@@ -109,7 +156,7 @@
     const startDrag = (e: MouseEvent | TouchEvent) => {
         dragSelected = e.target as SVGPolygonElement;
         targetArc = (e.target as SVGPolygonElement).id as Arc;
-    }
+    };
 
     const drag = (e: MouseEvent | TouchEvent) => {
         if (dragSelected !== undefined) {
@@ -117,7 +164,10 @@
             if ("touches" in e) {
                 const coord = getMousePosition(e);
                 for (const poly of polyPts) {
-                    const result = robustPointInPolygon(poly[1].map(pt => [pt.x, pt.y]), [coord.x, coord.y]);
+                    const result = robustPointInPolygon(
+                        poly[1].map((pt) => [pt.x, pt.y]),
+                        [coord.x, coord.y]
+                    );
                     if (result < 1) {
                         targetArc = poly[0];
                         break;
@@ -127,7 +177,7 @@
                 targetArc = (e.target as SVGPolygonElement).id as Arc;
             }
         }
-    }
+    };
 
     const getMousePosition = (e: MouseEvent | TouchEvent): IPoint => {
         var CTM = svgDisplay.getScreenCTM();
@@ -139,23 +189,26 @@
         }
         return {
             x: (realE.clientX - CTM.e) / CTM.a,
-            y: (realE.clientY - CTM.f) / CTM.d
+            y: (realE.clientY - CTM.f) / CTM.d,
         };
-    }
+    };
 
     const endDrag = (e: MouseEvent | TouchEvent) => {
         if (dragSelected !== undefined) {
             if (targetArc !== undefined) {
-                if ( (targetArc === dragSelected.id) || (! selectedArcs.includes(dragSelected.id as Arc)) ) {
+                if (
+                    targetArc === dragSelected.id ||
+                    !selectedArcs.includes(dragSelected.id as Arc)
+                ) {
                     handleClick(dragSelected.id as Arc);
                 } else {
-                    handleClick(dragSelected.id as Arc, targetArc)
+                    handleClick(dragSelected.id as Arc, targetArc);
                 }
             }
             dragSelected = undefined;
         }
         e.preventDefault();
-    }
+    };
 
     // This is ugly, brute-force work. No elegance here.
     const handleClick = (arc1: Arc, arc2: Arc | undefined = undefined) => {
@@ -173,15 +226,15 @@
         // Make a working copy of `selectedArcs`
         const selected = [...selectedArcs];
         // Add or remove the clicked arc as appropriate
-        const idx = selected.findIndex(x => x === arc);
+        const idx = selected.findIndex((x) => x === arc);
         if (idx !== -1) {
             selected.splice(idx, 1);
         } else {
             selected.push(arc);
         }
         // If a `delArc` was passed, delete that arc now (happens when clicking and dragging)
-        if ( (delArc !== undefined) && (arc !== delArc) ) {
-            const delIdx = selected.findIndex(x => x === delArc);
+        if (delArc !== undefined && arc !== delArc) {
+            const delIdx = selected.findIndex((x) => x === delArc);
             if (delIdx !== -1) {
                 selected.splice(delIdx, 1);
             }
@@ -199,7 +252,7 @@
             // Find the arc with an empty left-hand neighbour
             for (const a of selected) {
                 const lhn = neighboursLeft.get(a)!;
-                if (! selected.includes(lhn)) {
+                if (!selected.includes(lhn)) {
                     // Normally we'd break after finding one, but
                     // we're going to do the continuity check here.
                     // If there are two arcs with empty left-hand neighbours,
@@ -218,7 +271,7 @@
                 // Find the arc with an empty right-hand neighbour
                 for (const a of selected) {
                     const rhn = neighboursRight.get(a)!;
-                    if (! selected.includes(rhn)) {
+                    if (!selected.includes(rhn)) {
                         rh = a;
                         break;
                     }
@@ -242,7 +295,7 @@
                 sys.numArcs = dist;
             }
             selectedArcs = [...selected];
-        // Otherwise, update `selectedArcs`, but not the ship itself.
+            // Otherwise, update `selectedArcs`, but not the ship itself.
         } else {
             selectedArcs = [...selected];
         }
@@ -253,28 +306,43 @@
 
 <div class="content">
     <p class="smaller">
-        Click to toggle an arc on or off. Active arcs are highlighted in red. Arcs highlighted in black are locked and cannot be selected at all. You can click and drag an active arc to another position.
+        Click to toggle an arc on or off. Active arcs are highlighted in red.
+        Arcs highlighted in black are locked and cannot be selected at all. You
+        can click and drag an active arc to another position.
     </p>
-{#if ! contiguous}
-    <p class="alert">Selected arcs must be contiguous.</p>
-{:else if selectedArcs.length < minArcs}
-    <p class="alert">Not enough arcs selected.</p>
-{:else if selectedArcs.length > maxArcs}
-    <p class="alert">Too many arcs selected.</p>
-{/if}
+    {#if !contiguous}
+        <p class="alert">Selected arcs must be contiguous.</p>
+    {:else if selectedArcs.length < minArcs}
+        <p class="alert">Not enough arcs selected.</p>
+    {:else if selectedArcs.length > maxArcs}
+        <p class="alert">Too many arcs selected.</p>
+    {/if}
 </div>
 
 <div class="arcSelector">
-    <svg viewBox="-1 -1 602 602" bind:this="{svgDisplay}" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:touchstart="{startDrag}" on:touchmove="{drag}" on:touchend="{endDrag}" on:touchcancel="{endDrag}">
-    {#each polyStrs as p}
-        {#if arcBlacklist.includes(p[0])}
-            <polygon id="{p[0]}" points="{p[1]}" stroke="black" fill="black"/>
-        {:else if selectedArcs.includes(p[0])}
-            <polygon id="{p[0]}" points="{p[1]}" stroke="black" fill="red"/>
-        {:else}
-            <polygon id="{p[0]}" points="{p[1]}" stroke="black" fill="white"/>
-        {/if}
-    {/each}
+    <svg
+        viewBox="-1 -1 602 602"
+        bind:this="{svgDisplay}"
+        on:mousedown="{startDrag}"
+        on:mouseup="{endDrag}"
+        on:mousemove="{drag}"
+        on:touchstart="{startDrag}"
+        on:touchmove="{drag}"
+        on:touchend="{endDrag}"
+        on:touchcancel="{endDrag}"
+    >
+        {#each polyStrs as p}
+            {#if arcBlacklist.includes(p[0])}
+                <polygon id="{p[0]}" points="{p[1]}" stroke="black" fill="black"
+                ></polygon>
+            {:else if selectedArcs.includes(p[0])}
+                <polygon id="{p[0]}" points="{p[1]}" stroke="black" fill="red"
+                ></polygon>
+            {:else}
+                <polygon id="{p[0]}" points="{p[1]}" stroke="black" fill="white"
+                ></polygon>
+            {/if}
+        {/each}
     </svg>
 </div>
 

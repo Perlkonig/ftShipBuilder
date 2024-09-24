@@ -12,6 +12,6 @@ if (localStorage.getItem("ships") !== null) {
 
 export const savedShips = writable(storedShips);
 
-savedShips.subscribe(v => {
+savedShips.subscribe((v) => {
     localStorage.setItem("ships", JSON.stringify(v));
 });

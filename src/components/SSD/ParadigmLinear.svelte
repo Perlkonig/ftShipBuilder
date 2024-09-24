@@ -14,17 +14,21 @@
 
     let hullCols = hullArray[0].length;
     // If there's armour, look for situations where there's more armour than hull columns
-    if ( (ship.hasOwnProperty("armour")) && (ship.armour !== undefined) ) {
-        hullCols = Math.max(hullCols, ...ship.armour.map(x => x[0] + x[1]));
+    if (ship.hasOwnProperty("armour") && ship.armour !== undefined) {
+        hullCols = Math.max(hullCols, ...ship.armour.map((x) => x[0] + x[1]));
     }
     if (ship.hull.stealth === "2") {
         hullCols++;
-    } else if ( (ship.hull.stealth === "1") && (hullArray.length > 1) && (hullArray[1].length === hullArray[0].length) ) {
+    } else if (
+        ship.hull.stealth === "1" &&
+        hullArray.length > 1 &&
+        hullArray[1].length === hullArray[0].length
+    ) {
         hullCols++;
     }
 
     let hullRows = hullArray.length;
-    if ( (ship.hasOwnProperty("armour")) && (ship.armour !== undefined) ) {
+    if (ship.hasOwnProperty("armour") && ship.armour !== undefined) {
         hullRows += ship.armour.length;
     }
     if (hullRows < 4) {
@@ -37,10 +41,10 @@
     const mines: sysLib.MineLayer[] = [];
     const magazines: sysLib.Magazine[] = [];
     if (ship.flawed !== undefined && ship.flawed) {
-        systems.push(new sysLib.Flawed({name: "_flawed"}, ship));
+        systems.push(new sysLib.Flawed({ name: "_flawed" }, ship));
     }
     for (const s of ship.systems) {
-        if ( (s.name === "drive") || (s.name === "ftl") ) {
+        if (s.name === "drive" || s.name === "ftl") {
             continue;
         }
         const obj = sysLib.getSystem(s, ship);
@@ -61,7 +65,7 @@
     for (const s of ship.ordnance) {
         const obj = sysLib.getSystem(s, ship);
         if (obj.name === "salvoLauncher") {
-            launchers.push(obj as sysLib.SalvoLauncher)
+            launchers.push(obj as sysLib.SalvoLauncher);
         } else {
             ordnance.push(obj);
         }
@@ -177,35 +181,43 @@
     // Core systems
     totalRows += 3;
 
-    const svgCore = svgLib.find(x => x.id === "svglib_coreSys")!;
-    const sysFtl: sysLib.ISystem = ship.systems.find(x => x.name === "ftl");
+    const svgCore = svgLib.find((x) => x.id === "svglib_coreSys")!;
+    const sysFtl: sysLib.ISystem = ship.systems.find((x) => x.name === "ftl");
     let svgFtl: ISystemSVG;
     if (sysFtl !== undefined) {
         svgFtl = sysLib.getSystem(sysFtl, ship).glyph();
     }
 
-    const sysDrive = ship.systems.find(x => x.name === "drive")!;
+    const sysDrive = ship.systems.find((x) => x.name === "drive")!;
     const svgDrive = sysLib.getSystem(sysDrive, ship).glyph();
 
     const sysDistinct: ISystemSVG[] = [];
-    for (const set of [systems, turrets, mines, magazines, ordnance, launchers, weapons]) {
+    for (const set of [
+        systems,
+        turrets,
+        mines,
+        magazines,
+        ordnance,
+        launchers,
+        weapons,
+    ]) {
         for (const sys of set) {
             const svg = sys.glyph();
             if (svg !== undefined) {
-                const idx = sysDistinct.findIndex(x => x.id === svg.id);
+                const idx = sysDistinct.findIndex((x) => x.id === svg.id);
                 if (idx === -1) {
                     sysDistinct.push(svg);
                 }
             }
             if (sys.name === "mineLayer") {
                 const glyph = (sys as sysLib.MineLayer).individualMine();
-                const idx = sysDistinct.findIndex(x => x.id === glyph.id);
+                const idx = sysDistinct.findIndex((x) => x.id === glyph.id);
                 if (idx === -1) {
                     sysDistinct.push(glyph);
                 }
             } else if (sys.name === "magazine") {
                 const glyph = (sys as sysLib.Magazine).missileGlyph();
-                const idx = sysDistinct.findIndex(x => x.id === glyph.id);
+                const idx = sysDistinct.findIndex((x) => x.id === glyph.id);
                 if (idx === -1) {
                     sysDistinct.push(glyph);
                 }
@@ -218,11 +230,17 @@
     onMount(() => {
         if (nameElement !== undefined) {
             var bb = nameElement.getBBox();
-            var widthTransform = pxWidth * 0.9 / bb.width;
-            var heightTransform = ((cellsize * 1.5) * 0.9) / bb.height;
-            var value = widthTransform < heightTransform ? widthTransform : heightTransform;
+            var widthTransform = (pxWidth * 0.9) / bb.width;
+            var heightTransform = (cellsize * 1.5 * 0.9) / bb.height;
+            var value =
+                widthTransform < heightTransform
+                    ? widthTransform
+                    : heightTransform;
             if (value !== Infinity) {
-                nameElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
+                nameElement.setAttribute(
+                    "transform",
+                    "matrix(" + value + ", 0, 0, " + value + ", 0,0)"
+                );
                 const currx = parseFloat(nameElement.getAttribute("x"));
                 const curry = parseFloat(nameElement.getAttribute("y"));
                 nameElement.setAttribute("x", (currx / value).toString());
@@ -232,11 +250,17 @@
         if (statsElement !== undefined) {
             var bb = statsElement.getBBox();
             if (bb.x + bb.width > pxWidth) {
-                var widthTransform = pxWidth * 0.9 / bb.width;
-                var heightTransform = ((cellsize * 1.5) * 0.9) / bb.height;
-                var value = widthTransform < heightTransform ? widthTransform : heightTransform;
+                var widthTransform = (pxWidth * 0.9) / bb.width;
+                var heightTransform = (cellsize * 1.5 * 0.9) / bb.height;
+                var value =
+                    widthTransform < heightTransform
+                        ? widthTransform
+                        : heightTransform;
                 if (value !== Infinity) {
-                    statsElement.setAttribute("transform", "matrix("+value+", 0, 0, "+value+", 0,0)");
+                    statsElement.setAttribute(
+                        "transform",
+                        "matrix(" + value + ", 0, 0, " + value + ", 0,0)"
+                    );
                     const currx = parseFloat(statsElement.getAttribute("x"));
                     const curry = parseFloat(statsElement.getAttribute("y"));
                     statsElement.setAttribute("x", (currx / value).toString());
@@ -244,7 +268,7 @@
                 }
             }
         }
-    })
+    });
 
     interface IBuffer {
         xOffset: number;
@@ -253,13 +277,17 @@
         height: number;
     }
 
-    const buffInSquare = (glyph: ISystemSVG, size: number, graded: boolean = true): IBuffer => {
-        if ( (graded) && (glyph.width === 1) && (glyph.height === 1) ) {
+    const buffInSquare = (
+        glyph: ISystemSVG,
+        size: number,
+        graded: boolean = true
+    ): IBuffer => {
+        if (graded && glyph.width === 1 && glyph.height === 1) {
             return {
                 xOffset: size / 4,
                 yOffset: size / 4,
                 width: size / 2,
-                height: size / 2
+                height: size / 2,
             };
         } else {
             const factor = 0.9;
@@ -267,10 +295,10 @@
                 xOffset: (size * (1 - factor)) / 2,
                 yOffset: (size * (1 - factor)) / 2,
                 width: size * factor,
-                height: size * factor
+                height: size * factor,
             };
         }
-    }
+    };
 
     const cellsize = 50;
     let svgDisplay: SVGSVGElement;
@@ -284,7 +312,7 @@
     // systems
     if (systems.length > 0) {
         // name plate
-        svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Systems</text>`;
+        svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${currRow * cellsize + cellsize / 2}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Systems</text>`;
         currRow++;
         const sorted = [...systems].sort((a, b) => {
             if (a.name === b.name) {
@@ -298,7 +326,7 @@
             const realCol = i % breakPoint;
             const sys = sorted[i];
             const buff = buffInSquare(sys.glyph(), cellsize * 2, true);
-            svgBody += `<use id="${sys.uid}" href="#${sys.glyph().id}" x="${((realCol * 2) * cellsize) + buff.xOffset}" y="${((currRow + (realRow * 2)) * cellsize) + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
+            svgBody += `<use id="${sys.uid}" href="#${sys.glyph().id}" x="${realCol * 2 * cellsize + buff.xOffset}" y="${(currRow + realRow * 2) * cellsize + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
         }
         currRow += Math.ceil(sorted.length / breakPoint) * 2;
     }
@@ -306,7 +334,7 @@
     // Mines
     if (mines.length > 0) {
         // name plate
-        svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Mines</text>`;
+        svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${currRow * cellsize + cellsize / 2}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Mines</text>`;
         currRow++;
         let numMines = 0;
         for (const s of mines) {
@@ -315,9 +343,13 @@
         for (let i = 0; i < numMines; i++) {
             const realRow = Math.floor(i / totalCols);
             const realCol = i % totalCols;
-            const buff = buffInSquare(mines[0].individualMine(), cellsize, false);
+            const buff = buffInSquare(
+                mines[0].individualMine(),
+                cellsize,
+                false
+            );
             const individualID = mines[0].individualMine().id;
-            svgBody += `<use href="#${individualID}" x="${(realCol * cellsize) + buff.xOffset}" y="${((currRow + realRow) * cellsize) + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
+            svgBody += `<use href="#${individualID}" x="${realCol * cellsize + buff.xOffset}" y="${(currRow + realRow) * cellsize + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
         }
         currRow += Math.ceil(numMines / totalCols);
     }
@@ -325,7 +357,7 @@
     // Ordnance
     if (ordnance.length > 0) {
         // name plate
-        svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Ordnance</text>`;
+        svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${currRow * cellsize + cellsize / 2}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Ordnance</text>`;
         currRow++;
         const sorted = [...ordnance].sort((a, b) => {
             if (a.name === b.name) {
@@ -339,7 +371,7 @@
             const realCol = i % breakPoint;
             const sys = sorted[i];
             const buff = buffInSquare(sys.glyph(), cellsize * 2, true);
-            svgBody += `<use id="${sys.uid}" href="#${sys.glyph().id}" x="${((realCol * 2) * cellsize) + buff.xOffset}" y="${((currRow + (realRow * 2)) * cellsize) + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
+            svgBody += `<use id="${sys.uid}" href="#${sys.glyph().id}" x="${realCol * 2 * cellsize + buff.xOffset}" y="${(currRow + realRow * 2) * cellsize + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
         }
 
         currRow += Math.ceil(sorted.length / breakPoint) * 2;
@@ -349,7 +381,7 @@
     if (magazines.length > 0) {
         for (const mag of magazines) {
             // name plate
-            svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Magazine</text>`;
+            svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${currRow * cellsize + cellsize / 2}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Magazine</text>`;
             currRow++;
             const feeding: sysLib.SalvoLauncher[] = [];
             for (const l of launchers) {
@@ -362,7 +394,7 @@
                 const realCol = i % breakPoint;
                 const sys = feeding[i];
                 const buff = buffInSquare(sys.glyph(), cellsize * 2, true);
-                svgBody += `<use id="${sys.uid}" href="#${sys.glyph().id}" x="${((realCol * 2) * cellsize) + buff.xOffset}" y="${((currRow + (realRow * 2)) * cellsize) + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
+                svgBody += `<use id="${sys.uid}" href="#${sys.glyph().id}" x="${realCol * 2 * cellsize + buff.xOffset}" y="${(currRow + realRow * 2) * cellsize + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
             }
             for (let i = 0; i < mag.capacity; i++) {
                 const realI = i + feeding.length;
@@ -370,10 +402,11 @@
                 const realCol = realI % breakPoint;
                 const glyph = mag.missileGlyph();
                 const buff = buffInSquare(glyph, cellsize * 2, false);
-                svgBody += `<use href="#${glyph.id}" x="${((realCol * 2) * cellsize) + buff.xOffset}" y="${((currRow + (realRow * 2)) * cellsize) + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
+                svgBody += `<use href="#${glyph.id}" x="${realCol * 2 * cellsize + buff.xOffset}" y="${(currRow + realRow * 2) * cellsize + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
             }
 
-            currRow += Math.ceil((feeding.length + mag.capacity) / breakPoint) * 2;
+            currRow +=
+                Math.ceil((feeding.length + mag.capacity) / breakPoint) * 2;
         }
     }
 
@@ -381,13 +414,13 @@
     if (weapons.length > 0) {
         const freeWeapons: sysLib.System[] = [];
         for (const w of weapons) {
-            if (! turretedIds.has(w.uid)) {
+            if (!turretedIds.has(w.uid)) {
                 freeWeapons.push(w);
             }
         }
         if (freeWeapons.length > 0) {
             // name plate
-            svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Weapons</text>`;
+            svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${currRow * cellsize + cellsize / 2}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Weapons</text>`;
             currRow++;
 
             const sorted = [...freeWeapons].sort((a, b) => {
@@ -402,7 +435,7 @@
                 const realCol = i % breakPoint;
                 const sys = sorted[i];
                 const buff = buffInSquare(sys.glyph(), cellsize * 2, true);
-                svgBody += `<use id="${sys.uid}" href="#${sys.glyph().id}" x="${((realCol * 2) * cellsize) + buff.xOffset}" y="${((currRow + (realRow * 2)) * cellsize) + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
+                svgBody += `<use id="${sys.uid}" href="#${sys.glyph().id}" x="${realCol * 2 * cellsize + buff.xOffset}" y="${(currRow + realRow * 2) * cellsize + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
             }
 
             currRow += Math.ceil(sorted.length / breakPoint) * 2;
@@ -413,7 +446,7 @@
     if (turrets.length > 0) {
         for (const turret of turrets) {
             // name plate
-            svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Turret</text>`;
+            svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${currRow * cellsize + cellsize / 2}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Turret</text>`;
             currRow++;
             const hosting: sysLib.System[] = [];
             for (const w of weapons) {
@@ -423,16 +456,16 @@
             }
             // First add the turret glyph
             const buff = buffInSquare(turret.glyph(), cellsize * 2, true);
-            svgBody += `<use id="${turret.uid}" href="#${turret.glyph().id}" x="${buff.xOffset}" y="${(currRow * cellsize) + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
+            svgBody += `<use id="${turret.uid}" href="#${turret.glyph().id}" x="${buff.xOffset}" y="${currRow * cellsize + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
 
             for (let i = 0; i < turret.weapons.length; i++) {
                 const realI = i + 1;
                 const realRow = Math.floor(realI / breakPoint);
                 const realCol = realI % breakPoint;
-                const weapon = weapons.find(x => x.uid === turret.weapons[i]);
+                const weapon = weapons.find((x) => x.uid === turret.weapons[i]);
                 const glyph = weapon.glyph();
                 const buff = buffInSquare(glyph, cellsize * 2, false);
-                svgBody += `<use id="${weapon.uid}" href="#${glyph.id}" x="${((realCol * 2) * cellsize) + buff.xOffset}" y="${((currRow + (realRow * 2)) * cellsize) + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
+                svgBody += `<use id="${weapon.uid}" href="#${glyph.id}" x="${realCol * 2 * cellsize + buff.xOffset}" y="${(currRow + realRow * 2) * cellsize + buff.yOffset}" width="${buff.width}" height="${buff.height}" />`;
             }
 
             currRow += Math.ceil((turret.weapons.length + 1) / breakPoint) * 2;
@@ -441,7 +474,7 @@
 
     // Hull
     // name plate
-    svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${(currRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Hull</text>`;
+    svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${currRow * cellsize + cellsize / 2}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Hull</text>`;
     currRow++;
 
     const hullStart = currRow;
@@ -461,10 +494,10 @@
     let svgCombined: string;
     if (compact) {
         if (svgFtl !== undefined) {
-            svgBody += `<use id="_ftl" href="#${svgFtl.id}" x="${pxWidth - (cellsize * 3)}" y="${hullStart * cellsize}" width="${cellsize * 2}" height="${cellsize * 2}" />`;
+            svgBody += `<use id="_ftl" href="#${svgFtl.id}" x="${pxWidth - cellsize * 3}" y="${hullStart * cellsize}" width="${cellsize * 2}" height="${cellsize * 2}" />`;
         }
-        svgBody += `<use id="_drive" href="#${svgDrive.id}" x="${pxWidth - (cellsize * 3)}" y="${(hullStart + 2) * cellsize}" width="${cellsize * 2}" height="${cellsize * 2}" />`;
-        svgBody += `<use id="_core" href="#${svgCore.id}" x="${pxWidth * 0.05}" y="${(currRow * cellsize) + ((cellsize * 3) * 0.05)}" width="${pxWidth * 0.9}" height="${(cellsize * 3) * 0.9}" class="svgInvert" />`;
+        svgBody += `<use id="_drive" href="#${svgDrive.id}" x="${pxWidth - cellsize * 3}" y="${(hullStart + 2) * cellsize}" width="${cellsize * 2}" height="${cellsize * 2}" />`;
+        svgBody += `<use id="_core" href="#${svgCore.id}" x="${pxWidth * 0.05}" y="${currRow * cellsize + cellsize * 3 * 0.05}" width="${pxWidth * 0.9}" height="${cellsize * 3 * 0.9}" class="svgInvert" />`;
     } else {
         svgCombined = "";
         let startX = 0;
@@ -475,8 +508,11 @@
             groupWidth += 2;
         }
         svgCombined += `<use id="_drive" href="#${svgDrive.id}" x="${startX}" y="0" width="${cellsize * 2}" height="${cellsize * 2}" />`;
-        svgCombined += `<use id="_core" href="#${svgCore.id}" x="${startX + (cellsize * 3)}" y="0" width="${cellsize * 6}" height="${cellsize * 2}" />`;
-        svgCombined += `<symbol id="_internalLinearCombined" viewBox="-1 -1 ${(groupWidth * cellsize) + 2} ${(cellsize * 2) + 2}">` + svgCombined + `</symbol>`
+        svgCombined += `<use id="_core" href="#${svgCore.id}" x="${startX + cellsize * 3}" y="0" width="${cellsize * 6}" height="${cellsize * 2}" />`;
+        svgCombined +=
+            `<symbol id="_internalLinearCombined" viewBox="-1 -1 ${groupWidth * cellsize + 2} ${cellsize * 2 + 2}">` +
+            svgCombined +
+            `</symbol>`;
         svgBody += `<use href="#_internalLinearCombined" x="0" y="${currRow * cellsize}" height="${cellsize * 3}" width="${pxWidth}" class="svgInvert" />`;
     }
 
@@ -484,60 +520,116 @@
 </script>
 
 <div class="ssd">
-    <svg bind:this="{svgDisplay}" viewBox="-1 -1 {pxWidth + 2} {pxHeight + 2}" width="100%" height="100%">
+    <svg
+        bind:this="{svgDisplay}"
+        viewBox="-1 -1 {pxWidth + 2} {pxHeight + 2}"
+        width="100%"
+        height="100%"
+    >
         <!-- Add distinct symbol to <defs>-->
         <defs>
-            {@html hull.genSvg(ship, {cellsize})}
-        {#if svgFtl !== undefined}
-            {@html svgFtl.svg}
-        {/if}
+            {@html hull.genSvg(ship, { cellsize })}
+            {#if svgFtl !== undefined}
+                {@html svgFtl.svg}
+            {/if}
             {@html svgDrive.svg}
             {@html svgCore.svg}
-        {#each sysDistinct as symbol}
-            {@html symbol.svg}
-        {/each}
-        {#if svgCombined !== undefined}
-            {@html svgCombined}
-        {/if}
+            {#each sysDistinct as symbol}
+                {@html symbol.svg}
+            {/each}
+            {#if svgCombined !== undefined}
+                {@html svgCombined}
+            {/if}
         </defs>
 
         <!-- SSD background so the PNG comes out correctly -->
-        <rect x="0" y="0" height="{pxHeight}" width="{pxWidth}" stroke="none" fill="white"/>
+        <rect
+            x="0"
+            y="0"
+            height="{pxHeight}"
+            width="{pxWidth}"
+            stroke="none"
+            fill="white"
+        ></rect>
 
         <!-- Name plate can go here so it can be autosized, but the rest is in the <script> tag -->
-        <text bind:this="{nameElement}" x="{cellsize * 0.2}" y="{cellsize * 0.75}" dominant-baseline="middle" font-size="{cellsize}" class="futureFont">{ship.class} "{ship.name}"</text>
+        <text
+            bind:this="{nameElement}"
+            x="{cellsize * 0.2}"
+            y="{cellsize * 0.75}"
+            dominant-baseline="middle"
+            font-size="{cellsize}"
+            class="futureFont">{ship.class} "{ship.name}"</text
+        >
 
         <!-- Stats block also has to go here so it can be resized -->
-        <rect x="0" y="{statsRow * cellsize}" width="{pxWidth}" height="{cellsize}" stroke="none" fill="#c0c0c0"/><text bind:this={statsElement} x="{cellsize * 0.2}" y="{(statsRow * cellsize) + (cellsize / 2)}" dominant-baseline="middle" font-size="{cellsize / 2}" class="futureFont">Mass: {ship.mass} NPV: {ship.points} CPV: {ship.cpv}</text>
+        <rect
+            x="0"
+            y="{statsRow * cellsize}"
+            width="{pxWidth}"
+            height="{cellsize}"
+            stroke="none"
+            fill="#c0c0c0"
+        ></rect><text
+            bind:this="{statsElement}"
+            x="{cellsize * 0.2}"
+            y="{statsRow * cellsize + cellsize / 2}"
+            dominant-baseline="middle"
+            font-size="{cellsize / 2}"
+            class="futureFont"
+            >Mass: {ship.mass} NPV: {ship.points} CPV: {ship.cpv}</text
+        >
 
-        <rect x="0" y="{(totalRows - 3) * cellsize}" width="{pxWidth}" height="{cellsize * 3}" stroke="none" fill="black" bind:this="{footerFill}"/>
+        <rect
+            x="0"
+            y="{(totalRows - 3) * cellsize}"
+            width="{pxWidth}"
+            height="{cellsize * 3}"
+            stroke="none"
+            fill="black"
+            bind:this="{footerFill}"
+        ></rect>
 
         <!-- The body was generated in the <script> section for reasons. Insert it here wholesale.-->
         {@html svgBody}
 
         <!-- SSD outline, done last so it overlaps the heading backgrounds. -->
-        <rect x="0" y="0" height="{pxHeight}" width="{pxWidth}" stroke="black" fill="none" stroke-width="2"/>
+        <rect
+            x="0"
+            y="0"
+            height="{pxHeight}"
+            width="{pxWidth}"
+            stroke="black"
+            fill="none"
+            stroke-width="2"
+        ></rect>
     </svg>
 </div>
 
 <div class="content paddingTop">
     <p>
-        Layout inspired by <a href="https://zacgaming.wordpress.com/2021/05/02/ssd_templates/">Zac</a>. Font is <a href="https://fonts.google.com/specimen/Zen+Dots">Zen Dots</a>. The exported SVG will render properly in a browser, but the "adjusted" SVG and the PNG will not show the inverted footer.
+        Layout inspired by <a
+            href="https://zacgaming.wordpress.com/2021/05/02/ssd_templates/"
+            >Zac</a
+        >. Font is
+        <a href="https://fonts.google.com/specimen/Zen+Dots">Zen Dots</a>. The
+        exported SVG will render properly in a browser, but the "adjusted" SVG
+        and the PNG will not show the inverted footer.
     </p>
 </div>
 
 {#key svgDisplay}
-<Export
-    width={pxWidth}
-    height={pxHeight}
-    svgDisplay={svgDisplay}
-    footerRect={footerFill}
-    on:message
-/>
+    <Export
+        width="{pxWidth}"
+        height="{pxHeight}"
+        svgDisplay="{svgDisplay}"
+        footerRect="{footerFill}"
+        on:message
+    />
 {/key}
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap');
+    @import url("https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap");
     .ssd {
         height: 30rem;
         width: 100%;

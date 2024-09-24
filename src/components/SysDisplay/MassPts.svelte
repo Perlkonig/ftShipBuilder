@@ -5,7 +5,7 @@
     interface ISystem {
         name: string;
         [k: string]: unknown;
-    };
+    }
 
     export let prop: string;
     export let idx: number;

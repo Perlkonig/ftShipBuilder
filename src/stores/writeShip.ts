@@ -39,7 +39,7 @@ export interface IFreeform {
 
 export interface IBlocks {
     blocks: IBlockLayout;
-    elements: IElements
+    elements: IElements;
 }
 
 export interface ILayout {
@@ -48,20 +48,20 @@ export interface ILayout {
 }
 
 export const starterShip: FullThrustShip = {
-    hull: {points: 1, rows: 4, stealth: "0", streamlining: "none"},
+    hull: { points: 1, rows: 4, stealth: "0", streamlining: "none" },
     armour: [] as [number, number][],
     systems: [
         {
             name: "drive",
             thrust: 0,
-            advanced: false
-        }
+            advanced: false,
+        },
     ],
     weapons: [],
     ordnance: [],
     extras: [],
     fighters: [],
-    layout: {} as ILayout
+    layout: {} as ILayout,
 };
 
 export const ship = writable(starterShip as FullThrustShip);

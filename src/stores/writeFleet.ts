@@ -6,13 +6,13 @@ export interface ISavedFleet {
     ships: FullThrustShip[];
 }
 
-let storedFleet: ISavedFleet = {name: "Unnamed", ships: []};
+let storedFleet: ISavedFleet = { name: "Unnamed", ships: [] };
 if (localStorage.getItem("fleet") !== null) {
     storedFleet = JSON.parse(localStorage.getItem("fleet"));
 }
 
 export const savedFleet = writable(storedFleet);
 
-savedFleet.subscribe(v => {
+savedFleet.subscribe((v) => {
     localStorage.setItem("fleet", JSON.stringify(v));
 });

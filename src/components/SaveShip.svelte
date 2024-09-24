@@ -3,7 +3,7 @@
     import { savedShips } from "@/stores/writeStoredShips";
     import { afterUpdate } from "svelte";
     import LZString from "lz-string";
-    import { toast } from '@zerodevx/svelte-toast';
+    import { toast } from "@zerodevx/svelte-toast";
     import { savedFleet } from "@/stores/writeFleet";
 
     export let ship: FullThrustShip;
@@ -34,20 +34,25 @@
                 return v;
             }
         });
-        jsonDataStr = "data:text/json;charset=utf-8," + encodeURIComponent(replacedString);
+        jsonDataStr =
+            "data:text/json;charset=utf-8," +
+            encodeURIComponent(replacedString);
         jsonDataCode = LZString.compressToEncodedURIComponent(replacedString);
 
         const noLayoutString = JSON.stringify(ship, (k, v) => {
             if (k === "glyph") {
                 return undefined;
-            } else if ( (k === "layout") || (k === "x") || (k === "y") ) {
+            } else if (k === "layout" || k === "x" || k === "y") {
                 return undefined;
             } else {
                 return v;
             }
         });
-        jsonDataStrNoLayout = "data:text/json;charset=utf-8," + encodeURIComponent(noLayoutString);
-        jsonDataCodeNoLayout = LZString.compressToEncodedURIComponent(noLayoutString);
+        jsonDataStrNoLayout =
+            "data:text/json;charset=utf-8," +
+            encodeURIComponent(noLayoutString);
+        jsonDataCodeNoLayout =
+            LZString.compressToEncodedURIComponent(noLayoutString);
 
         // if ( (saveName === undefined) || (saveName.length === 0) ) {
         //     saveName = ship.name;
@@ -63,19 +68,24 @@
     });
 
     const saveStorage = () => {
-        const idx = $savedShips.findIndex(x => x.name === saveName);
+        const idx = $savedShips.findIndex((x) => x.name === saveName);
         if (idx !== -1) {
             $savedShips.splice(idx, 1);
         }
-        $savedShips.push({name: saveName, json: replacedString});
+        $savedShips.push({ name: saveName, json: replacedString });
         toast.push("Ship saved");
         saveName = "";
         $savedShips = $savedShips;
-    }
+    };
 
     const saveToFleet = () => {
-        savedFleet.update(val => ({...val, ships: [...val.ships, JSON.parse(JSON.stringify(ship))].sort((a,b) => a.mass - b.mass)}))
-    }
+        savedFleet.update((val) => ({
+            ...val,
+            ships: [...val.ships, JSON.parse(JSON.stringify(ship))].sort(
+                (a, b) => a.mass - b.mass
+            ),
+        }));
+    };
 </script>
 
 <div class="level">
@@ -87,7 +97,9 @@
                 </a>
             </p>
             <p style="text-align: center">
-                <a href="?ship={jsonDataCode}" target="_NEW">Ship + SSD: Shareable link</a>
+                <a href="?ship={jsonDataCode}" target="_NEW"
+                    >Ship + SSD: Shareable link</a
+                >
             </p>
         </div>
     </div>
@@ -99,7 +111,9 @@
                 </a>
             </p>
             <p style="text-align: center">
-                <a href="?ship={jsonDataCodeNoLayout}" target="_NEW">Ship Only: Shareable link</a>
+                <a href="?ship={jsonDataCodeNoLayout}" target="_NEW"
+                    >Ship Only: Shareable link</a
+                >
             </p>
         </div>
     </div>
@@ -107,19 +121,33 @@
         <div class="field">
             <label class="label" for="saveName">Save name</label>
             <div class="control">
-                <input id="saveName" class="input" type="text" placeholder="Save name" on:focus={setSaveNameDirty} bind:value="{saveName}">
-                <button class="button" on:click="{saveStorage}">Save Ship to Local Storage</button>
+                <input
+                    id="saveName"
+                    class="input"
+                    type="text"
+                    placeholder="Save name"
+                    on:focus="{setSaveNameDirty}"
+                    bind:value="{saveName}"
+                />
+                <button class="button" on:click="{saveStorage}"
+                    >Save Ship to Local Storage</button
+                >
             </div>
-        {#if ( (saveName !== undefined) && (saveName.length > 0) )}
-        {#if duplicated}
-            <p class="help is-danger">A ship is already saved with that name. Saving will overwrite it.</p>
-        {:else}
-            <p class="help is-success">That name is unique.</p>
-        {/if}
-        {/if}
+            {#if saveName !== undefined && saveName.length > 0}
+                {#if duplicated}
+                    <p class="help is-danger">
+                        A ship is already saved with that name. Saving will
+                        overwrite it.
+                    </p>
+                {:else}
+                    <p class="help is-success">That name is unique.</p>
+                {/if}
+            {/if}
         </div>
     </div>
     <div class="level-item">
-        <button class="button" on:click="{saveToFleet}">Add ship to fleet</button>
+        <button class="button" on:click="{saveToFleet}"
+            >Add ship to fleet</button
+        >
     </div>
 </div>

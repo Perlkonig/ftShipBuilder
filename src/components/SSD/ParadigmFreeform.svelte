@@ -13,22 +13,42 @@
 
     let layout: IFreeform;
     onMount(() => {
-        if ( ($ship.layout !== undefined) && (typeof $ship.layout !== "string") && ($ship.layout.hasOwnProperty("freeform")) && (($ship.layout as ILayout).freeform !== undefined) ) {
+        if (
+            $ship.layout !== undefined &&
+            typeof $ship.layout !== "string" &&
+            $ship.layout.hasOwnProperty("freeform") &&
+            ($ship.layout as ILayout).freeform !== undefined
+        ) {
             layout = ($ship.layout as ILayout).freeform;
             if (layout.background === undefined) {
-                layout.background = {svg: undefined, x: 0, y: 0, zoom: 1, opacity: 1};
+                layout.background = {
+                    svg: undefined,
+                    x: 0,
+                    y: 0,
+                    zoom: 1,
+                    opacity: 1,
+                };
             }
         } else {
             layout = {
                 width: 3000,
                 height: 2000,
                 cellsize: 200,
-                nameplate: {width: 2000, height: 200, x: 200, y: 200, factor: 1},
-                stats: {width: 1000, height: 100, x: 200, y: 200, factor: 1},
-                background: {svg: undefined, x: 0, y: 0, zoom: 1, opacity: 1},
-                elements: {}
-            }
-            if ( ($ship.layout === undefined) || (typeof $ship.layout === "string") ) {
+                nameplate: {
+                    width: 2000,
+                    height: 200,
+                    x: 200,
+                    y: 200,
+                    factor: 1,
+                },
+                stats: { width: 1000, height: 100, x: 200, y: 200, factor: 1 },
+                background: { svg: undefined, x: 0, y: 0, zoom: 1, opacity: 1 },
+                elements: {},
+            };
+            if (
+                $ship.layout === undefined ||
+                typeof $ship.layout === "string"
+            ) {
                 $ship.layout = {} as ILayout;
             }
             ($ship.layout as ILayout).freeform = layout;
@@ -67,11 +87,11 @@
         // <rect x="${bbox.x}" y="${bbox.y}" width="${bbox.width}" height="${bbox.height}" fill="none" stroke="black" />
         return {
             id: symbolid,
-            svg: `<symbol id="${symbolid}" viewBox="${bbox.x - (bufferWidth / 2)} ${bbox.y - (bufferHeight / 2)} ${bbox.width + bufferWidth} ${bbox.height + bufferHeight}"><text x="0" y="0" font-size="17">${text}</text></symbol>`,
+            svg: `<symbol id="${symbolid}" viewBox="${bbox.x - bufferWidth / 2} ${bbox.y - bufferHeight / 2} ${bbox.width + bufferWidth} ${bbox.height + bufferHeight}"><text x="0" y="0" font-size="17">${text}</text></symbol>`,
             width: bbox.width,
-            height: bbox.height
+            height: bbox.height,
         };
-    }
+    };
 
     let xs: number[] = [];
     let ys: number[] = [];
@@ -84,21 +104,25 @@
         xs = [];
         let currx = layout.cellsize;
         while (currx < layout.width) {
-            xs.push(currx)
+            xs.push(currx);
             currx += layout.cellsize;
         }
         ys = [];
         let curry = layout.cellsize;
         while (curry < layout.height) {
-            ys.push(curry)
+            ys.push(curry);
             curry += layout.cellsize;
         }
 
         // Generate text symbols
-        const nameplateGlyph = generateTextSymbol(`${$ship.class} "${$ship.name}"`, "_ssdNameplate");
+        const nameplateGlyph = generateTextSymbol(
+            `${$ship.class} "${$ship.name}"`,
+            "_ssdNameplate"
+        );
         defs.push(nameplateGlyph);
         layout.nameplate.factor = nameplateGlyph.width / nameplateGlyph.height;
-        layout.nameplate.height = layout.nameplate.width / layout.nameplate.factor;
+        layout.nameplate.height =
+            layout.nameplate.width / layout.nameplate.factor;
         if (layout.elements.hasOwnProperty("#nameplate")) {
             layout.elements["#nameplate"].height = layout.nameplate.height;
             layout.elements["#nameplate"].width = layout.nameplate.width;
@@ -109,11 +133,14 @@
                 width: layout.nameplate.width,
                 glyphid: "_ssdNameplate",
                 x: layout.cellsize,
-                y: layout.cellsize
+                y: layout.cellsize,
             };
         }
 
-        const statsGlyph = generateTextSymbol(`Mass: ${$ship.mass}, NPV: ${$ship.points}, CPV: ${$ship.cpv}`, "_ssdStats");
+        const statsGlyph = generateTextSymbol(
+            `Mass: ${$ship.mass}, NPV: ${$ship.points}, CPV: ${$ship.cpv}`,
+            "_ssdStats"
+        );
         defs.push(statsGlyph);
         layout.stats.factor = statsGlyph.width / statsGlyph.height;
         layout.stats.height = layout.stats.width / layout.stats.factor;
@@ -127,7 +154,7 @@
                 width: layout.stats.width,
                 glyphid: "_ssdStats",
                 x: layout.cellsize,
-                y: layout.cellsize
+                y: layout.cellsize,
             };
         }
 
@@ -136,18 +163,22 @@
         let hullCols = hullArray[0].length;
         if ($ship.hull.stealth === "2") {
             hullCols++;
-        } else if ( ($ship.hull.stealth === "1") && (hullArray[1].length === hullArray[0].length) ) {
+        } else if (
+            $ship.hull.stealth === "1" &&
+            hullArray[1].length === hullArray[0].length
+        ) {
             hullCols++;
         }
-        const hullSvg = hull.genSvg($ship, {cellsize: layout.cellsize});
+        const hullSvg = hull.genSvg($ship, { cellsize: layout.cellsize });
         defs.push({
             id: "_ssdHull",
             svg: hullSvg,
             width: hullCols,
-            height: hullArray.length
+            height: hullArray.length,
         });
         if (layout.elements.hasOwnProperty("#hull")) {
-            layout.elements["#hull"].height = hullArray.length * layout.cellsize;
+            layout.elements["#hull"].height =
+                hullArray.length * layout.cellsize;
             layout.elements["#hull"].width = hullCols * layout.cellsize;
         } else {
             layout.elements["#hull"] = {
@@ -156,21 +187,21 @@
                 width: hullCols * layout.cellsize,
                 glyphid: "_ssdHull",
                 x: layout.cellsize,
-                y: layout.cellsize
+                y: layout.cellsize,
             };
         }
 
-        const driveRaw = $ship.systems.find(x => x.name === "drive");
+        const driveRaw = $ship.systems.find((x) => x.name === "drive");
         const driveObj = systems.getSystem(driveRaw, $ship);
         defs.push(driveObj.glyph());
-        if (! layout.elements.hasOwnProperty("#drive")) {
+        if (!layout.elements.hasOwnProperty("#drive")) {
             layout.elements["#drive"] = {
                 id: "#drive",
                 glyphid: `svg_${driveObj.glyph().id}`,
                 height: layout.cellsize * 2,
                 width: layout.cellsize * 2,
                 x: layout.cellsize,
-                y: layout.cellsize
+                y: layout.cellsize,
             };
         } else {
             layout.elements["#drive"].glyphid = `svg_${driveObj.glyph().id}`;
@@ -178,18 +209,18 @@
             layout.elements["#drive"].width = layout.cellsize * 2;
         }
 
-        const ftlRaw = $ship.systems.find(x => x.name === "ftl");
+        const ftlRaw = $ship.systems.find((x) => x.name === "ftl");
         if (ftlRaw !== undefined) {
             const ftlObj = systems.getSystem(ftlRaw, $ship);
             defs.push(ftlObj.glyph());
-            if (! layout.elements.hasOwnProperty("#ftl")) {
+            if (!layout.elements.hasOwnProperty("#ftl")) {
                 layout.elements["#ftl"] = {
                     id: "#ftl",
                     glyphid: `svg_${ftlObj.glyph().id}`,
                     height: layout.cellsize * 2,
                     width: layout.cellsize * 2,
                     x: layout.cellsize,
-                    y: layout.cellsize
+                    y: layout.cellsize,
                 };
             } else {
                 layout.elements["#ftl"].glyphid = `svg_${ftlObj.glyph().id}`;
@@ -200,16 +231,16 @@
             delete layout.elements["#ftl"];
         }
 
-        const coreGlyph = svgLib.find(x => x.id === "svglib_coreSys");
+        const coreGlyph = svgLib.find((x) => x.id === "svglib_coreSys");
         defs.push(coreGlyph);
-        if (! layout.elements.hasOwnProperty("#core")) {
+        if (!layout.elements.hasOwnProperty("#core")) {
             layout.elements["#core"] = {
                 id: "#core",
                 glyphid: `svg_${coreGlyph.id}`,
                 height: layout.cellsize * 3,
                 width: layout.cellsize * 6,
                 x: layout.cellsize,
-                y: layout.cellsize
+                y: layout.cellsize,
             };
         } else {
             layout.elements["#core"].glyphid = `svg_${coreGlyph.id}`;
@@ -231,47 +262,52 @@
                 seenIds.add(obj.uid);
                 const svg = obj.glyph();
                 if (svg !== undefined) {
-                    const idx = defs.findIndex(x => x.id === svg.id);
+                    const idx = defs.findIndex((x) => x.id === svg.id);
                     if (idx === -1) {
                         defs.push(svg);
                     }
                 }
-                if (! layout.elements.hasOwnProperty(obj.uid)) {
+                if (!layout.elements.hasOwnProperty(obj.uid)) {
                     layout.elements[obj.uid] = {
                         id: obj.uid,
                         glyphid: `svg_${svg.id}`,
                         width: svg.width * layout.cellsize,
                         height: svg.height * layout.cellsize,
                         x: layout.cellsize,
-                        y: layout.cellsize
+                        y: layout.cellsize,
                     };
                 } else {
                     layout.elements[obj.uid].glyphid = `svg_${svg.id}`;
-                    layout.elements[obj.uid].width = svg.width * layout.cellsize;
-                    layout.elements[obj.uid].height = svg.height * layout.cellsize;
+                    layout.elements[obj.uid].width =
+                        svg.width * layout.cellsize;
+                    layout.elements[obj.uid].height =
+                        svg.height * layout.cellsize;
                 }
             }
         }
 
         // add Flawed glyph
         if ($ship.flawed !== undefined && $ship.flawed) {
-            const obj = new systems.Flawed({name: "flawed", id: "_____flawed_____"}, $ship);
+            const obj = new systems.Flawed(
+                { name: "flawed", id: "_____flawed_____" },
+                $ship
+            );
             seenIds.add(obj.uid);
             const svg = obj.glyph();
             if (svg !== undefined) {
-                const idx = defs.findIndex(x => x.id === svg.id);
+                const idx = defs.findIndex((x) => x.id === svg.id);
                 if (idx === -1) {
                     defs.push(svg);
                 }
             }
-            if (! layout.elements.hasOwnProperty(obj.uid)) {
+            if (!layout.elements.hasOwnProperty(obj.uid)) {
                 layout.elements[obj.uid] = {
                     id: obj.uid,
                     glyphid: `svg_${svg.id}`,
                     width: svg.width * layout.cellsize,
                     height: svg.height * layout.cellsize,
                     x: layout.cellsize,
-                    y: layout.cellsize
+                    y: layout.cellsize,
                 };
             } else {
                 layout.elements[obj.uid].glyphid = `svg_${svg.id}`;
@@ -283,7 +319,7 @@
         // prune unused glyphs
         const unused: string[] = [];
         for (const key in layout.elements) {
-            if ( (! seenIds.has(key)) && (! key.startsWith("#")) ) {
+            if (!seenIds.has(key) && !key.startsWith("#")) {
                 unused.push(key);
             }
         }
@@ -294,39 +330,55 @@
         // Look for glyphs that are now out of bounds
         outOfBounds = false;
         for (const key in layout.elements) {
-            if ( (layout.elements[key].x < 0) || (layout.elements[key].x > layout.width) ) {
+            if (
+                layout.elements[key].x < 0 ||
+                layout.elements[key].x > layout.width
+            ) {
                 outOfBounds = true;
                 break;
             }
-            if ( (layout.elements[key].y < 0) || (layout.elements[key].y > layout.height) ) {
+            if (
+                layout.elements[key].y < 0 ||
+                layout.elements[key].y > layout.height
+            ) {
                 outOfBounds = true;
                 break;
             }
         }
 
         // Find launcher/magazine combos and draw lines between them
-        for (const sys of $ship.ordnance){
+        for (const sys of $ship.ordnance) {
             if (sys.name === "salvoLauncher") {
-                if ( (sys.hasOwnProperty("magazine")) && (sys.magazine !== undefined) ) {
+                if (
+                    sys.hasOwnProperty("magazine") &&
+                    sys.magazine !== undefined
+                ) {
                     const launchObj = systems.getSystem(sys, $ship);
-                    const mag = $ship.systems.find(x => x.id === sys.magazine);
+                    const mag = $ship.systems.find(
+                        (x) => x.id === sys.magazine
+                    );
                     if (mag !== undefined) {
                         const magObj = systems.getSystem(mag, $ship);
                         const xLaunch = layout.elements[launchObj.uid].x;
                         const yLaunch = layout.elements[launchObj.uid].y;
-                        const wLaunch = launchObj.glyph().width * layout.cellsize;
-                        const hLaunch = launchObj.glyph().height * layout.cellsize;
-                        const x1 = xLaunch + (wLaunch / 2);
-                        const y1 = yLaunch + (hLaunch / 2);
+                        const wLaunch =
+                            launchObj.glyph().width * layout.cellsize;
+                        const hLaunch =
+                            launchObj.glyph().height * layout.cellsize;
+                        const x1 = xLaunch + wLaunch / 2;
+                        const y1 = yLaunch + hLaunch / 2;
 
                         const xMag = layout.elements[magObj.uid].x;
                         const yMag = layout.elements[magObj.uid].y;
                         const wMag = magObj.glyph().width * layout.cellsize;
                         const hMag = magObj.glyph().height * layout.cellsize;
-                        const x2 = xMag + (wMag / 2);
-                        const y2 = yMag + (hMag / 2);
+                        const x2 = xMag + wMag / 2;
+                        const y2 = yMag + hMag / 2;
 
-                        lines.push([{x: x1, y: y1}, {x: x2, y: y2}]);
+                        lines.push([
+                            { x: x1, y: y1 },
+                            { x: x2, y: y2 },
+                        ]);
                     }
                 }
             }
@@ -338,11 +390,11 @@
                 const tObj = systems.getSystem(s, $ship);
                 for (const id of s.weapons) {
                     let obj: any;
-                    let idx = $ship.ordnance.findIndex(x => x.id === id);
+                    let idx = $ship.ordnance.findIndex((x) => x.id === id);
                     if (idx !== -1) {
                         obj = $ship.ordnance[idx];
                     } else {
-                        idx = $ship.weapons.findIndex(x => x.id === id);
+                        idx = $ship.weapons.findIndex((x) => x.id === id);
                         if (idx !== -1) {
                             obj = $ship.weapons[idx];
                         }
@@ -353,19 +405,27 @@
                         const yTurret = layout.elements[tObj.uid].y;
                         const wTurret = tObj.glyph().width * layout.cellsize;
                         const hTurret = tObj.glyph().height * layout.cellsize;
-                        const x1 = xTurret + (wTurret / 2);
-                        const y1 = yTurret + (hTurret / 2);
+                        const x1 = xTurret + wTurret / 2;
+                        const y1 = yTurret + hTurret / 2;
 
                         const xWeapon = layout.elements[wObj.uid].x;
                         const yWeapon = layout.elements[wObj.uid].y;
                         const wWeapon = wObj.glyph().width * layout.cellsize;
                         const hWeapon = wObj.glyph().height * layout.cellsize;
-                        const x2 = xWeapon + (wWeapon / 2);
-                        const y2 = yWeapon + (hWeapon / 2);
+                        const x2 = xWeapon + wWeapon / 2;
+                        const y2 = yWeapon + hWeapon / 2;
 
                         // Test for overlap
-                        if ( (xWeapon < xTurret) || (xWeapon > xTurret + wTurret) || (yWeapon < yTurret) || (yWeapon > yTurret + hTurret) ) {
-                            lines.push([{x: x1, y: y1}, {x: x2, y: y2}]);
+                        if (
+                            xWeapon < xTurret ||
+                            xWeapon > xTurret + wTurret ||
+                            yWeapon < yTurret ||
+                            yWeapon > yTurret + hTurret
+                        ) {
+                            lines.push([
+                                { x: x1, y: y1 },
+                                { x: x2, y: y2 },
+                            ]);
                         }
                     }
                 }
@@ -375,15 +435,21 @@
 
     const correctOutOfBounds = () => {
         for (const key in layout.elements) {
-            if ( (layout.elements[key].x < 0) || (layout.elements[key].x > layout.width) ) {
+            if (
+                layout.elements[key].x < 0 ||
+                layout.elements[key].x > layout.width
+            ) {
                 layout.elements[key].x = layout.cellsize;
             }
-            if ( (layout.elements[key].y < 0) || (layout.elements[key].y > layout.height) ) {
+            if (
+                layout.elements[key].y < 0 ||
+                layout.elements[key].y > layout.height
+            ) {
                 layout.elements[key].y = layout.cellsize;
             }
         }
         layout = layout;
-    }
+    };
 
     let dragSelected: SVGUseElement; // | SVGGElement;
     let offset: IPoint;
@@ -402,7 +468,7 @@
                 maxy = layout.height - bbox.height;
             }
         }
-    }
+    };
 
     const drag = (e: MouseEvent | TouchEvent) => {
         if (dragSelected !== undefined) {
@@ -411,15 +477,21 @@
             let newx = coord.x - offset.x;
             let newy = coord.y - offset.y;
             if (maxx !== undefined) {
-                if (newx < 0) { newx = 0; }
-                else if (newx > maxx) { newx = maxx; }
-                if (newy < 0) { newy = 0; }
-                else if (newy > maxy) { newy = maxy; }
+                if (newx < 0) {
+                    newx = 0;
+                } else if (newx > maxx) {
+                    newx = maxx;
+                }
+                if (newy < 0) {
+                    newy = 0;
+                } else if (newy > maxy) {
+                    newy = maxy;
+                }
             }
             dragSelected.setAttribute("x", newx.toString());
             dragSelected.setAttribute("y", newy.toString());
         }
-    }
+    };
 
     const endDrag = (e: MouseEvent | TouchEvent) => {
         if (dragSelected !== undefined) {
@@ -429,16 +501,32 @@
                 let newx: number;
                 let newy: number;
                 if ($snapToGrid) {
-                    newx = Math.round(parseFloat(dragSelected.getAttribute("x")) / layout.cellsize) * layout.cellsize;
-                    newy = Math.round(parseFloat(dragSelected.getAttribute("y")) / layout.cellsize) * layout.cellsize;
+                    newx =
+                        Math.round(
+                            parseFloat(dragSelected.getAttribute("x")) /
+                                layout.cellsize
+                        ) * layout.cellsize;
+                    newy =
+                        Math.round(
+                            parseFloat(dragSelected.getAttribute("y")) /
+                                layout.cellsize
+                        ) * layout.cellsize;
                 } else {
                     newx = parseFloat(dragSelected.getAttribute("x"));
                     newy = parseFloat(dragSelected.getAttribute("y"));
                 }
-                if (newx < 0) { newx = 0; }
-                if (newx >= layout.width) { newx = layout.width - layout.cellsize; }
-                if (newy < 0) { newy = 0;}
-                if (newy >= layout.height) { newy = layout.height - layout.cellsize;}
+                if (newx < 0) {
+                    newx = 0;
+                }
+                if (newx >= layout.width) {
+                    newx = layout.width - layout.cellsize;
+                }
+                if (newy < 0) {
+                    newy = 0;
+                }
+                if (newy >= layout.height) {
+                    newy = layout.height - layout.cellsize;
+                }
                 element.x = newx;
                 element.y = newy;
                 ($ship.layout as ILayout).freeform = layout;
@@ -450,7 +538,7 @@
             maxx = maxy = undefined;
             // exportLayout();
         }
-    }
+    };
 
     let secretSvg: SVGSVGElement;
     let svgDisplay: SVGSVGElement;
@@ -460,13 +548,15 @@
 
     const genRect = (ele: IElement): DOMRect | undefined => {
         return new DOMRect(ele.x, ele.y, ele.width, ele.height);
-    }
+    };
 
     let allOverlaps: Set<string>;
     const findOverlapWith = (dropped: IElement) => {
         const droppedRect = genRect(dropped);
         for (const used of Object.values(layout.elements)) {
-            if (used.id === dropped.id) { continue; }
+            if (used.id === dropped.id) {
+                continue;
+            }
             const otherRect = genRect(used);
             if (overlapping(droppedRect, otherRect)) {
                 allOverlaps.add(dropped.id);
@@ -483,10 +573,12 @@
     };
 
     const overlapping = (r1: DOMRect, r2: DOMRect): boolean => {
-        return !((r2.left >= r1.right) ||
-           (r2.right <= r1.left) ||
-           (r2.top >= r1.bottom) ||
-           (r2.bottom <= r1.top));
+        return !(
+            r2.left >= r1.right ||
+            r2.right <= r1.left ||
+            r2.top >= r1.bottom ||
+            r2.bottom <= r1.top
+        );
     };
 
     const getMousePosition = (e: MouseEvent | TouchEvent): IPoint => {
@@ -499,20 +591,26 @@
         }
         return {
             x: (realE.clientX - CTM.e) / CTM.a,
-            y: (realE.clientY - CTM.f) / CTM.d
+            y: (realE.clientY - CTM.f) / CTM.d,
         };
-    }
+    };
 
     let selectedOutline: string;
     let outlineHelpText: string;
     const processOutline = () => {
         if (layout.background === undefined) {
-            layout.background = {svg: undefined, x: 0, y: 0, zoom: 1, opacity: 1};
+            layout.background = {
+                svg: undefined,
+                x: 0,
+                y: 0,
+                zoom: 1,
+                opacity: 1,
+            };
         }
-        if ( (selectedOutline === undefined) || (selectedOutline.length === 0) ) {
+        if (selectedOutline === undefined || selectedOutline.length === 0) {
             layout.background.svg = undefined;
         } else {
-            const outline = shipOutlines.find(x => x.id === selectedOutline);
+            const outline = shipOutlines.find((x) => x.id === selectedOutline);
             if (outline !== undefined) {
                 layout.background.svg = outline.svg;
                 bgXml = outline.svg;
@@ -525,25 +623,25 @@
     // when the cellsize value is 0 or simply deleted.
     let inputCellsize: number;
     const setCellsize = () => {
-        if ( (inputCellsize === undefined) || (inputCellsize < 1) ) {
+        if (inputCellsize === undefined || inputCellsize < 1) {
             inputCellsize = 100;
         }
         layout.cellsize = inputCellsize;
         layout = layout;
-    }
+    };
 
     let bgXml: string;
     const processXml = () => {
         // Process bgXml and put the results into layout.background.svg
         const result = XMLValidator.validate(bgXml, {
-            allowBooleanAttributes: true
+            allowBooleanAttributes: true,
         });
-        if ( (typeof result === "boolean") && (result === true) ) {
+        if (typeof result === "boolean" && result === true) {
             let interim = bgXml.trim();
             // Parse the well-formed XML and do basic sanity check
             const parser = new XMLParser({
                 ignoreAttributes: false,
-                attributeNamePrefix : "@_",
+                attributeNamePrefix: "@_",
                 allowBooleanAttributes: true,
                 preserveOrder: true,
                 ignoreDeclaration: true,
@@ -558,29 +656,38 @@
             const root = output[0];
             // Must be an SVG or symbol tag
             const rootName = [...Object.keys(root)][0] as string;
-            if ( (rootName !== "svg") && (rootName !== "symbol") ) {
-                toast.push("You must provide either an &lt;svg&gt; or a &lt;symbol&gt; tag.");
+            if (rootName !== "svg" && rootName !== "symbol") {
+                toast.push(
+                    "You must provide either an &lt;svg&gt; or a &lt;symbol&gt; tag."
+                );
                 return;
             }
             // Must have a viewbox attribute
-            if (! root[":@"].hasOwnProperty("@_viewBox")) {
+            if (!root[":@"].hasOwnProperty("@_viewBox")) {
                 toast.push("No `viewBox` attribute found.");
                 return;
             }
             // Set ID if not present or accurate
-            if ( (! root[":@"].hasOwnProperty("@_id")) || (root[":@"]["@_id"] !== "_freeformBackground") ) {
+            if (
+                !root[":@"].hasOwnProperty("@_id") ||
+                root[":@"]["@_id"] !== "_freeformBackground"
+            ) {
                 root[":@"]["@_id"] = "_freeformBackground";
             }
             // Rename <svg> to <symbol>
             if (rootName === "svg") {
-                Object.defineProperty(root, "symbol", Object.getOwnPropertyDescriptor(root, "svg"));
+                Object.defineProperty(
+                    root,
+                    "symbol",
+                    Object.getOwnPropertyDescriptor(root, "svg")
+                );
                 delete root["svg"];
             }
 
             // Save the result
             const builder = new XMLBuilder({
                 ignoreAttributes: false,
-                attributeNamePrefix : "@_",
+                attributeNamePrefix: "@_",
                 preserveOrder: true,
             });
             const built = builder.build(output);
@@ -588,188 +695,360 @@
             bgXml = built;
             layout = layout;
         } else {
-            toast.push("The background SVG you provided is not well formed.")
+            toast.push("The background SVG you provided is not well formed.");
         }
-    }
+    };
 </script>
 
-{#if (layout !== undefined)}
-<div class="columns">
-    <div class="column is-one-third">
-        <div class="field">
-            <label class="label" for="totalWidth">Total width</label>
-            <div class="control">
-                <input id="totalWidth" class="input" type="number" min="{layout.cellsize}" step="{layout.cellsize}" bind:value="{layout.width}" on:change="{() => layout = layout}">
-            </div>
-        </div>
-        <div class="field">
-            <label class="label" for="totalHeight">Total height</label>
-            <div class="control">
-                <input id="totalHeight" class="input" type="number" min="{layout.cellsize}" step="{layout.cellsize}" bind:value="{layout.height}" on:change="{() => layout = layout}">
-            </div>
-        </div>
-        <div class="field">
-            <label class="label" for="cellsize">Cell size</label>
-            <div class="control">
-                <input id="cellsize" class="input" type="number" min="1" bind:value="{inputCellsize}" on:change="{setCellsize}">
-            </div>
-            <p class="help">Biggest determiner of how much can fit in the SSD. This is the size of the smallest elements (e.g., a single hull box).</p>
-        </div>
-        <div class="field">
-            <label class="label" for="nameWidth">Nameplate width</label>
-            <div class="control">
-                <input id="nameWidth" class="input" type="number" step="{Math.round(layout.cellsize / 4)}" bind:value="{layout.nameplate.width}" on:change="{() => {layout.nameplate.height = layout.nameplate.width / layout.nameplate.factor; layout = layout}}">
-            </div>
-            <p class="help">Set to 0 to disable the nameplate.</p>
-        </div>
-        <div class="field">
-            <label class="label" for="statsWidth">Stats block width</label>
-            <div class="control">
-                <input id="statsWidth" class="input" type="number" step="{Math.round(layout.cellsize / 8)}" bind:value="{layout.stats.width}" on:change="{() => {layout.stats.height = layout.stats.width / layout.stats.factor; layout = layout}}">
-            </div>
-            <p class="help">Set to 0 to disable the stats block.</p>
-        </div>
-        <div class="columns">
-            <div class="column">
-                <div class="field">
-                    <label class="label" for="bgSvg">Background image</label>
-                    <div class="control">
-                        <input id="bgSvg" class="input" type="text" bind:value="{bgXml}" on:change="{processXml}">
-                    </div>
-                    <p class="help">Must be an &lt;svg&gt; or &lt;symbol&gt; tag.</p>
+{#if layout !== undefined}
+    <div class="columns">
+        <div class="column is-one-third">
+            <div class="field">
+                <label class="label" for="totalWidth">Total width</label>
+                <div class="control">
+                    <input
+                        id="totalWidth"
+                        class="input"
+                        type="number"
+                        min="{layout.cellsize}"
+                        step="{layout.cellsize}"
+                        bind:value="{layout.width}"
+                        on:change="{() => (layout = layout)}"
+                    />
                 </div>
             </div>
-            <div class="column">
-                <div class="field">
-                    <label class="label" for="bgSelect">Built-in outlines</label>
-                    <div class="control">
-                        <div class="select">
-                            <select bind:value="{selectedOutline}" on:change="{processOutline}">
-                                <option value="">No Outline</option>
-                            {#each shipOutlines as outline}
-                                <option value="{outline.id}">{outline.name}</option>
-                            {/each}
-                            </select>
+            <div class="field">
+                <label class="label" for="totalHeight">Total height</label>
+                <div class="control">
+                    <input
+                        id="totalHeight"
+                        class="input"
+                        type="number"
+                        min="{layout.cellsize}"
+                        step="{layout.cellsize}"
+                        bind:value="{layout.height}"
+                        on:change="{() => (layout = layout)}"
+                    />
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="cellsize">Cell size</label>
+                <div class="control">
+                    <input
+                        id="cellsize"
+                        class="input"
+                        type="number"
+                        min="1"
+                        bind:value="{inputCellsize}"
+                        on:change="{setCellsize}"
+                    />
+                </div>
+                <p class="help">
+                    Biggest determiner of how much can fit in the SSD. This is
+                    the size of the smallest elements (e.g., a single hull box).
+                </p>
+            </div>
+            <div class="field">
+                <label class="label" for="nameWidth">Nameplate width</label>
+                <div class="control">
+                    <input
+                        id="nameWidth"
+                        class="input"
+                        type="number"
+                        step="{Math.round(layout.cellsize / 4)}"
+                        bind:value="{layout.nameplate.width}"
+                        on:change="{() => {
+                            layout.nameplate.height =
+                                layout.nameplate.width /
+                                layout.nameplate.factor;
+                            layout = layout;
+                        }}"
+                    />
+                </div>
+                <p class="help">Set to 0 to disable the nameplate.</p>
+            </div>
+            <div class="field">
+                <label class="label" for="statsWidth">Stats block width</label>
+                <div class="control">
+                    <input
+                        id="statsWidth"
+                        class="input"
+                        type="number"
+                        step="{Math.round(layout.cellsize / 8)}"
+                        bind:value="{layout.stats.width}"
+                        on:change="{() => {
+                            layout.stats.height =
+                                layout.stats.width / layout.stats.factor;
+                            layout = layout;
+                        }}"
+                    />
+                </div>
+                <p class="help">Set to 0 to disable the stats block.</p>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="label" for="bgSvg">Background image</label
+                        >
+                        <div class="control">
+                            <input
+                                id="bgSvg"
+                                class="input"
+                                type="text"
+                                bind:value="{bgXml}"
+                                on:change="{processXml}"
+                            />
                         </div>
-                    {#if outlineHelpText !== undefined}
-                        <p class="help is-info">{outlineHelpText}</p>
-                    {/if}
-                        <p class="help">If you have outlines you're willing to share, please send them to me!</p>
+                        <p class="help">
+                            Must be an &lt;svg&gt; or &lt;symbol&gt; tag.
+                        </p>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="label" for="bgSelect"
+                            >Built-in outlines</label
+                        >
+                        <div class="control">
+                            <div class="select">
+                                <select
+                                    bind:value="{selectedOutline}"
+                                    on:change="{processOutline}"
+                                >
+                                    <option value="">No Outline</option>
+                                    {#each shipOutlines as outline}
+                                        <option value="{outline.id}"
+                                            >{outline.name}</option
+                                        >
+                                    {/each}
+                                </select>
+                            </div>
+                            {#if outlineHelpText !== undefined}
+                                <p class="help is-info">{outlineHelpText}</p>
+                            {/if}
+                            <p class="help">
+                                If you have outlines you're willing to share,
+                                please send them to me!
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {#if ( (layout.background !== undefined) && (layout.background.svg !== undefined) && (layout.background.svg.length > 0) )}
-        <div class="columns">
-            <div class="column">
-                <div class="field">
-                    <label class="label" for="bgX">Background X</label>
-                    <div class="control">
-                        <input id="bgX" class="input" type="number" step="{layout.cellsize}" bind:value="{layout.background.x}" on:change="{() => layout = layout}">
+            {#if layout.background !== undefined && layout.background.svg !== undefined && layout.background.svg.length > 0}
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label" for="bgX">Background X</label>
+                            <div class="control">
+                                <input
+                                    id="bgX"
+                                    class="input"
+                                    type="number"
+                                    step="{layout.cellsize}"
+                                    bind:value="{layout.background.x}"
+                                    on:change="{() => (layout = layout)}"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label" for="bgY">Background Y</label>
+                            <div class="control">
+                                <input
+                                    id="bgY"
+                                    class="input"
+                                    type="number"
+                                    step="{layout.cellsize}"
+                                    bind:value="{layout.background.y}"
+                                    on:change="{() => (layout = layout)}"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label" for="bgZoom"
+                                >Background zoom</label
+                            >
+                            <div class="control">
+                                <input
+                                    id="bgZoom"
+                                    class="input"
+                                    type="number"
+                                    step="0.1"
+                                    bind:value="{layout.background.zoom}"
+                                    on:change="{() => (layout = layout)}"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label" for="bgOpacity"
+                                >Background opacity</label
+                            >
+                            <div class="control">
+                                <input
+                                    id="bgOpacity"
+                                    class="input"
+                                    type="number"
+                                    step="0.1"
+                                    min="0"
+                                    max="1"
+                                    bind:value="{layout.background.opacity}"
+                                    on:change="{() => (layout = layout)}"
+                                />
+                                <p class="help">
+                                    1 means fully visible. 0 means invisible.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="column">
-                <div class="field">
-                    <label class="label" for="bgY">Background Y</label>
-                    <div class="control">
-                        <input id="bgY" class="input" type="number" step="{layout.cellsize}" bind:value="{layout.background.y}" on:change="{() => layout = layout}">
-                    </div>
-                </div>
-            </div>
-            <div class="column">
-                <div class="field">
-                    <label class="label" for="bgZoom">Background zoom</label>
-                    <div class="control">
-                        <input id="bgZoom" class="input" type="number" step="0.1" bind:value="{layout.background.zoom}" on:change="{() => layout = layout}">
-                    </div>
-                </div>
-            </div>
-            <div class="column">
-                <div class="field">
-                    <label class="label" for="bgOpacity">Background opacity</label>
-                    <div class="control">
-                        <input id="bgOpacity" class="input" type="number" step="0.1" min="0" max="1" bind:value="{layout.background.opacity}" on:change="{() => layout = layout}">
-                        <p class="help">1 means fully visible. 0 means invisible.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {/if}
-    </div>
-    <div class="column">
-        <div class="field">
-            <div class="control">
-                <label class="checkbox">
-                    <input type="checkbox" bind:checked="{$snapToGrid}">
-                    Snap to grid
-                </label>
-            </div>
-        </div>
-    {#if outOfBounds}
-        <div class="field">
-            <div class="control">
-                <button class="button is-danger" on:click="{correctOutOfBounds}">Correct Overflow</button>
-            </div>
-            <p class="help">There are elements outside of the SSD boundaries. Clicking the button will pull them onto the canvas.</p>
-        </div>
-    {/if}
-    {#key layout}
-        <div class="ssd">
-            <svg viewBox="-1 -1 {layout.width + 2} {layout.height + 2}" width="100%" height="100%" on:mousedown="{startDrag}" on:mouseup="{endDrag}" on:mousemove="{drag}" on:mouseleave="{endDrag}" on:touchstart="{startDrag}" on:touchmove="{drag}" on:touchend="{endDrag}" on:touchcancel="{endDrag}" bind:this="{svgDisplay}">
-                <defs>
-                {#each defs as g}
-                    {@html g.svg}
-                {/each}
-                {#if ( (layout.background !== undefined) && (layout.background.svg !== undefined) && (layout.background.svg.length > 0) )}
-                    {@html layout.background.svg}
-                {/if}
-                </defs>
-
-            <!-- White background to start -->
-            <rect x="0" y="0" width="{layout.width}" height="{layout.height}" fill="white" />
-
-            <!-- Background image if provided -->
-            {#if ( (layout.background !== undefined) && (layout.background.svg !== undefined) && (layout.background.svg.length > 0) )}
-                <use href="#_freeformBackground" x="{layout.background.x}" y="{layout.background.y}" width="{layout.width * layout.background.zoom}" height="{layout.height * layout.background.zoom}" opacity="{layout.background.opacity}" />
             {/if}
-
-            <!-- Grid of cellsize for alignment -->
-                <g id="grid">
-            {#each xs as x}
-                <line x1="{x}" y1="0" x2="{x}" y2="{layout.height}" stroke="#c0c0c0"/>
-            {/each}
-            {#each ys as y}
-                <line x1="0" y1="{y}" x2="{layout.width}" y2="{y}" stroke="#c0c0c0"/>
-            {/each}
-                </g>
-
-            <!-- Lines between magazines and launches and turreted weapons outside their turret graphic -->
-            {#each lines as line}
-                <line x1="{line[0].x}" y1="{line[0].y}" x2="{line[1].x}" y2="{line[1].y}" stroke="black" stroke-width="5"/>
-            {/each}
-
-            <!-- Each system and other element -->
-            {#each Object.values(layout.elements) as sys, i}
-                <use id="{sys.id}" href="#{sys.glyphid}" x="{sys.x}" y="{sys.y}" width="{sys.width}" height="{sys.height}" class="draggable" class:svgHighlight="{allOverlaps.has(sys.id)}" />
-            {/each}
-
-            <!-- And finally the black border -->
-                <rect x="0" y="0" width="{layout.width}" height="{layout.height}" fill="none" stroke="black"/>
-            </svg>
         </div>
-        {/key}
-        {#key svgDisplay}
-        <Export
-            width={layout.width}
-            height={layout.height}
-            svgDisplay={svgDisplay}
-            on:message
-        />
-        {/key}
-    </div>
-</div>
+        <div class="column">
+            <div class="field">
+                <div class="control">
+                    <label class="checkbox">
+                        <input type="checkbox" bind:checked="{$snapToGrid}" />
+                        Snap to grid
+                    </label>
+                </div>
+            </div>
+            {#if outOfBounds}
+                <div class="field">
+                    <div class="control">
+                        <button
+                            class="button is-danger"
+                            on:click="{correctOutOfBounds}"
+                            >Correct Overflow</button
+                        >
+                    </div>
+                    <p class="help">
+                        There are elements outside of the SSD boundaries.
+                        Clicking the button will pull them onto the canvas.
+                    </p>
+                </div>
+            {/if}
+            {#key layout}
+                <div class="ssd">
+                    <svg
+                        viewBox="-1 -1 {layout.width + 2} {layout.height + 2}"
+                        width="100%"
+                        height="100%"
+                        on:mousedown="{startDrag}"
+                        on:mouseup="{endDrag}"
+                        on:mousemove="{drag}"
+                        on:mouseleave="{endDrag}"
+                        on:touchstart="{startDrag}"
+                        on:touchmove="{drag}"
+                        on:touchend="{endDrag}"
+                        on:touchcancel="{endDrag}"
+                        bind:this="{svgDisplay}"
+                    >
+                        <defs>
+                            {#each defs as g}
+                                {@html g.svg}
+                            {/each}
+                            {#if layout.background !== undefined && layout.background.svg !== undefined && layout.background.svg.length > 0}
+                                {@html layout.background.svg}
+                            {/if}
+                        </defs>
 
+                        <!-- White background to start -->
+                        <rect
+                            x="0"
+                            y="0"
+                            width="{layout.width}"
+                            height="{layout.height}"
+                            fill="white"
+                        ></rect>
+
+                        <!-- Background image if provided -->
+                        {#if layout.background !== undefined && layout.background.svg !== undefined && layout.background.svg.length > 0}
+                            <use
+                                href="#_freeformBackground"
+                                x="{layout.background.x}"
+                                y="{layout.background.y}"
+                                width="{layout.width * layout.background.zoom}"
+                                height="{layout.height *
+                                    layout.background.zoom}"
+                                opacity="{layout.background.opacity}"
+                            ></use>
+                        {/if}
+
+                        <!-- Grid of cellsize for alignment -->
+                        <g id="grid">
+                            {#each xs as x}
+                                <line
+                                    x1="{x}"
+                                    y1="0"
+                                    x2="{x}"
+                                    y2="{layout.height}"
+                                    stroke="#c0c0c0"
+                                ></line>
+                            {/each}
+                            {#each ys as y}
+                                <line
+                                    x1="0"
+                                    y1="{y}"
+                                    x2="{layout.width}"
+                                    y2="{y}"
+                                    stroke="#c0c0c0"
+                                ></line>
+                            {/each}
+                        </g>
+
+                        <!-- Lines between magazines and launches and turreted weapons outside their turret graphic -->
+                        {#each lines as line}
+                            <line
+                                x1="{line[0].x}"
+                                y1="{line[0].y}"
+                                x2="{line[1].x}"
+                                y2="{line[1].y}"
+                                stroke="black"
+                                stroke-width="5"
+                            ></line>
+                        {/each}
+
+                        <!-- Each system and other element -->
+                        {#each Object.values(layout.elements) as sys, i}
+                            <use
+                                id="{sys.id}"
+                                href="#{sys.glyphid}"
+                                x="{sys.x}"
+                                y="{sys.y}"
+                                width="{sys.width}"
+                                height="{sys.height}"
+                                class="draggable"
+                                class:svgHighlight="{allOverlaps.has(sys.id)}"
+                            ></use>
+                        {/each}
+
+                        <!-- And finally the black border -->
+                        <rect
+                            x="0"
+                            y="0"
+                            width="{layout.width}"
+                            height="{layout.height}"
+                            fill="none"
+                            stroke="black"
+                        ></rect>
+                    </svg>
+                </div>
+            {/key}
+            {#key svgDisplay}
+                <Export
+                    width="{layout.width}"
+                    height="{layout.height}"
+                    svgDisplay="{svgDisplay}"
+                    on:message
+                />
+            {/key}
+        </div>
+    </div>
 {/if}
 
 <div>

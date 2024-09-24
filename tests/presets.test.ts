@@ -8,7 +8,7 @@ import library from "../src/stores/presets.json" assert { type: "json" };
 
 describe("Presets", () => {
     it("Validate fleets", () => {
-        const lib: IPresetFleet[] = (library as unknown) as IPresetFleet[];
+        const lib: IPresetFleet[] = library as unknown as IPresetFleet[];
         for (const fleet of lib) {
             expect(fleet).haveOwnProperty("name");
             expect(fleet).haveOwnProperty("ships");
@@ -16,7 +16,7 @@ describe("Presets", () => {
         }
     });
     it("Validate ships", () => {
-        const lib: IPresetFleet[] = (library as unknown) as IPresetFleet[];
+        const lib: IPresetFleet[] = library as unknown as IPresetFleet[];
         for (const fleet of lib) {
             for (const ship of fleet.ships) {
                 // console.log(`Fleet: ${fleet.name}, Ship: ${ship.name}`);

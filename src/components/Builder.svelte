@@ -7,7 +7,7 @@
     import SaveShip from "./SaveShip.svelte";
 
     const addArmour = () => {
-        $ship.armour.push([1,0]);
+        $ship.armour.push([1, 0]);
         $ship = $ship;
     };
 
@@ -19,7 +19,7 @@
     let thrust: number;
     let driveAdvanced: boolean;
     ship.subscribe((obj) => {
-        const drive = obj.systems.find(x => x.name === "drive");
+        const drive = obj.systems.find((x) => x.name === "drive");
         if (drive !== undefined) {
             thrust = drive.thrust as number;
             driveAdvanced = drive.advanced as boolean;
@@ -29,7 +29,7 @@
         }
     });
     $: {
-        const drive = $ship.systems.find(x => x.name === "drive");
+        const drive = $ship.systems.find((x) => x.name === "drive");
         if (drive !== undefined) {
             drive.thrust = thrust;
             drive.advanced = driveAdvanced;
@@ -45,7 +45,7 @@
     let ftlAdvanced: boolean;
     let transferMass = 0;
     ship.subscribe((obj) => {
-        const idx = obj.systems.findIndex(x => x.name === "ftl");
+        const idx = obj.systems.findIndex((x) => x.name === "ftl");
         if (idx === -1) {
             ftl = false;
             ftlAdvanced = false;
@@ -55,12 +55,12 @@
         }
     });
     $: {
-        const idx = $ship.systems.findIndex(x => x.name === "ftl");
+        const idx = $ship.systems.findIndex((x) => x.name === "ftl");
         if (idx === -1) {
             if (ftl) {
                 $ship.systems.push({
-                name: "ftl",
-                advanced: ftlAdvanced
+                    name: "ftl",
+                    advanced: ftlAdvanced,
                 });
             }
         } else {
@@ -74,42 +74,65 @@
     }
 
     const updateTransferMass = () => {
-        if ( (transferMass === undefined) || (transferMass === null) ) {
+        if (transferMass === undefined || transferMass === null) {
             transferMass = 0;
         }
         if (transferMass % 5 !== 0) {
             transferMass = Math.ceil(transferMass / 5) * 5;
         }
-        const idx = $ship.systems.findIndex(x => x.name === "ftl");
+        const idx = $ship.systems.findIndex((x) => x.name === "ftl");
         if (idx !== -1) {
             $ship.systems[idx].transferMass = transferMass;
         }
         $ship = $ship;
-    }
+    };
 
     let shipSystem: string;
     const addSystem = () => {
         if (shipSystem !== undefined) {
             if (shipSystem === "mineLayer") {
-                $ship.systems.push({name: "mineLayer", capacity: 2});
+                $ship.systems.push({ name: "mineLayer", capacity: 2 });
             } else if (shipSystem === "bay") {
-                $ship.systems.push({name: "bay", id: nanoid(5), capacity: 1, type: "cargo"});
+                $ship.systems.push({
+                    name: "bay",
+                    id: nanoid(5),
+                    capacity: 1,
+                    type: "cargo",
+                });
             } else if (shipSystem === "hangar") {
-                $ship.systems.push({name: "hangar", id: nanoid(5), isRack: false, critRules: false});
+                $ship.systems.push({
+                    name: "hangar",
+                    id: nanoid(5),
+                    isRack: false,
+                    critRules: false,
+                });
             } else if (shipSystem === "magazine") {
                 // @ts-ignore
-                $ship.systems.push({name: "magazine", capacity: 2, id: nanoid(5)});
+                $ship.systems.push({
+                    name: "magazine",
+                    capacity: 2,
+                    id: nanoid(5),
+                });
             } else if (shipSystem === "launchTube") {
-                $ship.systems.push({name: "launchTube", catapult: false});
+                $ship.systems.push({ name: "launchTube", catapult: false });
             } else if (shipSystem === "turret") {
-                $ship.systems.push({name: "turret", leftArc: "F", numArcs: 1});
+                $ship.systems.push({
+                    name: "turret",
+                    leftArc: "F",
+                    numArcs: 1,
+                });
             } else if (shipSystem === "decoy") {
-                $ship.systems.push({name: "decoy", type: "cruiser"});
+                $ship.systems.push({ name: "decoy", type: "cruiser" });
             } else if (shipSystem === "screen") {
-                $ship.systems.push({name: "screen", level: undefined, area: false, advanced: false});
+                $ship.systems.push({
+                    name: "screen",
+                    level: undefined,
+                    area: false,
+                    advanced: false,
+                });
             } else {
                 // @ts-ignore
-                $ship.systems.push({name: shipSystem});
+                $ship.systems.push({ name: shipSystem });
             }
             $ship = $ship;
         }
@@ -117,11 +140,18 @@
     let shipOrdnance: string;
     const addOrdnance = () => {
         if (shipOrdnance !== undefined) {
-            if ( (shipOrdnance === "salvoLauncher") || (shipOrdnance === "rocketPod") ) {
-                $ship.ordnance.push({name: shipOrdnance, leftArc: "FP", numArcs: 3});
+            if (
+                shipOrdnance === "salvoLauncher" ||
+                shipOrdnance === "rocketPod"
+            ) {
+                $ship.ordnance.push({
+                    name: shipOrdnance,
+                    leftArc: "FP",
+                    numArcs: 3,
+                });
             } else {
                 // @ts-ignore
-                $ship.ordnance.push({name: shipOrdnance});
+                $ship.ordnance.push({ name: shipOrdnance });
             }
             $ship = $ship;
         }
@@ -130,22 +160,67 @@
     const addWeapon = () => {
         if (shipWeapon !== undefined) {
             if (shipWeapon === "ads") {
-                $ship.weapons.push({name: shipWeapon, leftArc: "FP", numArcs: 3});
-            } else if (["phaser", "transporter", "needle", "beam", "emp", "plasmaCannon", "kgun", "gravitic", "pbl"].includes(shipWeapon)) {
+                $ship.weapons.push({
+                    name: shipWeapon,
+                    leftArc: "FP",
+                    numArcs: 3,
+                });
+            } else if (
+                [
+                    "phaser",
+                    "transporter",
+                    "needle",
+                    "beam",
+                    "emp",
+                    "plasmaCannon",
+                    "kgun",
+                    "gravitic",
+                    "pbl",
+                ].includes(shipWeapon)
+            ) {
                 // @ts-ignore
-                $ship.weapons.push({name: shipWeapon, class: 1, leftArc: "F", numArcs: 1});
-            } else if (["gatling", "particle", "meson", "fusion", "torpedoPulse", "pulser"].includes(shipWeapon)) {
+                $ship.weapons.push({
+                    name: shipWeapon,
+                    class: 1,
+                    leftArc: "F",
+                    numArcs: 1,
+                });
+            } else if (
+                [
+                    "gatling",
+                    "particle",
+                    "meson",
+                    "fusion",
+                    "torpedoPulse",
+                    "pulser",
+                ].includes(shipWeapon)
+            ) {
                 // @ts-ignore
-                $ship.weapons.push({name: shipWeapon, leftArc: "F", numArcs: 1});
+                $ship.weapons.push({
+                    name: shipWeapon,
+                    leftArc: "F",
+                    numArcs: 1,
+                });
             } else if (shipWeapon === "submunition") {
-                $ship.weapons.push({name: "submunition", leftArc: "FP", numArcs: 3});
+                $ship.weapons.push({
+                    name: "submunition",
+                    leftArc: "FP",
+                    numArcs: 3,
+                });
             } else if (shipWeapon === "graser") {
-                $ship.weapons.push({name: "graser", class: 1, leftArc: "F", numArcs: 3, heavy: false, highIntensity: false});
+                $ship.weapons.push({
+                    name: "graser",
+                    class: 1,
+                    leftArc: "F",
+                    numArcs: 3,
+                    heavy: false,
+                    highIntensity: false,
+                });
             } else if (shipWeapon === "mkp") {
-                $ship.weapons.push({name: "mkp", arc: "F"});
+                $ship.weapons.push({ name: "mkp", arc: "F" });
             } else {
                 // @ts-ignore
-                $ship.weapons.push({name: shipWeapon});
+                $ship.weapons.push({ name: shipWeapon });
                 $ship = $ship;
             }
         }
@@ -153,17 +228,21 @@
     };
 
     const addFighter = () => {
-        $ship.fighters.push({name: "fighters", type: "standard"});
+        $ship.fighters.push({ name: "fighters", type: "standard" });
         $ship = $ship;
     };
 
     let emptyHangars: number;
     let duplicateHangars = false;
     $: {
-        const numHangars = $ship.systems.reduce((a, v) => {return v.name === "hangar" ? a + 1 : a}, 0);
+        const numHangars = $ship.systems.reduce((a, v) => {
+            return v.name === "hangar" ? a + 1 : a;
+        }, 0);
         const numFighters = $ship.fighters.length;
         emptyHangars = numHangars - numFighters;
-        const unique: Set<string> = new Set([...$ship.fighters.map(x => x.hangar)]);
+        const unique: Set<string> = new Set([
+            ...$ship.fighters.map((x) => x.hangar),
+        ]);
         if (unique.size !== $ship.fighters.length) {
             duplicateHangars = true;
         } else {
@@ -201,7 +280,7 @@
         } else if (m <= 180) {
             $ship.class = "Dreadnought";
         } else {
-            $ship.class = "Superdreadnought"
+            $ship.class = "Superdreadnought";
         }
     };
 
@@ -212,19 +291,19 @@
     const toggle = (flag: string) => {
         switch (flag) {
             case "systems":
-                showSystems = ! showSystems;
+                showSystems = !showSystems;
                 break;
             case "ordnance":
-                showOrdnance = ! showOrdnance;
+                showOrdnance = !showOrdnance;
                 break;
             case "weapons":
-                showWeapons = ! showWeapons;
+                showWeapons = !showWeapons;
                 break;
             case "fighters":
-                showFighters = ! showFighters;
+                showFighters = !showFighters;
                 break;
         }
-    }
+    };
 </script>
 
 <div class="columns" id="anchorBuilder">
@@ -235,58 +314,96 @@
             <div class="field">
                 <label class="label" for="mass">Mass</label>
                 <div class="control">
-                    <input id="mass" class="input" type="number" placeholder="Mass" min="4" max="300" step="2" bind:value={$ship.mass} on:change="{setClass}">
+                    <input
+                        id="mass"
+                        class="input"
+                        type="number"
+                        placeholder="Mass"
+                        min="4"
+                        max="300"
+                        step="2"
+                        bind:value="{$ship.mass}"
+                        on:change="{setClass}"
+                    />
                 </div>
-            {#if ($ship.mass < 4)}
-                <p class="help is-danger">The minimum mass is 4.</p>
-            {:else if ($ship.mass > 300)}
-                <p class="help is-danger">The maximum mass is 300.</p>
-            {:else if ( ($ship.mass > 10) && ($ship.mass % 2 !== 0) )}
-                <p class="help is-danger">The mass of ships larger than 9 must be an even number.</p>
-            {/if}
+                {#if $ship.mass < 4}
+                    <p class="help is-danger">The minimum mass is 4.</p>
+                {:else if $ship.mass > 300}
+                    <p class="help is-danger">The maximum mass is 300.</p>
+                {:else if $ship.mass > 10 && $ship.mass % 2 !== 0}
+                    <p class="help is-danger">
+                        The mass of ships larger than 9 must be an even number.
+                    </p>
+                {/if}
             </div>
 
             <div class="field">
                 <label class="label" for="class">Ship class</label>
-                <p class="help">Is overwritten by the system if the mass changes.</p>
+                <p class="help">
+                    Is overwritten by the system if the mass changes.
+                </p>
                 <div class="control">
-                    <input id="class" class="input" type="text" placeholder="Ship class" bind:value="{$ship.class}">
+                    <input
+                        id="class"
+                        class="input"
+                        type="text"
+                        placeholder="Ship class"
+                        bind:value="{$ship.class}"
+                    />
                 </div>
-
             </div>
 
             <div class="field">
                 <label class="label" for="shipName">Ship name</label>
                 <p class="help">Appears on the SSD in quotes.</p>
                 <div class="control">
-                    <input id="shipName" class="input" type="text" placeholder="Ship name" bind:value="{$ship.name}">
+                    <input
+                        id="shipName"
+                        class="input"
+                        type="text"
+                        placeholder="Ship name"
+                        bind:value="{$ship.name}"
+                    />
                 </div>
-
             </div>
 
             <div class="field">
                 <label class="label" for="hull">Hull strength</label>
                 <div class="control">
-                <input name="hull" class="input" type="number" placeholder="Hull strength" bind:value={$ship.hull.points} max="{$ship.mass}">
+                    <input
+                        name="hull"
+                        class="input"
+                        type="number"
+                        placeholder="Hull strength"
+                        bind:value="{$ship.hull.points}"
+                        max="{$ship.mass}"
+                    />
                 </div>
-                {#if $ship.hull.points < ($ship.mass * 0.1)}
-                    <p class="help is-danger">Hull strength must be at least 10% of total mass.</p>
+                {#if $ship.hull.points < $ship.mass * 0.1}
+                    <p class="help is-danger">
+                        Hull strength must be at least 10% of total mass.
+                    </p>
                 {:else if $ship.hull.points > $ship.mass}
-                    <p class="help is-danger">Hull strength may not exceed the total mass.</p>
-                {:else if $ship.hull.points < ($ship.mass * 0.2)}
+                    <p class="help is-danger">
+                        Hull strength may not exceed the total mass.
+                    </p>
+                {:else if $ship.hull.points < $ship.mass * 0.2}
                     <p class="help is-danger">Hull rating: FRAGILE</p>
-                {:else if $ship.hull.points < ($ship.mass * 0.3)}
+                {:else if $ship.hull.points < $ship.mass * 0.3}
                     <p class="help is-warning">Hull rating: WEAK</p>
-                {:else if $ship.hull.points < ($ship.mass * 0.4)}
+                {:else if $ship.hull.points < $ship.mass * 0.4}
                     <p class="help is-success">Hull rating: AVERAGE</p>
-                {:else if $ship.hull.points < ($ship.mass * 0.5)}
+                {:else if $ship.hull.points < $ship.mass * 0.5}
                     <p class="help is-success">Hull rating: STRONG</p>
-                {:else if $ship.hull.points >= ($ship.mass * 0.5)}
+                {:else if $ship.hull.points >= $ship.mass * 0.5}
                     <p class="help is-warning">Hull rating: SUPER</p>
                 {/if}
                 <div class="control">
                     <label class="checkbox">
-                        <input type="checkbox" bind:checked="{$ship.civilian}">
+                        <input
+                            type="checkbox"
+                            bind:checked="{$ship.civilian}"
+                        />
                         Civilian ship (changes the crew factor)
                     </label>
                 </div>
@@ -294,57 +411,94 @@
 
             <div class="field">
                 <label class="label" for="rows">Hull rows</label>
-                <p class="help">4 is the default. 3 means advanced tech. 5 and 6 increases your odds of critical damage, but reduces the point cost.</p>
+                <p class="help">
+                    4 is the default. 3 means advanced tech. 5 and 6 increases
+                    your odds of critical damage, but reduces the point cost.
+                </p>
                 <div class="control">
-                <input id="rows" class="input" type="number" placeholder="Hull rows" min="3" max="6" bind:value={$ship.hull.rows}>
+                    <input
+                        id="rows"
+                        class="input"
+                        type="number"
+                        placeholder="Hull rows"
+                        min="3"
+                        max="6"
+                        bind:value="{$ship.hull.rows}"
+                    />
                 </div>
             </div>
-            <MassPts
-                obj={systems.getSpecial("hull", $ship)}
-            />
+            <MassPts obj="{systems.getSpecial('hull', $ship)}" />
 
             <div class="field is-grouped topPadding">
                 <div class="control">
-                    <button class="button is-primary is-small" on:click="{addArmour}" disabled="{$ship.armour.length >= 5}">
+                    <button
+                        class="button is-primary is-small"
+                        on:click="{addArmour}"
+                        disabled="{$ship.armour.length >= 5}"
+                    >
                         Add armour row
                     </button>
                 </div>
                 <div class="control">
-                    <button class="button is-danger is-small" on:click="{delArmour}" disabled="{$ship.armour.length === 0}">
+                    <button
+                        class="button is-danger is-small"
+                        on:click="{delArmour}"
+                        disabled="{$ship.armour.length === 0}"
+                    >
                         Remove armour row
                     </button>
                 </div>
             </div>
 
-            {#each $ship.armour as row, i }
-            <div class="columns">
-                <div class="column">
-                    <div class="field">
-                        <label class="label" for="armour{i}">Armour: Row {i + 1}</label>
-                        <div class="control">
-                        <input id="armour{i}" class="input" type="number" placeholder="Armour points" min="1" bind:value={$ship.armour[i][0]}>
+            {#each $ship.armour as row, i}
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label" for="armour{i}"
+                                >Armour: Row {i + 1}</label
+                            >
+                            <div class="control">
+                                <input
+                                    id="armour{i}"
+                                    class="input"
+                                    type="number"
+                                    placeholder="Armour points"
+                                    min="1"
+                                    bind:value="{$ship.armour[i][0]}"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label" for="regenArmour{i}"
+                                >Regenerative: Row {i + 1}</label
+                            >
+                            <div class="control">
+                                <input
+                                    id="regenArmour{i}"
+                                    class="input"
+                                    type="number"
+                                    placeholder="Regenerative armour points"
+                                    min="0"
+                                    bind:value="{$ship.armour[i][1]}"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="column">
-                    <div class="field">
-                        <label class="label" for="regenArmour{i}">Regenerative: Row {i + 1}</label>
-                        <div class="control">
-                        <input id="regenArmour{i}" class="input" type="number" placeholder="Regenerative armour points" min="0" bind:value={$ship.armour[i][1]}>
-                        </div>
-                    </div>
-                </div>
-            </div>
             {/each}
-            <MassPts
-                obj={systems.getSpecial("armour", $ship)}
-            />
+            <MassPts obj="{systems.getSpecial('armour', $ship)}" />
 
             <div class="field">
                 <label class="label" for="stealth">Stealth level</label>
                 <div class="control">
                     <div class="select">
-                        <select id="stealth" bind:value={$ship.hull.stealth} on:change="{() => $ship = $ship}">
+                        <select
+                            id="stealth"
+                            bind:value="{$ship.hull.stealth}"
+                            on:change="{() => ($ship = $ship)}"
+                        >
                             <option value="0">No stealth</option>
                             <option value="1">Stealth level 1</option>
                             <option value="2">Stealth level 2</option>
@@ -352,54 +506,67 @@
                     </div>
                 </div>
             </div>
-            <MassPts
-                obj={systems.getSpecial("stealth", $ship)}
-            />
+            <MassPts obj="{systems.getSpecial('stealth', $ship)}" />
 
             <div class="field">
-                <label class="label" for="streamlining">Atmospheric streamlining</label>
+                <label class="label" for="streamlining"
+                    >Atmospheric streamlining</label
+                >
                 <p class="help">Not indicated on the SSD.</p>
                 <div class="control">
                     <div class="select">
-                        <select id="streamlining" bind:value={$ship.hull.streamlining} on:change="{() => $ship = $ship}">
+                        <select
+                            id="streamlining"
+                            bind:value="{$ship.hull.streamlining}"
+                            on:change="{() => ($ship = $ship)}"
+                        >
                             <option value="none">None</option>
                             <option value="partial">Partial</option>
                             <option value="full">Full</option>
                         </select>
                     </div>
-
                 </div>
             </div>
-            <MassPts
-                obj={systems.getSpecial("streamlining", $ship)}
-            />
+            <MassPts obj="{systems.getSpecial('streamlining', $ship)}" />
 
             <div class="field">
                 <label class="label" for="orientation">Arc orientation</label>
-                <p class="help">Alpha is the default. Beta rotates the firing arcs 30&deg; clockwise.</p>
+                <p class="help">
+                    Alpha is the default. Beta rotates the firing arcs 30&deg;
+                    clockwise.
+                </p>
                 <div class="control">
                     <div class="select">
-                        <select id="orientation" bind:value={$ship.orientation} on:change="{() => $ship = $ship}">
+                        <select
+                            id="orientation"
+                            bind:value="{$ship.orientation}"
+                            on:change="{() => ($ship = $ship)}"
+                        >
                             <option value="alpha">Alpha</option>
                             <option value="beta">Beta</option>
                         </select>
                     </div>
-
                 </div>
             </div>
 
             {#if $ship.mass !== undefined && $ship.mass >= 60}
-            <div class="field">
-                <div class="control">
-                    <label class="checkbox">
-                        <input type="checkbox" bind:checked={$ship.flawed}>
-                        Flawed design?
-                    </label>
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                            <input
+                                type="checkbox"
+                                bind:checked="{$ship.flawed}"
+                            />
+                            Flawed design?
+                        </label>
+                    </div>
+                    <p class="help">
+                        Reduces point cost by 20% but makes ship vulnerable to
+                        catastrophic failure. See <em>Continuum</em> ruleset, page
+                        113.
+                    </p>
                 </div>
-                <p class="help">Reduces point cost by 20% but makes ship vulnerable to catastrophic failure. See <em>Continuum</em> ruleset, page 113.</p>
-            </div>
             {/if}
-
         </section>
 
         <section class="section">
@@ -408,38 +575,66 @@
             <div class="field">
                 <label class="label" for="thrust">Thrust</label>
                 <div class="control">
-                    <input id="thrust" class="input" type="number" placeholder="Thrust" min="0" bind:value={thrust}>
+                    <input
+                        id="thrust"
+                        class="input"
+                        type="number"
+                        placeholder="Thrust"
+                        min="0"
+                        bind:value="{thrust}"
+                    />
                 </div>
                 <div class="control">
                     <label class="checkbox">
-                        <input type="checkbox" bind:checked="{driveAdvanced}">
+                        <input type="checkbox" bind:checked="{driveAdvanced}" />
                         Advanced drive
                     </label>
                 </div>
                 <MassPts
-                    obj={systems.getSystem($ship.systems.find(x => x.name === "drive"), $ship)}
+                    obj="{systems.getSystem(
+                        $ship.systems.find((x) => x.name === 'drive'),
+                        $ship
+                    )}"
                 />
                 <div class="control">
                     <label class="checkbox">
-                        <input type="checkbox" bind:checked="{ftl}">
+                        <input type="checkbox" bind:checked="{ftl}" />
                         FTL enabled
                     </label>
-                {#if ftl}
-                    <label class="checkbox">
-                        <input type="checkbox" bind:checked="{ftlAdvanced}">
-                        Advanced FTL
-                    </label>
-                    <div class="field">
-                        <label class="label" for="transferMass">Tug capacity (transfer mass)</label>
-                        <div class="control">
-                            <input id="transferMass" class="input" type="number" placeholder="Tug capacity (transfer mass)" bind:value={transferMass} on:blur={updateTransferMass}>
+                    {#if ftl}
+                        <label class="checkbox">
+                            <input
+                                type="checkbox"
+                                bind:checked="{ftlAdvanced}"
+                            />
+                            Advanced FTL
+                        </label>
+                        <div class="field">
+                            <label class="label" for="transferMass"
+                                >Tug capacity (transfer mass)</label
+                            >
+                            <div class="control">
+                                <input
+                                    id="transferMass"
+                                    class="input"
+                                    type="number"
+                                    placeholder="Tug capacity (transfer mass)"
+                                    bind:value="{transferMass}"
+                                    on:blur="{updateTransferMass}"
+                                />
+                            </div>
+                            <p class="help">
+                                Must be a multiple of 5. Ship doesn't update
+                                until you exit the field.
+                            </p>
                         </div>
-                        <p class="help">Must be a multiple of 5. Ship doesn't update until you exit the field.</p>
-                    </div>
-                    <MassPts
-                        obj={systems.getSystem($ship.systems.find(x => x.name === "ftl"), $ship)}
-                    />
-                {/if}
+                        <MassPts
+                            obj="{systems.getSystem(
+                                $ship.systems.find((x) => x.name === 'ftl'),
+                                $ship
+                            )}"
+                        />
+                    {/if}
                 </div>
             </div>
         </section>
@@ -462,214 +657,271 @@
         {/if}
         </section>
         -->
-
-    </div> <!-- Column -->
+    </div>
+    <!-- Column -->
 
     <div class="column">
         <section class="section">
-            <div class ="level">
+            <div class="level">
                 <div class="level-left">
                     <div class="level-item">
-                        <span class="icon" on:click="{() => toggle("systems")}">
-                        {#if showSystems}
-                            <i class="fa-solid fa-chevron-down"></i>
-                        {:else}
-                            <i class="fa-solid fa-chevron-right"></i>
-                        {/if}
-                          </span>
+                        <span class="icon" on:click="{() => toggle('systems')}">
+                            {#if showSystems}
+                                <i class="fa-solid fa-chevron-down"></i>
+                            {:else}
+                                <i class="fa-solid fa-chevron-right"></i>
+                            {/if}
+                        </span>
                     </div>
                     <div class="level-item">
-                        <h2 class="subtitle" title="Systems that appear on your SSD but that aren't triggered in the ordnance or firing phases">General Systems</h2>
+                        <h2
+                            class="subtitle"
+                            title="Systems that appear on your SSD but that aren't triggered in the ordnance or firing phases"
+                        >
+                            General Systems
+                        </h2>
                     </div>
                 </div>
             </div>
-        {#if showSystems}
-            <label class="label" for="shipSystems">Select a system to add</label>
-            <p class="help">Some systems have additional options available once equipped.</p>
-            <div class="field has-addons">
-
-                <div class="control is-expanded">
-                    <div class="select is-fullwidth">
-                        <select id="shipSystems" bind:value={shipSystem}>
-                        {#each systems.systemList as sysname}
-                            <option value="{sysname}">{systems.sortNames.get(sysname)}</option>
-                        {/each}
-                        </select>
-                    </div>
-                </div>
-
-                <div class="control">
-                    <button class="button is-primary" on:click="{addSystem}">Add System</button>
-                </div>
-            </div>
-
-            <section class="container">
-            {#each $ship.systems as sys, i}
-                {#if systems.systemList.includes(sys.name) }
-                <SysDisplay
-                    prop="systems"
-                    idx={i}
-                />
-                {/if}
-            {/each}
-            </section>
-        {/if}
-        </section>
-
-        <section class="section">
-            <div class ="level">
-                <div class="level-left">
-                    <div class="level-item">
-                        <span class="icon" on:click="{() => toggle("ordnance")}">
-                        {#if showOrdnance}
-                            <i class="fa-solid fa-chevron-down"></i>
-                        {:else}
-                            <i class="fa-solid fa-chevron-right"></i>
-                        {/if}
-                          </span>
-                    </div>
-                    <div class="level-item">
-                        <h2 class="subtitle" title="Systems that are triggered during the ordnance phase">Ordnance</h2>
-                    </div>
-                </div>
-            </div>
-
-        {#if showOrdnance}
-            <label class="label" for="ordnanceSystems">Select a system to add</label>
-            <p class="help">Some systems have additional options available once equipped.</p>
-            <div class="field has-addons">
-                <div class="control is-expanded">
-                    <div class="select is-fullwidth">
-                        <select id="ordnanceSystems" bind:value={shipOrdnance}>
-                        {#each systems.ordnanceList as ordname}
-                            <option value="{ordname}">{systems.sortNames.get(ordname)}</option>
-                        {/each}
-                        </select>
-                    </div>
-                </div>
-                <div class="control">
-                    <button class="button is-primary" on:click="{addOrdnance}">Load Ordnance</button>
-                </div>
-            </div>
-            <section class="container">
-            {#each $ship.ordnance as sys, i}
-                {#if systems.ordnanceList.includes(sys.name) }
-                <SysDisplay
-                    prop="ordnance"
-                    idx={i}
-                />
-                {/if}
-            {/each}
-            </section>
-        {/if}
-        </section>
-
-        <section class="section">
-            <div class ="level">
-                <div class="level-left">
-                    <div class="level-item">
-                        <span class="icon" on:click="{() => toggle("weapons")}">
-                        {#if showWeapons}
-                            <i class="fa-solid fa-chevron-down"></i>
-                        {:else}
-                            <i class="fa-solid fa-chevron-right"></i>
-                        {/if}
-                          </span>
-                    </div>
-                    <div class="level-item">
-                        <h2 class="subtitle" title="Systems that are triggered during the firing phase">Weapons (Offensive and Defensive)</h2>
-                    </div>
-                </div>
-            </div>
-
-        {#if showWeapons}
-            <label class="label" for="weaponSystems">Select a system to add</label>
-            <p class="help">Some systems have additional options available once equipped.</p>
-            <div class="field has-addons">
-                <div class="control is-expanded">
-                    <div class="select is-fullwidth">
-                        <select id="weaponSystems" bind:value={shipWeapon}>
-                        {#each systems.weaponList as weaponName}
-                            <option value="{weaponName}">{systems.sortNames.get(weaponName)}</option>
-                        {/each}
-                        </select>
-                    </div>
-                </div>
-
-                <div class="control">
-                    <button class="button is-primary" on:click="{addWeapon}">Add weapon</button>
-                </div>
-            </div>
-            <section class="container">
-            {#each $ship.weapons as sys, i}
-                {#if systems.weaponList.includes(sys.name) }
-                <SysDisplay
-                    prop="weapons"
-                    idx={i}
-                />
-                {/if}
-            {/each}
-            </section>
-        {/if}
-        </section>
-
-    {#if ( (emptyHangars > 0) || ($ship.fighters.length > 0) )}
-        <section class="section">
-            <div class ="level">
-                <div class="level-left">
-                    <div class="level-item">
-                        <span class="icon" on:click="{() => toggle("fighters")}">
-                        {#if showFighters}
-                            <i class="fa-solid fa-chevron-down"></i>
-                        {:else}
-                            <i class="fa-solid fa-chevron-right"></i>
-                        {/if}
-                          </span>
-                    </div>
-                    <div class="level-item">
-                        <h2 class="subtitle">Fighters</h2>
-                    </div>
-                </div>
-            </div>
-
-        {#if showFighters}
-            <div class="content">
-                <p>
-                    You have {emptyHangars} empty hangar{emptyHangars != 1 ? "s" : ""} awaiting fighters.
+            {#if showSystems}
+                <label class="label" for="shipSystems"
+                    >Select a system to add</label
+                >
+                <p class="help">
+                    Some systems have additional options available once
+                    equipped.
                 </p>
-            {#if duplicateHangars}
-                <p class="alert">
-                    You have multiple fighters assigned to the same hangar.
-                </p>
+                <div class="field has-addons">
+                    <div class="control is-expanded">
+                        <div class="select is-fullwidth">
+                            <select id="shipSystems" bind:value="{shipSystem}">
+                                {#each systems.systemList as sysname}
+                                    <option value="{sysname}"
+                                        >{systems.sortNames.get(
+                                            sysname
+                                        )}</option
+                                    >
+                                {/each}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control">
+                        <button class="button is-primary" on:click="{addSystem}"
+                            >Add System</button
+                        >
+                    </div>
+                </div>
+
+                <section class="container">
+                    {#each $ship.systems as sys, i}
+                        {#if systems.systemList.includes(sys.name)}
+                            <SysDisplay prop="systems" idx="{i}" />
+                        {/if}
+                    {/each}
+                </section>
             {/if}
-            </div>
-            <div class="field">
-                <div class="control">
-                {#if emptyHangars > 0}
-                    <button class="button is-primary" on:click="{addFighter}">Add fighter wing</button>
-                {:else}
-                    <button class="button is-primary" disabled>Add fighter wing</button>
-                {/if}
+        </section>
+
+        <section class="section">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <span
+                            class="icon"
+                            on:click="{() => toggle('ordnance')}"
+                        >
+                            {#if showOrdnance}
+                                <i class="fa-solid fa-chevron-down"></i>
+                            {:else}
+                                <i class="fa-solid fa-chevron-right"></i>
+                            {/if}
+                        </span>
+                    </div>
+                    <div class="level-item">
+                        <h2
+                            class="subtitle"
+                            title="Systems that are triggered during the ordnance phase"
+                        >
+                            Ordnance
+                        </h2>
+                    </div>
                 </div>
             </div>
-            <section class="container">
-            {#each $ship.fighters as sys, i}
-                <SysDisplay
-                    prop="fighters"
-                    idx={i}
-                />
-            {/each}
+
+            {#if showOrdnance}
+                <label class="label" for="ordnanceSystems"
+                    >Select a system to add</label
+                >
+                <p class="help">
+                    Some systems have additional options available once
+                    equipped.
+                </p>
+                <div class="field has-addons">
+                    <div class="control is-expanded">
+                        <div class="select is-fullwidth">
+                            <select
+                                id="ordnanceSystems"
+                                bind:value="{shipOrdnance}"
+                            >
+                                {#each systems.ordnanceList as ordname}
+                                    <option value="{ordname}"
+                                        >{systems.sortNames.get(
+                                            ordname
+                                        )}</option
+                                    >
+                                {/each}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control">
+                        <button
+                            class="button is-primary"
+                            on:click="{addOrdnance}">Load Ordnance</button
+                        >
+                    </div>
+                </div>
+                <section class="container">
+                    {#each $ship.ordnance as sys, i}
+                        {#if systems.ordnanceList.includes(sys.name)}
+                            <SysDisplay prop="ordnance" idx="{i}" />
+                        {/if}
+                    {/each}
+                </section>
+            {/if}
+        </section>
+
+        <section class="section">
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <span class="icon" on:click="{() => toggle('weapons')}">
+                            {#if showWeapons}
+                                <i class="fa-solid fa-chevron-down"></i>
+                            {:else}
+                                <i class="fa-solid fa-chevron-right"></i>
+                            {/if}
+                        </span>
+                    </div>
+                    <div class="level-item">
+                        <h2
+                            class="subtitle"
+                            title="Systems that are triggered during the firing phase"
+                        >
+                            Weapons (Offensive and Defensive)
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            {#if showWeapons}
+                <label class="label" for="weaponSystems"
+                    >Select a system to add</label
+                >
+                <p class="help">
+                    Some systems have additional options available once
+                    equipped.
+                </p>
+                <div class="field has-addons">
+                    <div class="control is-expanded">
+                        <div class="select is-fullwidth">
+                            <select
+                                id="weaponSystems"
+                                bind:value="{shipWeapon}"
+                            >
+                                {#each systems.weaponList as weaponName}
+                                    <option value="{weaponName}"
+                                        >{systems.sortNames.get(
+                                            weaponName
+                                        )}</option
+                                    >
+                                {/each}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control">
+                        <button class="button is-primary" on:click="{addWeapon}"
+                            >Add weapon</button
+                        >
+                    </div>
+                </div>
+                <section class="container">
+                    {#each $ship.weapons as sys, i}
+                        {#if systems.weaponList.includes(sys.name)}
+                            <SysDisplay prop="weapons" idx="{i}" />
+                        {/if}
+                    {/each}
+                </section>
+            {/if}
+        </section>
+
+        {#if emptyHangars > 0 || $ship.fighters.length > 0}
+            <section class="section">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <span
+                                class="icon"
+                                on:click="{() => toggle('fighters')}"
+                            >
+                                {#if showFighters}
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                {:else}
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                {/if}
+                            </span>
+                        </div>
+                        <div class="level-item">
+                            <h2 class="subtitle">Fighters</h2>
+                        </div>
+                    </div>
+                </div>
+
+                {#if showFighters}
+                    <div class="content">
+                        <p>
+                            You have {emptyHangars} empty hangar{emptyHangars !=
+                            1
+                                ? "s"
+                                : ""} awaiting fighters.
+                        </p>
+                        {#if duplicateHangars}
+                            <p class="alert">
+                                You have multiple fighters assigned to the same
+                                hangar.
+                            </p>
+                        {/if}
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            {#if emptyHangars > 0}
+                                <button
+                                    class="button is-primary"
+                                    on:click="{addFighter}"
+                                    >Add fighter wing</button
+                                >
+                            {:else}
+                                <button class="button is-primary" disabled
+                                    >Add fighter wing</button
+                                >
+                            {/if}
+                        </div>
+                    </div>
+                    <section class="container">
+                        {#each $ship.fighters as sys, i}
+                            <SysDisplay prop="fighters" idx="{i}" />
+                        {/each}
+                    </section>
+                {/if}
             </section>
         {/if}
-        </section>
-    {/if}
+    </div>
+    <!-- Column -->
+</div>
+<!-- Columns -->
 
-    </div> <!-- Column -->
-</div> <!-- Columns -->
-
-<SaveShip
-    ship={$ship}
-/>
+<SaveShip ship="{$ship}" />
 
 <style>
     .alert {

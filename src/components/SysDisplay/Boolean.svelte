@@ -5,7 +5,7 @@
     interface ISystem {
         name: string;
         [k: string]: unknown;
-    };
+    }
 
     export let prop: string;
     export let idx: number;
@@ -17,15 +17,19 @@
     $: sys = $ship[prop][idx];
 
     afterUpdate(() => {
-        if (! sys.hasOwnProperty(flagName)) {
-        sys[flagName] = defaultVal as boolean;
+        if (!sys.hasOwnProperty(flagName)) {
+            sys[flagName] = defaultVal as boolean;
         }
     });
 </script>
 
 <div class="control">
     <label class="checkbox">
-        <input type="checkbox" bind:checked="{sys[flagName]}" on:change="{() => $ship = $ship}">
+        <input
+            type="checkbox"
+            bind:checked="{sys[flagName]}"
+            on:change="{() => ($ship = $ship)}"
+        />
         {flagText}
     </label>
 </div>
