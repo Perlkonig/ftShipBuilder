@@ -22,6 +22,7 @@
     let sumMass: number;
     let sumNpv: number;
     let sumCpv: number;
+    let invertFooter = false;
     savedFleet.subscribe((fleet) => {
         htmlExport = `<!DOCTYPE html>
 <html lang="en">
@@ -49,7 +50,7 @@
         `;
         htmlExport += fleet.ships
             .map((ship) => {
-                const svg = renderSvg(ship);
+                const svg = renderSvg(ship, { invertFooter });
                 if (svg !== undefined) {
                     const match = svg.match(
                         /viewBox="(\-?\d+) (\-?\d+) (\d+) (\d+)"/
@@ -177,18 +178,30 @@
         </div>
     </div>
     <div class="level-item">
-        <div class="control">
-            <a
-                href="{'data:text/html;charset=utf-8,' +
-                    encodeURIComponent(htmlExport)}"
-                download="{`fleet-${new Date().toISOString()}.html`}"
-            >
-                <button
-                    class="button is-small is-info"
-                    disabled="{$savedFleet.ships.length === 0}"
-                    >Export to HTML</button
+        <div>
+            <div class="control">
+                <a
+                    href="{'data:text/html;charset=utf-8,' +
+                        encodeURIComponent(htmlExport)}"
+                    download="{`fleet-${new Date().toISOString()}.html`}"
                 >
-            </a>
+                    <button
+                        class="button is-small is-info"
+                        disabled="{$savedFleet.ships.length === 0}"
+                        >Export to HTML</button
+                    >
+                </a>
+            </div>
+            <div class="control">
+                <label class="checkbox">
+                    <input
+                        type="checkbox"
+                        bind:checked="{invertFooter}"
+                        on:change="{() => ($savedFleet = $savedFleet)}"
+                    />
+                    Invert footers
+                </label>
+            </div>
         </div>
     </div>
     <div class="level-item">
@@ -223,7 +236,7 @@
             class="column is-one-quarter alignVertical"
             style="{hasErrors(ship) ? 'background-color: red;' : ''}"
         >
-            {@html renderSvg(ship)}
+            {@html renderSvg(ship, { invertFooter })}
             <div class="level">
                 <div class="level-item">
                     <a href="#anchorBuilder">

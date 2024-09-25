@@ -1,7 +1,7 @@
 {
     "name": "ftshipbuilder",
     "private": true,
-    "version": "3.7.0",
+    "version": "3.7.1",
     "description": "A web-based tool for generating valid Full Thrust ships",
     "author": "Aaron Dalton <aaron@daltons.ca> (https://www.perlkonig.com)",
     "license": "MIT",
@@ -43,7 +43,7 @@
         "@zerodevx/svelte-toast": "^0.9.3",
         "canvg": "^4.0.1",
         "fast-xml-parser": "^4.2.0",
-        "ftlibship": "github:perlkonig/ftLibShip#v2.4.0",
+        "ftlibship": "github:perlkonig/ftlibship#v2.4.1",
         "lz-string": "^1.5.0",
         "nanoid": "^4.0.2",
         "robust-point-in-polygon": "^1.0.3",

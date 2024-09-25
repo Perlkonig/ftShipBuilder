@@ -503,7 +503,7 @@
         let startX = 0;
         let groupWidth = 9;
         if (svgFtl !== undefined) {
-            svgCombined += `<use id="_ftl" href="_${svgFtl.id}" x="0" y="0" width="${cellsize * 2}" height="${cellsize * 2}" />`;
+            svgCombined += `<use id="_ftl" href="#${svgFtl.id}" x="0" y="0" width="${cellsize * 2}" height="${cellsize * 2}" />`;
             startX = cellsize * 2;
             groupWidth += 2;
         }
