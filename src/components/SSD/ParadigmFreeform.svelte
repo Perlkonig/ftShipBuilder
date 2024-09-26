@@ -197,14 +197,14 @@
         if (!layout.elements.hasOwnProperty("#drive")) {
             layout.elements["#drive"] = {
                 id: "#drive",
-                glyphid: `svg_${driveObj.glyph().id}`,
+                glyphid: `${driveObj.glyph().id}`,
                 height: layout.cellsize * 2,
                 width: layout.cellsize * 2,
                 x: layout.cellsize,
                 y: layout.cellsize,
             };
         } else {
-            layout.elements["#drive"].glyphid = `svg_${driveObj.glyph().id}`;
+            layout.elements["#drive"].glyphid = `${driveObj.glyph().id}`;
             layout.elements["#drive"].height = layout.cellsize * 2;
             layout.elements["#drive"].width = layout.cellsize * 2;
         }
@@ -216,14 +216,14 @@
             if (!layout.elements.hasOwnProperty("#ftl")) {
                 layout.elements["#ftl"] = {
                     id: "#ftl",
-                    glyphid: `svg_${ftlObj.glyph().id}`,
+                    glyphid: `${ftlObj.glyph().id}`,
                     height: layout.cellsize * 2,
                     width: layout.cellsize * 2,
                     x: layout.cellsize,
                     y: layout.cellsize,
                 };
             } else {
-                layout.elements["#ftl"].glyphid = `svg_${ftlObj.glyph().id}`;
+                layout.elements["#ftl"].glyphid = `${ftlObj.glyph().id}`;
                 layout.elements["#ftl"].height = layout.cellsize * 2;
                 layout.elements["#ftl"].width = layout.cellsize * 2;
             }
@@ -236,14 +236,14 @@
         if (!layout.elements.hasOwnProperty("#core")) {
             layout.elements["#core"] = {
                 id: "#core",
-                glyphid: `svg_${coreGlyph.id}`,
+                glyphid: `${coreGlyph.id}`,
                 height: layout.cellsize * 3,
                 width: layout.cellsize * 6,
                 x: layout.cellsize,
                 y: layout.cellsize,
             };
         } else {
-            layout.elements["#core"].glyphid = `svg_${coreGlyph.id}`;
+            layout.elements["#core"].glyphid = `${coreGlyph.id}`;
             layout.elements["#core"].height = layout.cellsize * 3;
             layout.elements["#core"].width = layout.cellsize * 6;
         }
@@ -270,14 +270,14 @@
                 if (!layout.elements.hasOwnProperty(obj.uid)) {
                     layout.elements[obj.uid] = {
                         id: obj.uid,
-                        glyphid: `svg_${svg.id}`,
+                        glyphid: `${svg.id}`,
                         width: svg.width * layout.cellsize,
                         height: svg.height * layout.cellsize,
                         x: layout.cellsize,
                         y: layout.cellsize,
                     };
                 } else {
-                    layout.elements[obj.uid].glyphid = `svg_${svg.id}`;
+                    layout.elements[obj.uid].glyphid = `${svg.id}`;
                     layout.elements[obj.uid].width =
                         svg.width * layout.cellsize;
                     layout.elements[obj.uid].height =
@@ -303,14 +303,14 @@
             if (!layout.elements.hasOwnProperty(obj.uid)) {
                 layout.elements[obj.uid] = {
                     id: obj.uid,
-                    glyphid: `svg_${svg.id}`,
+                    glyphid: `${svg.id}`,
                     width: svg.width * layout.cellsize,
                     height: svg.height * layout.cellsize,
                     x: layout.cellsize,
                     y: layout.cellsize,
                 };
             } else {
-                layout.elements[obj.uid].glyphid = `svg_${svg.id}`;
+                layout.elements[obj.uid].glyphid = `${svg.id}`;
                 layout.elements[obj.uid].width = svg.width * layout.cellsize;
                 layout.elements[obj.uid].height = svg.height * layout.cellsize;
             }
