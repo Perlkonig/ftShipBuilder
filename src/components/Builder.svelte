@@ -321,7 +321,6 @@
                         placeholder="Mass"
                         min="4"
                         max="300"
-                        step="2"
                         bind:value="{$ship.mass}"
                         on:change="{setClass}"
                     />
@@ -330,10 +329,6 @@
                     <p class="help is-danger">The minimum mass is 4.</p>
                 {:else if $ship.mass > 300}
                     <p class="help is-danger">The maximum mass is 300.</p>
-                {:else if $ship.mass > 10 && $ship.mass % 2 !== 0}
-                    <p class="help is-danger">
-                        The mass of ships larger than 9 must be an even number.
-                    </p>
                 {/if}
             </div>
 
