@@ -4,7 +4,7 @@
     import { shipOutlines } from "@/lib/shipOutlines";
     import type { ISystemSVG } from "ftlibship";
     import { hull, systems, svgLib } from "ftlibship";
-    import { afterUpdate, onMount } from "svelte";
+    import { afterUpdate } from "svelte";
     import type { ILayout, IFreeform, IElement } from "@/stores/writeShip";
     import { XMLBuilder, XMLParser, XMLValidator } from "fast-xml-parser";
     import { toast } from "@zerodevx/svelte-toast";
@@ -12,7 +12,10 @@
     import { nanoid } from "nanoid";
 
     let layout: IFreeform;
-    onMount(() => {
+    let inputCellsize: number;
+    let bgXml: string = "";
+
+    $: if ($ship) {
         if (
             $ship.layout !== undefined &&
             typeof $ship.layout !== "string" &&
@@ -45,20 +48,16 @@
                 background: { svg: undefined, x: 0, y: 0, zoom: 1, opacity: 1 },
                 elements: {},
             };
-            if (
-                $ship.layout === undefined ||
-                typeof $ship.layout === "string"
-            ) {
+            if ($ship.layout === undefined || typeof $ship.layout === "string") {
                 $ship.layout = {} as ILayout;
             }
             ($ship.layout as ILayout).freeform = layout;
-            if (layout.background.svg !== undefined) {
-                bgXml = layout.background.svg;
-            }
         }
         inputCellsize = layout.cellsize;
-        // findAllOverlaps();
-    });
+        if (layout.background && layout.background.svg !== undefined) {
+            bgXml = layout.background.svg;
+        }
+    }
 
     interface ISystem {
         name: string;
@@ -98,7 +97,7 @@
     let defs: ISystemSVG[] = [];
     let lines: IPoint[][] = [];
     let outOfBounds = false;
-    $: if (layout !== undefined) {
+    $: if (layout !== undefined && secretSvg) {
         defs = [];
         lines = [];
         xs = [];
@@ -169,7 +168,10 @@
         ) {
             hullCols++;
         }
-        const hullSvg = hull.genSvg($ship, { cellsize: layout.cellsize });
+        let hullSvg = hull.genSvg($ship, { cellsize: layout.cellsize });
+        if (hullSvg) {
+            hullSvg = hullSvg.replace(/<symbol id="[^"]+"/, '<symbol id="_ssdHull"');
+        }
         defs.push({
             id: "_ssdHull",
             svg: hullSvg,
@@ -180,6 +182,7 @@
             layout.elements["#hull"].height =
                 hullArray.length * layout.cellsize;
             layout.elements["#hull"].width = hullCols * layout.cellsize;
+            layout.elements["#hull"].glyphid = "_ssdHull";
         } else {
             layout.elements["#hull"] = {
                 id: "#hull",
@@ -550,7 +553,7 @@
         return new DOMRect(ele.x, ele.y, ele.width, ele.height);
     };
 
-    let allOverlaps: Set<string>;
+    let allOverlaps: Set<string> = new Set();
     const findOverlapWith = (dropped: IElement) => {
         const droppedRect = genRect(dropped);
         for (const used of Object.values(layout.elements)) {
@@ -621,7 +624,6 @@
 
     // The following is required to prevent a STATUS_BREAKPOINT crash in Chrome
     // when the cellsize value is 0 or simply deleted.
-    let inputCellsize: number;
     const setCellsize = () => {
         if (inputCellsize === undefined || inputCellsize < 1) {
             inputCellsize = 100;
@@ -630,7 +632,6 @@
         layout = layout;
     };
 
-    let bgXml: string;
     const processXml = () => {
         // Process bgXml and put the results into layout.background.svg
         const result = XMLValidator.validate(bgXml, {

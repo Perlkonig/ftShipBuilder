@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.7.4] - 2026-04-22
+
+### Fixed
+
+-   Fixed a bug that kept hull and armour blocks from displaying properly in the Blocks and Freeform layout engines when loading ships from a fleet. (Thank you, @Bk2O7 for reporting.)
+
 ## [v3.7.3] - 2024-09-27
 
 ### Fixed

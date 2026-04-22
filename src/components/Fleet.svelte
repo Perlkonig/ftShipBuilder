@@ -77,8 +77,8 @@
         let newship = $savedFleet.ships[idx];
         if (newship !== undefined) {
             newship = JSON.parse(JSON.stringify(newship));
-            compatCheck(newship);
             $ship = newship;
+            compatCheck(newship);
         }
     };
 

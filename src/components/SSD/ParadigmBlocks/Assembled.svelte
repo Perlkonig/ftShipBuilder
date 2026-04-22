@@ -35,13 +35,17 @@
     let fullSsdSvg: SVGSVGElement;
 
     const genHull = () => {
-        $ssdComponents.hull = hull.genSvg($ship, {
+        let hullSvg = hull.genSvg($ship, {
             cellsize: layout.blocks.cellsize,
             dim: {
                 height: layout.blocks.blockHull.height,
                 width: layout.blocks.blockHull.width,
             },
         });
+        if (hullSvg) {
+            hullSvg = hullSvg.replace(/<symbol id="[^"]+"/, '<symbol id="_ssdHull"');
+        }
+        $ssdComponents.hull = hullSvg;
         $ssdComponents = $ssdComponents;
     };
 
