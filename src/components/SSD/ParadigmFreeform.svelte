@@ -15,6 +15,9 @@
     let inputCellsize: number;
     let bgXml: string = "";
 
+    // Flag to track if the input is currently focused
+    let isCellsizeInputFocused = false;
+
     $: if ($ship) {
         if (
             $ship.layout !== undefined &&
@@ -53,7 +56,11 @@
             }
             ($ship.layout as ILayout).freeform = layout;
         }
-        inputCellsize = layout.cellsize;
+        // Only update inputCellsize from layout.cellsize if the input is not focused
+        // This prevents user input from being overwritten
+        if (!isCellsizeInputFocused) {
+            inputCellsize = layout.cellsize;
+        }
         if (layout.background && layout.background.svg !== undefined) {
             bgXml = layout.background.svg;
         }
@@ -101,16 +108,18 @@
         defs = [];
         lines = [];
         xs = [];
-        let currx = layout.cellsize;
+        const stepX = Math.max(1, layout.cellsize || 100);
+        let currx = stepX;
         while (currx < layout.width) {
             xs.push(currx);
-            currx += layout.cellsize;
+            currx += stepX;
         }
         ys = [];
-        let curry = layout.cellsize;
+        const stepY = Math.max(1, layout.cellsize || 100);
+        let curry = stepY;
         while (curry < layout.height) {
             ys.push(curry);
-            curry += layout.cellsize;
+            curry += stepY;
         }
 
         // Generate text symbols
@@ -625,10 +634,11 @@
     // The following is required to prevent a STATUS_BREAKPOINT crash in Chrome
     // when the cellsize value is 0 or simply deleted.
     const setCellsize = () => {
-        if (inputCellsize === undefined || inputCellsize < 1) {
+        if (inputCellsize === undefined || inputCellsize === null || inputCellsize < 1) {
             inputCellsize = 100;
         }
         layout.cellsize = inputCellsize;
+        $ship = $ship;
         layout = layout;
     };
 
@@ -714,7 +724,7 @@
                         min="{layout.cellsize}"
                         step="{layout.cellsize}"
                         bind:value="{layout.width}"
-                        on:change="{() => (layout = layout)}"
+                        on:change="{() => { layout = layout; $ship = $ship; }}"
                     />
                 </div>
             </div>
@@ -728,7 +738,7 @@
                         min="{layout.cellsize}"
                         step="{layout.cellsize}"
                         bind:value="{layout.height}"
-                        on:change="{() => (layout = layout)}"
+                        on:change="{() => { layout = layout; $ship = $ship; }}"
                     />
                 </div>
             </div>
@@ -742,6 +752,8 @@
                         min="1"
                         bind:value="{inputCellsize}"
                         on:change="{setCellsize}"
+                        on:focus="{() => isCellsizeInputFocused = true}"
+                        on:blur="{() => isCellsizeInputFocused = false}"
                     />
                 </div>
                 <p class="help">
@@ -847,7 +859,7 @@
                                     type="number"
                                     step="{layout.cellsize}"
                                     bind:value="{layout.background.x}"
-                                    on:change="{() => (layout = layout)}"
+                                    on:change="{() => { layout = layout; $ship = $ship; }}"
                                 />
                             </div>
                         </div>
@@ -862,7 +874,7 @@
                                     type="number"
                                     step="{layout.cellsize}"
                                     bind:value="{layout.background.y}"
-                                    on:change="{() => (layout = layout)}"
+                                    on:change="{() => { layout = layout; $ship = $ship; }}"
                                 />
                             </div>
                         </div>
@@ -879,7 +891,7 @@
                                     type="number"
                                     step="0.1"
                                     bind:value="{layout.background.zoom}"
-                                    on:change="{() => (layout = layout)}"
+                                    on:change="{() => { layout = layout; $ship = $ship; }}"
                                 />
                             </div>
                         </div>
@@ -898,7 +910,7 @@
                                     min="0"
                                     max="1"
                                     bind:value="{layout.background.opacity}"
-                                    on:change="{() => (layout = layout)}"
+                                    on:change="{() => { layout = layout; $ship = $ship; }}"
                                 />
                                 <p class="help">
                                     1 means fully visible. 0 means invisible.
