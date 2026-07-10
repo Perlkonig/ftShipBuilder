@@ -14,11 +14,24 @@
     export let defaultVal = false;
 
     let sys: ISystem;
+    let checked = false;
+
     $: sys = $ship[prop][idx];
+    $: {
+        if (sys && !sys.hasOwnProperty(flagName)) {
+            sys[flagName] = defaultVal;
+        }
+        checked = Boolean(sys?.[flagName]);
+    }
+
+    const onCheckChange = () => {
+        sys[flagName] = checked;
+        $ship = $ship;
+    };
 
     afterUpdate(() => {
         if (!sys.hasOwnProperty(flagName)) {
-            sys[flagName] = defaultVal as boolean;
+            sys[flagName] = defaultVal;
         }
     });
 </script>
@@ -27,8 +40,8 @@
     <label class="checkbox">
         <input
             type="checkbox"
-            bind:checked="{sys[flagName]}"
-            on:change="{() => ($ship = $ship)}"
+            bind:checked="{checked}"
+            on:change="{onCheckChange}"
         />
         {flagText}
     </label>

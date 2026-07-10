@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.7.6] - 2026-07-09
+
+### Changed
+
+-   Updated ftlibship to v3.0.2 (shared SSD title resize utility).
+-   Updated ftlibship to v3.0.1 (browser-safe schema loading).
+-   Updated dependencies within the current Svelte 3 / Vite 4 stack.
+-   Build scripts use `cross-env` for reliable `NODE_ENV` on Windows.
+
+### Fixed
+
+-   Compatibility fixes for ftlibship v3.0 type changes (`extras` shape, weapon name typing).
+-   Test suite updated for current Node/ts-node JSON import behavior.
+-   Fixed in-place `.sort()` on stored ships and presets mutating localStorage.
+-   Fixed preset load assigning by reference into bundled preset data.
+-   Fixed fleet JSON import not updating the fleet name input.
+-   Fixed mass input allowing 4 when ftlibship requires minimum 5.
+-   Fixed FTL tug capacity not syncing when loading a ship.
+-   Fixed duplicate embedded font data URLs breaking offline SVG export.
+-   Fixed compact block layout hull grid (5×7 cells).
+-   Extended `compatCheck` for v3 schema migration (legacy armour, `invaders` stripping, `extras` normalization).
+-   Completed evaluation error messages for v3 codes (`UnknownSystem`, `FlawedUnderMass`).
+-   Hardened localStorage and JSON load paths against corrupt data.
+-   Fleet SSD nameplate and stats text no longer stay at default size (inline SVG scripts do not run under Svelte `{@html}`).
+
+### Added
+
+-   Unit tests for `compatCheck`, block layout presets, ship outline assets, and the starter ship template.
+-   Builder UI to view and remove unknown/legacy system entries from loaded JSON.
+-   Shared evaluation error messages in `statusErrors.ts`.
+-   Additional unit tests for fonts, layout grid alignment, and error message coverage.
+-   Fleet view uses `FleetShipSvg` to resize SSD titles after DOM mount; fleet HTML export includes shared resize script.
+
 ## [v3.7.5] - 2026-04-29
 
 ### Fixed

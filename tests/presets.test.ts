@@ -4,7 +4,16 @@ import "mocha";
 import type { FullThrustShip, IValidation } from "ftlibship";
 import { EvalErrorCode, ValErrorCode, evaluate, validate } from "ftlibship";
 import type { IPresetFleet } from "../src/stores/readPresets";
-import library from "../src/stores/presets.json" assert { type: "json" };
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const library = JSON.parse(
+    readFileSync(
+        join(dirname(fileURLToPath(import.meta.url)), "../src/stores/presets.json"),
+        "utf-8"
+    )
+);
 
 describe("Presets", () => {
     it("Validate fleets", () => {

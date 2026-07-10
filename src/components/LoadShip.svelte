@@ -3,7 +3,6 @@
     import { savedShips } from "../stores/writeStoredShips";
     import { savedFleet } from "../stores/writeFleet";
     import { presets } from "../stores/readPresets";
-    import type { IPresetFleet } from "../stores/readPresets";
     import LZString from "lz-string";
     import { toast } from "@zerodevx/svelte-toast";
     import { onMount } from "svelte";
@@ -76,13 +75,16 @@
     };
 
     const readConfigJson = (e) => {
-        let file = e.target.files[0];
-        let reader = new FileReader();
+        const file = e.target.files?.[0];
+        if (file === undefined) {
+            return;
+        }
+        const reader = new FileReader();
         reader.readAsText(file);
-        reader.onload = (e) => {
+        reader.onload = () => {
             shipJSON = reader.result.toString();
         };
-        reader.onerror = (e) => {
+        reader.onerror = () => {
             toast.push("Error loading provided file. (Not JSON?)", {});
         };
     };
@@ -92,31 +94,41 @@
     const loadLocal = () => {
         const entry = $savedShips.find((x) => x.name === shipID);
         if (entry !== undefined) {
-            $ship = JSON.parse(entry.json);
-            compatCheck($ship);
+            try {
+                $ship = JSON.parse(entry.json);
+                compatCheck($ship);
+            } catch {
+                toast.push("Stored ship data is corrupted", {});
+            }
         }
     };
 
     let presetFleetName: string;
-    let presetFleet: IPresetFleet;
-    $: {
-        if (presetFleetName !== undefined && presetFleetName !== "") {
-            presetFleet = $presets.find((f) => f.name === presetFleetName);
-        }
-    }
     let presetShipName: string;
+    let prevPresetFleetName: string | undefined;
+    $: presetFleet =
+        presetFleetName !== undefined && presetFleetName !== ""
+            ? $presets.find((f) => f.name === presetFleetName)
+            : undefined;
+    $: if (presetFleetName !== prevPresetFleetName) {
+        presetShipName = undefined;
+        prevPresetFleetName = presetFleetName;
+    }
     const loadPreset = () => {
         const fleet = $presets.find((f) => f.name === presetFleetName);
         if (fleet !== undefined) {
             const entry = fleet.ships.find((x) => x.name === presetShipName);
             if (entry !== undefined) {
-                $ship = entry;
+                $ship = structuredClone(entry);
                 compatCheck($ship);
             }
         }
     };
 
     const loadFaction = () => {
+        if (presetFleet === undefined) {
+            return;
+        }
         savedFleet.update((v) => ({
             ...v,
             ships: [
@@ -147,7 +159,7 @@
             <div class="control">
                 <div class="select">
                     <select id="saveName" bind:value="{shipID}">
-                        {#each $savedShips.sort( (a, b) => a.name.localeCompare(b.name) ) as s}
+                        {#each [...$savedShips].sort( (a, b) => a.name.localeCompare(b.name) ) as s}
                             <option id="{s.name}" value="{s.name}"
                                 >{s.name}</option
                             >
@@ -167,12 +179,12 @@
     </div>
     <div class="level-item">
         <div class="field">
-            <label class="label" for="fleetName">Presets</label>
+            <label class="label" for="presetFleetSelect">Presets</label>
             <div class="control">
                 <div class="select">
-                    <select id="fleetName" bind:value="{presetFleetName}">
+                    <select id="presetFleetSelect" bind:value="{presetFleetName}">
                         <option id="" value=""></option>
-                        {#each $presets.sort( (a, b) => a.name.localeCompare(b.name) ) as fleet}
+                        {#each [...$presets].sort( (a, b) => a.name.localeCompare(b.name) ) as fleet}
                             <option id="{fleet.name}" value="{fleet.name}"
                                 >{fleet.name}</option
                             >
@@ -180,11 +192,11 @@
                     </select>
                 </div>
             </div>
-            {#if presetFleetName !== undefined && presetFleetName !== ""}
+            {#if presetFleetName !== undefined && presetFleetName !== "" && presetFleet}
                 <div class="control">
                     <div class="select">
                         <select id="shipName" bind:value="{presetShipName}">
-                            {#each presetFleet.ships.sort((a, b) => a.mass - b.mass) as ship}
+                            {#each [...presetFleet.ships].sort((a, b) => a.mass - b.mass) as ship}
                                 <option id="{ship.name}" value="{ship.name}"
                                     >{ship.name} (Mass: {ship.mass}, NPV: {ship.points})</option
                                 >

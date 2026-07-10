@@ -8,6 +8,7 @@
     import Assembled from "./ParadigmBlocks/Assembled.svelte";
     import SystemArranger from "./ParadigmBlocks/SystemArranger.svelte";
     import CustomLayout from "./ParadigmBlocks/CustomLayout.svelte";
+    import { toast } from "@zerodevx/svelte-toast";
 
     let layout: IBlocks;
     onMount(() => {
@@ -60,8 +61,12 @@
     };
 
     const loadJSON = () => {
-        editingLayout = JSON.parse(layoutJSON);
-        modalLoadJSON = undefined;
+        try {
+            editingLayout = JSON.parse(layoutJSON);
+            modalLoadJSON = undefined;
+        } catch {
+            toast.push("Invalid layout JSON provided", {});
+        }
     };
 
     const handleMessage = (e) => {

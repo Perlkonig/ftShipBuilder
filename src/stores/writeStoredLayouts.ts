@@ -1,13 +1,11 @@
 import { writable } from "svelte/store";
 import type { ILayout } from "../lib/layouts";
+import { readJsonStorage, writeJsonStorage } from "../lib/localStorage.js";
 
-let storedLayouts: ILayout[] = [];
-if (localStorage.getItem("layouts") !== null) {
-    storedLayouts = JSON.parse(localStorage.getItem("layouts"));
-}
+const storedLayouts = readJsonStorage<ILayout[]>("layouts", []);
 
 export const savedLayouts = writable(storedLayouts);
 
 savedLayouts.subscribe((v) => {
-    localStorage.setItem("layouts", JSON.stringify(v));
+    writeJsonStorage("layouts", v);
 });

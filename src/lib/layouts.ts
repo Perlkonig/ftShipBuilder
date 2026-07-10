@@ -48,7 +48,7 @@ const layoutCompact: ILayout = {
         minx: 0,
         miny: 100,
         width: 1000,
-        height: 1500,
+        height: 1400,
     },
     blockName: {
         minx: 1000,

@@ -4,7 +4,7 @@ export const fontZen = `
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url(data:application/font-woff;base64,data:application/font-woff;base64,
+    src: url(data:application/font-woff;base64,
     d09GMgABAAAAADMUABEAAAAAekQAADKzAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     GoEOG6N0HGwGYACDHAhKCZwMEQgKgZRkgYEYC4NQAAE2AiQDhxoEIAWEFAeFSAyB
     MhuBbQdUrxnnbgfyuEfdRxBFyWZtLYq6RTltG/z/f0+QIYfJ6y5fYLqJIoq6mukO
@@ -289,7 +289,7 @@ export const fontRoboto = `
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url(data:application/font-woff;base64,data:application/font-woff;base64,
+    src: url(data:application/font-woff;base64,
     d09GMgABAAAAAD2AABIAAAAAjnQAAD0aAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     GmQbmWQchV4GYACDIAhUCYM8EQwKgdx8gcR7C4QKABKCEAE2AiQDiBAEIAWCdAcg
     DIJJGzN/JezYiwK6AzihqSaqkQj7NFrlfHQg9jiQuO4X/P/nBM1EBrn5JK11TkWF

@@ -2,6 +2,7 @@
     import { nanoid } from "nanoid";
     import { ship } from "../stores/writeShip";
     import { systems } from "ftlibship";
+    import type { FullThrustShip } from "ftlibship";
     import SysDisplay from "./SysDisplay.svelte";
     import MassPts from "./MassPts.svelte";
     import SaveShip from "./SaveShip.svelte";
@@ -49,9 +50,13 @@
         if (idx === -1) {
             ftl = false;
             ftlAdvanced = false;
+            transferMass = 0;
         } else {
             ftl = true;
             ftlAdvanced = obj.systems[idx].advanced as boolean;
+            const tm = obj.systems[idx].transferMass;
+            transferMass =
+                tm !== undefined && tm !== null ? (tm as number) : 0;
         }
     });
     $: {
@@ -178,13 +183,12 @@
                     "pbl",
                 ].includes(shipWeapon)
             ) {
-                // @ts-ignore
-                $ship.weapons.push({
+                ($ship.weapons as FullThrustShip["weapons"]).push({
                     name: shipWeapon,
                     class: 1,
                     leftArc: "F",
                     numArcs: 1,
-                });
+                } as FullThrustShip["weapons"][number]);
             } else if (
                 [
                     "gatling",
@@ -195,12 +199,11 @@
                     "pulser",
                 ].includes(shipWeapon)
             ) {
-                // @ts-ignore
-                $ship.weapons.push({
+                ($ship.weapons as FullThrustShip["weapons"]).push({
                     name: shipWeapon,
                     leftArc: "F",
                     numArcs: 1,
-                });
+                } as FullThrustShip["weapons"][number]);
             } else if (shipWeapon === "submunition") {
                 $ship.weapons.push({
                     name: "submunition",
@@ -304,6 +307,33 @@
                 break;
         }
     };
+
+    const hiddenSystemNames = new Set(["drive", "ftl"]);
+    $: unknownSystems = $ship.systems
+        .map((sys, i) => ({ sys, i }))
+        .filter(
+            ({ sys }) =>
+                !hiddenSystemNames.has(sys.name) &&
+                !systems.systemList.includes(sys.name)
+        );
+    $: unknownOrdnance = $ship.ordnance
+        .map((sys, i) => ({ sys, i }))
+        .filter(({ sys }) => !systems.ordnanceList.includes(sys.name));
+    $: unknownWeapons = $ship.weapons
+        .map((sys, i) => ({ sys, i }))
+        .filter(({ sys }) => !systems.weaponList.includes(sys.name));
+    $: hasUnknownEntries =
+        unknownSystems.length > 0 ||
+        unknownOrdnance.length > 0 ||
+        unknownWeapons.length > 0;
+
+    const removeFromShip = (
+        prop: "systems" | "ordnance" | "weapons",
+        idx: number
+    ) => {
+        $ship[prop].splice(idx, 1);
+        $ship = $ship;
+    };
 </script>
 
 <div class="columns" id="anchorBuilder">
@@ -319,14 +349,14 @@
                         class="input"
                         type="number"
                         placeholder="Mass"
-                        min="4"
+                        min="5"
                         max="300"
                         bind:value="{$ship.mass}"
                         on:change="{setClass}"
                     />
                 </div>
-                {#if $ship.mass < 4}
-                    <p class="help is-danger">The minimum mass is 4.</p>
+                {#if $ship.mass < 5}
+                    <p class="help is-danger">The minimum mass is 5.</p>
                 {:else if $ship.mass > 300}
                     <p class="help is-danger">The maximum mass is 300.</p>
                 {/if}
@@ -909,6 +939,63 @@
                         {/each}
                     </section>
                 {/if}
+            </section>
+        {/if}
+
+        {#if hasUnknownEntries}
+            <section class="section">
+                <h2 class="subtitle">Unknown / legacy entries</h2>
+                <p class="help is-danger">
+                    These entries are not recognized by the current system
+                    library. They may have come from an older JSON file. Remove
+                    them to clear validation errors.
+                </p>
+                {#each unknownSystems as { sys, i }}
+                    <div class="field is-grouped">
+                        <p class="control is-expanded">
+                            System: <code>{sys.name}</code>
+                            {#if sys.id !== undefined}
+                                (id: {sys.id})
+                            {/if}
+                        </p>
+                        <p class="control">
+                            <button
+                                class="button is-danger is-small"
+                                on:click="{() => removeFromShip('systems', i)}"
+                                >Remove</button
+                            >
+                        </p>
+                    </div>
+                {/each}
+                {#each unknownOrdnance as { sys, i }}
+                    <div class="field is-grouped">
+                        <p class="control is-expanded">
+                            Ordnance: <code>{sys.name}</code>
+                        </p>
+                        <p class="control">
+                            <button
+                                class="button is-danger is-small"
+                                on:click="{() =>
+                                    removeFromShip('ordnance', i)}"
+                                >Remove</button
+                            >
+                        </p>
+                    </div>
+                {/each}
+                {#each unknownWeapons as { sys, i }}
+                    <div class="field is-grouped">
+                        <p class="control is-expanded">
+                            Weapon: <code>{sys.name}</code>
+                        </p>
+                        <p class="control">
+                            <button
+                                class="button is-danger is-small"
+                                on:click="{() => removeFromShip('weapons', i)}"
+                                >Remove</button
+                            >
+                        </p>
+                    </div>
+                {/each}
             </section>
         {/if}
     </div>

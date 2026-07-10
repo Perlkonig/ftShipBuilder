@@ -1,7 +1,8 @@
 <script lang="ts">
     import { savedFleet } from "@/stores/writeFleet";
     import { ship } from "@/stores/writeShip";
-    import { renderSvg } from "ftlibship";
+    import { renderSvg, buildFleetHtmlResizeScript } from "ftlibship";
+    import FleetShipSvg from "./FleetShipSvg.svelte";
     import { compatCheck } from "@/lib/compatCheck";
     import { toast } from "@zerodevx/svelte-toast";
     import { evaluate, type FullThrustShip } from "ftlibship";
@@ -67,6 +68,7 @@
             .join("");
         htmlExport += `
       </div>
+      ${buildFleetHtmlResizeScript()}
     </main>
   </body>
 </html>
@@ -103,7 +105,12 @@
         // strip leading whitespace
         const cleaned = fleetJSON.trim();
         try {
-            $savedFleet = JSON.parse(cleaned);
+            const fleet = JSON.parse(cleaned) as typeof $savedFleet;
+            for (const s of fleet.ships) {
+                compatCheck(s);
+            }
+            $savedFleet = fleet;
+            fleetName = fleet.name;
             modalLoadJSON = undefined;
             toast.push("Fleet loaded");
             clearLoadJSON();
@@ -119,13 +126,16 @@
     };
 
     const readConfigJson = (e) => {
-        let file = e.target.files[0];
-        let reader = new FileReader();
+        const file = e.target.files?.[0];
+        if (file === undefined) {
+            return;
+        }
+        const reader = new FileReader();
         reader.readAsText(file);
-        reader.onload = (e) => {
+        reader.onload = () => {
             fleetJSON = reader.result.toString();
         };
-        reader.onerror = (e) => {
+        reader.onerror = () => {
             toast.push("Error loading provided file. (Not JSON?)", {});
         };
     };
@@ -147,6 +157,7 @@
             <label class="label" for="fleetName">Name the fleet</label>
             <div class="control">
                 <input
+                    id="fleetName"
                     name="fleetName"
                     class="input"
                     type="text"
@@ -236,7 +247,7 @@
             class="column is-one-quarter alignVertical"
             style="{hasErrors(ship) ? 'background-color: red;' : ''}"
         >
-            {@html renderSvg(ship, { invertFooter })}
+            <FleetShipSvg {ship} {invertFooter} />
             <div class="level">
                 <div class="level-item">
                     <a href="#anchorBuilder">

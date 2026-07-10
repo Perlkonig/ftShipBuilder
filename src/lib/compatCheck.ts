@@ -9,4 +9,14 @@ export const compatCheck = (ship: FullThrustShip) => {
             }
         }
     }
+
+    // v3: invaders are render-time only, not persisted on ship JSON
+    if (ship.hasOwnProperty("invaders")) {
+        delete (ship as FullThrustShip & { invaders?: unknown }).invaders;
+    }
+
+    // v3: extras is an object, not an array
+    if (Array.isArray(ship.extras)) {
+        ship.extras = {};
+    }
 };
