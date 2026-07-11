@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ship } from "../stores/writeShip";
+    import { ship, starterShip } from "../stores/writeShip";
     import { evaluate } from "ftlibship";
     import type { IEvaluation } from "ftlibship";
     import { afterUpdate } from "svelte";
@@ -10,13 +10,14 @@
         [k: string]: unknown;
     }
 
-    let results: IEvaluation;
-    let delta: number;
+    let results: IEvaluation = evaluate(starterShip);
+    let delta: number | undefined;
     afterUpdate(() => {
         results = evaluate($ship);
         $ship.points = results.points;
         $ship.cpv = results.cpv;
-        delta = $ship.mass - results.mass;
+        delta =
+            $ship.mass !== undefined ? $ship.mass - results.mass : undefined;
     });
 
     let modalClearShip: string;
@@ -32,11 +33,11 @@
     };
 </script>
 
-{#if $ship.hasOwnProperty("mass") && $ship.mass !== undefined}
-    <div class="status">
-        {#if results !== undefined}
-            <div class="level">
-                <div class="level-left">
+<div class="status">
+    {#if results !== undefined}
+        <div class="level">
+            <div class="level-left">
+                {#if $ship.mass !== undefined}
                     <div class="level-item">
                         <div>
                             <div class="container">
@@ -68,38 +69,38 @@
                             </div>
                         </div>
                     </div>
-                    <div class="level-item">
-                        <button
-                            class="button is-small is-light is-danger is-rounded"
-                            on:click="{() => (modalClearShip = 'is-active')}"
-                            >Clear Ship</button
-                        >
-                    </div>
-                    <div class="level-item">
-                        <a href="#anchorSSD" style="font-size: smaller"
-                            >Jump to SSD</a
-                        >
-                    </div>
-                    <div class="level-item">
-                        <a href="#anchorFleet" style="font-size: smaller"
-                            >Jump to Fleet</a
-                        >
-                    </div>
-                    <div class="level-item">
-                        <a href="#anchorBuilder" style="font-size: smaller"
-                            >Jump to Top</a
-                        >
-                    </div>
+                {/if}
+                <div class="level-item">
+                    <button
+                        class="button is-small is-light is-danger is-rounded"
+                        on:click="{() => (modalClearShip = 'is-active')}"
+                        >Clear Ship</button
+                    >
+                </div>
+                <div class="level-item">
+                    <a href="#anchorSSD" style="font-size: smaller"
+                        >Jump to SSD</a
+                    >
+                </div>
+                <div class="level-item">
+                    <a href="#anchorFleet" style="font-size: smaller"
+                        >Jump to Fleet</a
+                    >
+                </div>
+                <div class="level-item">
+                    <a href="#anchorBuilder" style="font-size: smaller"
+                        >Jump to Top</a
+                    >
                 </div>
             </div>
-            <div class="content">
-                {#each results.errors as e}
-                    <p>{formatEvalError(e)}</p>
-                {/each}
-            </div>
-        {/if}
-    </div>
-{/if}
+        </div>
+        <div class="content">
+            {#each results.errors as e}
+                <p>{formatEvalError(e)}</p>
+            {/each}
+        </div>
+    {/if}
+</div>
 
 <div class="modal {modalClearShip}" id="delShip">
     <div class="modal-background"></div>

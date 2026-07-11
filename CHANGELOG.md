@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.7.7] - 2026-07-11
+
+### Added
+
+-   **Auto** button beside the mass field sets ship mass to the correct value for all equipped systems, including thrust-scaled drives, FTL, screens, and other mass-dependent components.
+
+### Fixed
+
+-   Sticky status bar (mass indicators, validation errors, and jump-to links) now appears on a fresh ship before mass is entered; mass/NPV/CPV tags still appear only after mass is set.
+
 ## [v3.7.6] - 2026-07-09
 
 ### Changed

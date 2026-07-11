@@ -6,6 +6,7 @@
     import SysDisplay from "./SysDisplay.svelte";
     import MassPts from "./MassPts.svelte";
     import SaveShip from "./SaveShip.svelte";
+    import { computeAutoMass } from "@/lib/autoMass";
 
     const addArmour = () => {
         $ship.armour.push([1, 0]);
@@ -287,6 +288,12 @@
         }
     };
 
+    const autoMass = () => {
+        $ship.mass = computeAutoMass($ship);
+        setClass();
+        $ship = $ship;
+    };
+
     let showSystems = true;
     let showOrdnance = true;
     let showWeapons = true;
@@ -343,17 +350,27 @@
 
             <div class="field">
                 <label class="label" for="mass">Mass</label>
-                <div class="control">
-                    <input
-                        id="mass"
-                        class="input"
-                        type="number"
-                        placeholder="Mass"
-                        min="5"
-                        max="300"
-                        bind:value="{$ship.mass}"
-                        on:change="{setClass}"
-                    />
+                <div class="field has-addons">
+                    <div class="control is-expanded">
+                        <input
+                            id="mass"
+                            class="input"
+                            type="number"
+                            placeholder="Mass"
+                            min="5"
+                            max="300"
+                            bind:value="{$ship.mass}"
+                            on:change="{setClass}"
+                        />
+                    </div>
+                    <div class="control">
+                        <button
+                            class="button is-link"
+                            type="button"
+                            title="Set mass to fit all equipped systems, including thrust-scaled drives and similar"
+                            on:click="{autoMass}">Auto</button
+                        >
+                    </div>
                 </div>
                 {#if $ship.mass < 5}
                     <p class="help is-danger">The minimum mass is 5.</p>
