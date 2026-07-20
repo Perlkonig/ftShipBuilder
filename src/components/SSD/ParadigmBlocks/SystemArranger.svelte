@@ -155,7 +155,48 @@
                 ) {
                     const launchObj = systems.getSystem(sys, $ship);
                     const mag = $ship.systems.find(
-                        (x) => x.id === sys.magazine
+                        (x) => x.id === sys.magazine && x.name === "magazine"
+                    );
+                    if (mag !== undefined) {
+                        const magObj = systems.getSystem(mag, $ship);
+                        const xLaunch = layout.elements[launchObj.uid].x;
+                        const yLaunch = layout.elements[launchObj.uid].y;
+                        const wLaunch =
+                            launchObj.glyph().width * layout.blocks.cellsize;
+                        const hLaunch =
+                            launchObj.glyph().height * layout.blocks.cellsize;
+                        const x1 = xLaunch + wLaunch / 2;
+                        const y1 = yLaunch + hLaunch / 2;
+
+                        const xMag = layout.elements[magObj.uid].x;
+                        const yMag = layout.elements[magObj.uid].y;
+                        const wMag =
+                            magObj.glyph().width * layout.blocks.cellsize;
+                        const hMag =
+                            magObj.glyph().height * layout.blocks.cellsize;
+                        const x2 = xMag + wMag / 2;
+                        const y2 = yMag + hMag / 2;
+
+                        lines.push([
+                            { x: x1, y: y1 },
+                            { x: x2, y: y2 },
+                        ]);
+                    }
+                }
+            }
+        }
+
+        for (const sys of $ship.weapons) {
+            if (sys.name === "boardingTorpedoLauncher") {
+                if (
+                    sys.hasOwnProperty("magazine") &&
+                    sys.magazine !== undefined
+                ) {
+                    const launchObj = systems.getSystem(sys, $ship);
+                    const mag = $ship.systems.find(
+                        (x) =>
+                            x.id === sys.magazine &&
+                            x.name === "boardingTorpedoMagazine"
                     );
                     if (mag !== undefined) {
                         const magObj = systems.getSystem(mag, $ship);

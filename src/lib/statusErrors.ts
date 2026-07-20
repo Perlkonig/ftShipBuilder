@@ -40,6 +40,10 @@ export const errorMsgs: Map<EvalErrorCode, string> = new Map([
         "You have equipped more plasma bolt launchers than your ship's mass can accommodate.",
     ],
     [
+        EvalErrorCode.BadMagazinePairing,
+        "A launcher references a magazine that is missing or the wrong type.",
+    ],
+    [
         EvalErrorCode.FlawedUnderMass,
         "Flawed designs require a minimum mass of 60.",
     ],

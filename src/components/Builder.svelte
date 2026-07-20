@@ -119,6 +119,13 @@
                     capacity: 2,
                     id: nanoid(5),
                 });
+            } else if (shipSystem === "boardingTorpedoMagazine") {
+                // @ts-ignore
+                $ship.systems.push({
+                    name: "boardingTorpedoMagazine",
+                    capacity: 2,
+                    id: nanoid(5),
+                });
             } else if (shipSystem === "launchTube") {
                 $ship.systems.push({ name: "launchTube", catapult: false });
             } else if (shipSystem === "turret") {
@@ -208,6 +215,12 @@
             } else if (shipWeapon === "submunition") {
                 $ship.weapons.push({
                     name: "submunition",
+                    leftArc: "FP",
+                    numArcs: 3,
+                });
+            } else if (shipWeapon === "boardingTorpedoLauncher") {
+                $ship.weapons.push({
+                    name: "boardingTorpedoLauncher",
                     leftArc: "FP",
                     numArcs: 3,
                 });

@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.8.0] - 2026-07-19
+
+### Added
+
+-   **Boarding torpedo magazines** (`boardingTorpedoMagazine`) under General Systems — capacity and unique ID, no modifier variants.
+-   **Boarding torpedo launchers** (`boardingTorpedoLauncher`) under Weapons — arc selection and magazine picker tied to BT magazines only.
+-   Magazine pairing validation surfaced in the status bar (`BadMagazinePairing`): salvo launchers may only reference salvo magazines; BT launchers may only reference BT magazines.
+-   Linear SSD layout renders BT magazines and launchers (mirroring salvo magazine sections); freeform and block layouts draw connector lines between BT launchers and their magazines.
+
+### Changed
+
+-   Updated ftlibship to v4.0 (boarding torpedo systems and magazine pairing rules).
+
 ## [v3.7.7] - 2026-07-11
 
 ### Added

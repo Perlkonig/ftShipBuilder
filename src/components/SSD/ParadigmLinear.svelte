@@ -40,6 +40,7 @@
     const turrets: sysLib.Turret[] = [];
     const mines: sysLib.MineLayer[] = [];
     const magazines: sysLib.Magazine[] = [];
+    const btMagazines: sysLib.BoardingTorpedoMagazine[] = [];
     if (ship.flawed !== undefined && ship.flawed) {
         systems.push(new sysLib.Flawed({ name: "_flawed" }, ship));
     }
@@ -52,6 +53,8 @@
             turrets.push(obj as sysLib.Turret);
         } else if (obj.name === "magazine") {
             magazines.push(obj as sysLib.Magazine);
+        } else if (obj.name === "boardingTorpedoMagazine") {
+            btMagazines.push(obj as sysLib.BoardingTorpedoMagazine);
         } else if (obj.name === "mineLayer") {
             mines.push(obj as sysLib.MineLayer);
         } else {
@@ -73,10 +76,20 @@
 
     // Get a list of weapons
     const weapons: sysLib.System[] = [];
+    const btLaunchers: sysLib.BoardingTorpedoLauncher[] = [];
     for (const s of ship.weapons) {
         const obj = sysLib.getSystem(s, ship);
-        weapons.push(obj);
+        if (obj.name === "boardingTorpedoLauncher") {
+            btLaunchers.push(obj as sysLib.BoardingTorpedoLauncher);
+        } else {
+            weapons.push(obj);
+        }
     }
+
+    const magazineSystems: (
+        | sysLib.Magazine
+        | sysLib.BoardingTorpedoMagazine
+    )[] = [...magazines, ...btMagazines];
 
     let compact = false;
     let totalCols = hullCols;
@@ -123,18 +136,24 @@
         totalRows += ordRows * 2;
     }
     // Magazines
-    if (magazines.length > 0) {
-        for (const m of magazines) {
+    if (magazineSystems.length > 0) {
+        for (const m of magazineSystems) {
             // heading
             totalRows++;
-            // Find out how many launchers it feeds
-            const feeding: sysLib.SalvoLauncher[] = [];
-            for (const l of launchers) {
-                if (l.magazine === m.id) {
-                    feeding.push(l);
+            const feeding: sysLib.System[] = [];
+            if (m.name === "boardingTorpedoMagazine") {
+                for (const l of btLaunchers) {
+                    if (l.magazine === m.id) {
+                        feeding.push(l);
+                    }
+                }
+            } else {
+                for (const l of launchers) {
+                    if (l.magazine === m.id) {
+                        feeding.push(l);
+                    }
                 }
             }
-            // Add the number of launchers and the number of missiles to determine how many rows are needed
             const numEntries = feeding.length + m.capacity;
             const magRows = Math.ceil(numEntries / breakPoint);
             totalRows += magRows * 2;
@@ -196,9 +215,10 @@
         systems,
         turrets,
         mines,
-        magazines,
+        magazineSystems,
         ordnance,
         launchers,
+        btLaunchers,
         weapons,
     ]) {
         for (const sys of set) {
@@ -215,8 +235,13 @@
                 if (idx === -1) {
                     sysDistinct.push(glyph);
                 }
-            } else if (sys.name === "magazine") {
-                const glyph = (sys as sysLib.Magazine).missileGlyph();
+            } else if (
+                sys.name === "magazine" ||
+                sys.name === "boardingTorpedoMagazine"
+            ) {
+                const glyph = (
+                    sys as sysLib.Magazine | sysLib.BoardingTorpedoMagazine
+                ).missileGlyph();
                 const idx = sysDistinct.findIndex((x) => x.id === glyph.id);
                 if (idx === -1) {
                     sysDistinct.push(glyph);
@@ -378,15 +403,23 @@
     }
 
     // Magazines
-    if (magazines.length > 0) {
-        for (const mag of magazines) {
+    if (magazineSystems.length > 0) {
+        for (const mag of magazineSystems) {
             // name plate
             svgBody += `<rect x="0" y="${currRow * cellsize}" width="${pxWidth}" height="${cellsize}" stroke="none" fill="#c0c0c0"/><text x="${cellsize * 0.2}" y="${currRow * cellsize + cellsize / 2}" dominant-baseline="middle" font-size="${cellsize / 2}" class="futureFont">Magazine</text>`;
             currRow++;
-            const feeding: sysLib.SalvoLauncher[] = [];
-            for (const l of launchers) {
-                if (l.magazine === mag.id) {
-                    feeding.push(l);
+            const feeding: sysLib.System[] = [];
+            if (mag.name === "boardingTorpedoMagazine") {
+                for (const l of btLaunchers) {
+                    if (l.magazine === mag.id) {
+                        feeding.push(l);
+                    }
+                }
+            } else {
+                for (const l of launchers) {
+                    if (l.magazine === mag.id) {
+                        feeding.push(l);
+                    }
                 }
             }
             for (let i = 0; i < feeding.length; i++) {

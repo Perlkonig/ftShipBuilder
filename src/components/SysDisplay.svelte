@@ -105,6 +105,9 @@
             />
             <Capacity prop="{prop}" idx="{idx}" min="{2}" />
             <Id prop="{prop}" idx="{idx}" />
+        {:else if sys.name === "boardingTorpedoMagazine"}
+            <Capacity prop="{prop}" idx="{idx}" min="{2}" />
+            <Id prop="{prop}" idx="{idx}" />
         {:else if sys.name === "mkp"}
             <ArcSingle prop="{prop}" idx="{idx}" />
         {:else if sys.name === "rocketPod" || sys.name === "missile" || sys.name === "salvo" || sys.name === "salvoLauncher" || sys.name === "amt"}
@@ -126,8 +129,21 @@
                 arcBlacklist="{$ship.orientation === 'beta' ? [] : ['A']}"
             />
             {#if sys.name === "salvoLauncher"}
-                <Magazine prop="{prop}" idx="{idx}" />
+                <Magazine prop="{prop}" idx="{idx}" magazineType="magazine" />
             {/if}
+        {:else if sys.name === "boardingTorpedoLauncher"}
+            <Arcs
+                prop="{prop}"
+                idx="{idx}"
+                minArcs="{3}"
+                maxArcs="{3}"
+                arcBlacklist="{$ship.orientation === 'beta' ? [] : ['A']}"
+            />
+            <Magazine
+                prop="{prop}"
+                idx="{idx}"
+                magazineType="boardingTorpedoMagazine"
+            />
         {:else if sys.name === "ads"}
             <Arcs prop="{prop}" idx="{idx}" minArcs="{3}" maxArcs="{6}" />
         {:else if sys.name.startsWith("spinal") && sys.name !== "spinalNova" && sys.name !== "spinalWave"}

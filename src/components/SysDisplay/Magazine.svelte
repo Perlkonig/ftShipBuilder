@@ -17,16 +17,22 @@
 
     export let prop: string;
     export let idx: number;
+    export let magazineType: "magazine" | "boardingTorpedoMagazine" =
+        "magazine";
 
     let sys: ISystem;
     $: sys = $ship[prop][idx];
 
+    const labels: Record<typeof magazineType, string> = {
+        magazine: "salvo missile magazine",
+        boardingTorpedoMagazine: "boarding torpedo magazine",
+    };
+
     let allMags: IMag[] = [];
     afterUpdate(() => {
-        // Get list of available magazines
         allMags = [];
         for (const s of $ship.systems) {
-            if (s.name === "magazine") {
+            if (s.name === magazineType) {
                 allMags.push(s as IMag);
             }
         }
@@ -34,7 +40,9 @@
 </script>
 
 <div class="field">
-    <label class="label" for="magazine">Select an equipped magazine</label>
+    <label class="label" for="magazine"
+        >Select an equipped {labels[magazineType]}</label
+    >
     <div class="control">
         <div class="select" id="magazine">
             <select
