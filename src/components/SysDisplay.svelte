@@ -16,6 +16,7 @@
     import Magazine from "./SysDisplay/Magazine.svelte";
     import MassPts from "./SysDisplay/MassPts.svelte";
     import Modifier from "./SysDisplay/Modifier.svelte";
+    import Mode from "./SysDisplay/Mode.svelte";
     import Range from "./SysDisplay/Range.svelte";
     import Ratio from "./SysDisplay/Ratio.svelte";
     import Type from "./SysDisplay/Type.svelte";
@@ -168,6 +169,14 @@
         {:else if sys.name === "submunition"}
             <Arcs prop="{prop}" idx="{idx}" minArcs="{3}" maxArcs="{3}" />
         {:else if sys.name === "fusion"}
+            <Mode
+                prop="{prop}"
+                idx="{idx}"
+                choices="{[
+                    ['flare', 'Flare'],
+                    ['torpedo', 'Torpedo'],
+                ]}"
+            />
             <Arcs prop="{prop}" idx="{idx}" minArcs="{1}" maxArcs="{3}" />
         {:else if sys.name === "torpedoPulse"}
             <Modifier

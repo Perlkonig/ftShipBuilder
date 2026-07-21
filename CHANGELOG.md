@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   **Boarding torpedo launchers** (`boardingTorpedoLauncher`) under Weapons — arc selection and magazine picker tied to BT magazines only.
 -   Magazine pairing validation surfaced in the status bar (`BadMagazinePairing`): salvo launchers may only reference salvo magazines; BT launchers may only reference BT magazines.
 -   Linear SSD layout renders BT magazines and launchers (mirroring salvo magazine sections); freeform and block layouts draw connector lines between BT launchers and their magazines.
+-   Fusion arrays support **Flare** and **Torpedo** modes via the weapons editor, with a reset back to the standard (undefined) mode.
 
 ### Changed
 
