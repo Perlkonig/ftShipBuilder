@@ -208,6 +208,8 @@
         {:else if sys.name === "hangar"}
             <Id prop="{prop}" idx="{idx}" />
             <Hangar prop="{prop}" idx="{idx}" />
+        {:else if sys.name === "gunboatRack"}
+            <Id prop="{prop}" idx="{idx}" />
         {:else if sys.name === "launchTube"}
             <Boolean
                 prop="{prop}"

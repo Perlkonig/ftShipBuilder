@@ -1,8 +1,3 @@
-/// <reference types="svelte" />
-/// <reference types="vite/client" />
-
-declare const __APP_VERSION__: string;
-
 declare module "ftlibship/preset-fleets.json" {
     import type { FullThrustShip } from "ftlibship";
     interface PresetFleet {

@@ -67,10 +67,6 @@
                 </p>
                 <ul>
                     <li>
-                        Gunboats are not supported at all, and I don't know they
-                        ever will be.
-                    </li>
-                    <li>
                         Turrets are implemented, but the rules are not clear, so
                         I had to make some calls. You can have multiple arcs
                         open on a turret, but they must be contiguous. Weapons

@@ -4,6 +4,7 @@
     import { systems } from "ftlibship";
     import type { FullThrustShip } from "ftlibship";
     import SysDisplay from "./SysDisplay.svelte";
+    import GunboatSquadron from "./SysDisplay/GunboatSquadron.svelte";
     import MassPts from "./MassPts.svelte";
     import SaveShip from "./SaveShip.svelte";
     import { computeAutoMass } from "@/lib/autoMass";
@@ -111,6 +112,11 @@
                     id: nanoid(5),
                     isRack: false,
                     critRules: false,
+                });
+            } else if (shipSystem === "gunboatRack") {
+                $ship.systems.push({
+                    name: "gunboatRack",
+                    id: nanoid(5),
                 });
             } else if (shipSystem === "magazine") {
                 // @ts-ignore
@@ -249,6 +255,25 @@
         $ship = $ship;
     };
 
+    const defaultGunboatBoats = () =>
+        Array.from({ length: 6 }, () => ({ type: "beam" as const }));
+
+    const addGunboatSquadron = () => {
+        if ($ship.gunboatSquadrons === undefined) {
+            $ship.gunboatSquadrons = [];
+        }
+        $ship.gunboatSquadrons.push({ boats: defaultGunboatBoats() });
+        $ship = $ship;
+    };
+
+    const removeGunboatSquadron = (idx: number) => {
+        $ship.gunboatSquadrons?.splice(idx, 1);
+        if ($ship.gunboatSquadrons?.length === 0) {
+            delete $ship.gunboatSquadrons;
+        }
+        $ship = $ship;
+    };
+
     let emptyHangars: number;
     let duplicateHangars = false;
     $: {
@@ -265,6 +290,32 @@
         } else {
             duplicateHangars = false;
         }
+    }
+
+    let numRacks = 0;
+    let numGunboatSquadrons = 0;
+    let emptyRacks = 0;
+    let duplicateRacks = false;
+    let showGunboatsSection = false;
+    $: {
+        numRacks = $ship.systems.reduce(
+            (a, v) => (v.name === "gunboatRack" ? a + 1 : a),
+            0
+        );
+        numGunboatSquadrons = $ship.gunboatSquadrons?.length ?? 0;
+        const linkedRacks = ($ship.gunboatSquadrons ?? []).filter(
+            (s) => s.rack !== undefined
+        ).length;
+        emptyRacks = numRacks - linkedRacks;
+        const rackIds = ($ship.gunboatSquadrons ?? [])
+            .map((s) => s.rack)
+            .filter((r): r is string => r !== undefined);
+        duplicateRacks = new Set(rackIds).size !== rackIds.length;
+        const hasFtlSquadron = ($ship.gunboatSquadrons ?? []).some((s) =>
+            s.mods?.includes("ftl")
+        );
+        showGunboatsSection =
+            numRacks > 0 || numGunboatSquadrons > 0 || hasFtlSquadron;
     }
 
     const setClass = () => {
@@ -311,6 +362,7 @@
     let showOrdnance = true;
     let showWeapons = true;
     let showFighters = true;
+    let showGunboats = true;
     const toggle = (flag: string) => {
         switch (flag) {
             case "systems":
@@ -324,6 +376,9 @@
                 break;
             case "fighters":
                 showFighters = !showFighters;
+                break;
+            case "gunboats":
+                showGunboats = !showGunboats;
                 break;
         }
     };
@@ -966,6 +1021,68 @@
                     <section class="container">
                         {#each $ship.fighters as sys, i}
                             <SysDisplay prop="fighters" idx="{i}" />
+                        {/each}
+                    </section>
+                {/if}
+            </section>
+        {/if}
+
+        {#if showGunboatsSection}
+            <section class="section">
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <span
+                                class="icon"
+                                on:click="{() => toggle('gunboats')}"
+                            >
+                                {#if showGunboats}
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                {:else}
+                                    <i class="fa-solid fa-chevron-right"></i>
+                                {/if}
+                            </span>
+                        </div>
+                        <div class="level-item">
+                            <h2 class="subtitle">Gunboats</h2>
+                        </div>
+                    </div>
+                </div>
+
+                {#if showGunboats}
+                    <div class="content">
+                        {#if emptyRacks > 0}
+                            <p class="help is-info">
+                                You have {emptyRacks} gunboat rack{emptyRacks !=
+                                1
+                                    ? "s"
+                                    : ""} without an assigned squadron. Empty
+                                racks are valid; add a squadron when you are
+                                ready to equip them.
+                            </p>
+                        {/if}
+                        {#if duplicateRacks}
+                            <p class="alert">
+                                You have multiple squadrons assigned to the same
+                                rack.
+                            </p>
+                        {/if}
+                        <div class="field is-grouped">
+                            <p class="control">
+                                <button
+                                    class="button is-primary"
+                                    on:click="{addGunboatSquadron}"
+                                    >Add gunboat squadron</button
+                                >
+                            </p>
+                        </div>
+                    </div>
+                    <section class="gunboat-squadrons">
+                        {#each $ship.gunboatSquadrons ?? [] as _, i}
+                            <GunboatSquadron
+                                idx="{i}"
+                                onRemove="{() => removeGunboatSquadron(i)}"
+                            />
                         {/each}
                     </section>
                 {/if}

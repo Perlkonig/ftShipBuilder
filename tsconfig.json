@@ -26,7 +26,8 @@
         "src/**/*.ts",
         "src/**/*.js",
         "src/**/*.svelte",
-        "tests/**/*.test.ts"
+        "tests/**/*.test.ts",
+        "tests/**/*.d.ts"
     ],
     "references": [{ "path": "./tsconfig.node.json" }]
 }

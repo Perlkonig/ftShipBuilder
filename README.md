@@ -6,7 +6,6 @@ If you want to host it yourself, download the latest ZIP file from the Releases 
 
 This builder follows [the _Continuum_ ruleset](https://emeraldcoastskunkworks.wordpress.com/category/project-continum-rules/). But the rules are not wholly unambiguous. Some tweaks have been made.
 
--   Gunboats are not supported at all, and I don't know they ever will be.
 -   Turrets are implemented, but the rules are not clear, so I had to make some calls. You can have multiple arcs open on a turret, but they must be contiguous. Weapons have to be manually placed inside the turret graphic. Lines are drawn to help you.
 
 This site is built on the [Svelte framework](https://svelte.dev/), using the [Bulma CSS library](https://bulma.io/) and good ol' [scalable vector graphics (SVG)](https://www.w3.org/Graphics/SVG/) for the SSD.

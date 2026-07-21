@@ -51,6 +51,38 @@ export const errorMsgs: Map<EvalErrorCode, string> = new Map([
         EvalErrorCode.UnknownSystem,
         "The ship JSON contains one or more unrecognized system names. Remove or replace them in the builder.",
     ],
+    [
+        EvalErrorCode.OverFighters,
+        "You have more fighter wings than hangar bays.",
+    ],
+    [
+        EvalErrorCode.UnknownFighterHangar,
+        "A fighter wing references a hangar id that does not exist on this ship.",
+    ],
+    [
+        EvalErrorCode.DuplicateFighterHangar,
+        "More than one fighter wing is assigned to the same hangar.",
+    ],
+    [
+        EvalErrorCode.OverGunboats,
+        "A gunboat squadron has more than six boats.",
+    ],
+    [
+        EvalErrorCode.FtlOnRack,
+        "FTL gunboat squadrons cannot be assigned to a gunboat rack.",
+    ],
+    [
+        EvalErrorCode.GunboatSquadronNoRack,
+        "Each non-FTL gunboat squadron must be assigned to a gunboat rack.",
+    ],
+    [
+        EvalErrorCode.UnknownGunboatRack,
+        "A gunboat squadron references a rack id that does not exist on this ship.",
+    ],
+    [
+        EvalErrorCode.DuplicateGunboatRack,
+        "More than one gunboat squadron is assigned to the same rack.",
+    ],
 ]);
 
 export const formatEvalError = (code: EvalErrorCode): string =>

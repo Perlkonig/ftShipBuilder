@@ -61,6 +61,7 @@ export const starterShip: FullThrustShip = {
     ordnance: [],
     extras: {},
     fighters: [],
+    gunboatSquadrons: [],
     layout: {} as ILayout,
 };
 

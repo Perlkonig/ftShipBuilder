@@ -1,6 +1,6 @@
 import { readable } from "svelte/store";
 import type { FullThrustShip } from "ftlibship";
-import library from "./presets.json";
+import library from "ftlibship/preset-fleets.json";
 
 export interface IPresetFleet {
     name: string;

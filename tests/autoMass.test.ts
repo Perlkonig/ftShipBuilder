@@ -1,19 +1,10 @@
 import { expect } from "chai";
 import "mocha";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { evaluate } from "ftlibship";
 import { computeAutoMass } from "../src/lib/autoMass.js";
 import { starterShip } from "../src/stores/writeShip.js";
-
-const library = JSON.parse(
-    readFileSync(
-        join(dirname(fileURLToPath(import.meta.url)), "../src/stores/presets.json"),
-        "utf-8"
-    )
-);
+import library from "./loadPresetFleets.js";
 
 describe("computeAutoMass", () => {
     it("matches preset ship mass values", () => {

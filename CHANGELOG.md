@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v4.0.0] - 2026-07-21
+
+### Added
+
+-   **Gunboat racks** (`gunboatRack`) under General Systems with unique rack ids.
+-   **Gunboat squadrons** editor: six boats per squadron (mixed types), squadron protection, ECM, rack assignment, and FTL-independent squadrons.
+-   Preset fleets loaded from **ftlibship** `preset-fleets.json` (canonical source).
+
+### Changed
+
+-   **Breaking change**: Updated ftlibship to v5.0.0 (gunboats, fighter wing points in `evaluate()`, empty gunboat racks allowed). Point totals calculated before this version were not correct.
+
 ## [v3.8.0] - 2026-07-19
 
 ### Added
