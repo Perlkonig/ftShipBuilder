@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
--   Updated ftlibship to v4.0 (boarding torpedo systems and magazine pairing rules).
+-   Updated ftlibship to v4.0.0 (boarding torpedo systems, fusion modes, and magazine pairing rules).
 
 ## [v3.7.7] - 2026-07-11
 
