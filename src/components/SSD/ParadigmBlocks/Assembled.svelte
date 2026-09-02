@@ -164,7 +164,7 @@
                 height="{layout.blocks.blockHull.height}"
             ></use>
             <use
-                href="#coreSys"
+                href="#{svgCore.id}"
                 x="{layout.blocks.blockCore.minx + coreWidthOffset}"
                 y="{layout.blocks.blockCore.miny + coreHeightOffset}"
                 width="{layout.blocks.blockCore.width * (1 - coreOffsetFactor)}"
